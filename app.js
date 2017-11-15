@@ -14,11 +14,11 @@ var con = require("./SQLConfig.js");
 const pool = new sql.ConnectionPool(con.config);
 //store the connection
 sql.globalPool = pool;
-
 var app = express();
 
 // all environments
 app.set("port", 2525);
+
 app.set("views", path.join(__dirname, "public/dist"));
 app.set("view engine", "ejs");
 app.engine("html", require("ejs").renderFile);
