@@ -33,7 +33,7 @@ BEGIN
        IF(@userID IS NULL)
            SELECT 'Authentication failed. Wrong password.' AS Error
        ELSE 
-           SELECT UserID, UserName FROM dbo.Users WHERE UserID = @userID
+           SELECT UserID, UserName,hashPassword, Salt FROM dbo.Users WHERE UserID = @userID
 END
 ELSE
     SELECT 'Authentication failed. User not found.' AS Error

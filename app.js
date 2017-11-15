@@ -42,7 +42,6 @@ app.use(express.static(path.join(__dirname, "public/dist")));
 //if ('development' == app.get('env')) {
 //    app.use(express.errorHandler());
 //}
-app.set("superSecret", "ilovescotchyscotch");
 
 var index = require("./routes/index.js");
 var login = require("./routes/login.js");
