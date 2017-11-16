@@ -6,7 +6,7 @@ export const ROUTES: RouteInfo[] = [
         path: '/full-layout', title: 'Full Layout', icon: 'ft-layout', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: []
     },
     {
-        path: '/content-layout', title: 'Content Layout', icon: 'ft-square', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: []
+        path: '/full-layout/users', title: 'Users', icon: 'ft-square', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: []
     },
     {
         path: '/content-layout/login', title: 'Login', icon: 'ft-square', class: '', badge: '', badgeClass: '', isExternalLink: false, submenu: []

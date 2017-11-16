@@ -2,12 +2,12 @@
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
-import { SharedModule } from "./shared/shared.module";
+import { SharedModule } from './shared/shared.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppComponent } from './app.component';
-import { ContentLayoutComponent } from "./layouts/content/content-layout.component";
-import { FullLayoutComponent } from "./layouts/full/full-layout.component";
+import { ContentLayoutComponent } from './layouts/content/content-layout.component';
+import { FullLayoutComponent } from './layouts/full/full-layout.component';
 
 // import { ChangeLogComponent } from './changelog/changelog.component';
 // import { FullLayoutPageComponent } from './pages/full-layout-page/full-layout-page.component';

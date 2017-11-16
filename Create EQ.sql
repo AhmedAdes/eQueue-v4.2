@@ -21,7 +21,7 @@ CREATE TABLE Company
 	[Description] NVARCHAR(max),
 	WorkField NVARCHAR(100),
 	DefaultLanguage NVARCHAR(20),
-	[Disabled] BIT,	-- for ADMIN Use Only
+	[Disabled] BIT DEFAULT 0,	-- for ADMIN Use Only
 	CONSTRAINT PK_Company PRIMARY KEY CLUSTERED (CompID)
 )
 CREATE TABLE Branch
@@ -36,7 +36,7 @@ CREATE TABLE Branch
 	Mobile NVARCHAR(50),
 	Email NVARCHAR(200), 
 	Fax NVARCHAR(200), 
-	[Disabled] BIT, -- For CompanyAdmin Use
+	[Disabled] BIT DEFAULT 0, -- For CompanyAdmin Use
 	CONSTRAINT PK_Branch PRIMARY KEY CLUSTERED (BranchID)
 )
 CREATE TABLE CompDept
@@ -47,7 +47,7 @@ CREATE TABLE CompDept
 	RangeFrom INT,
 	RangeTo INT,
 	Letter NCHAR(1),
-	[Disabled] BIT, -- For CompanyAdmin Use	
+	[Disabled] BIT DEFAULT 0, -- For CompanyAdmin Use	
 	CONSTRAINT PK_CompDept PRIMARY KEY CLUSTERED (DeptID)
 )
 CREATE TABLE BranchDepts
@@ -61,7 +61,7 @@ CREATE TABLE DeptServices
 	ServID INT IDENTITY(1,1) NOT NULL,
 	DeptID INT,
 	ServName NVARCHAR(300),
-	[Disabled] BIT, -- For CompanyAdmin Use	
+	[Disabled] BIT DEFAULT 0, -- For CompanyAdmin Use	
 	CONSTRAINT PK_DeptServices PRIMARY KEY CLUSTERED (ServID)
 )
 CREATE TABLE Users 
@@ -70,7 +70,7 @@ CREATE TABLE Users
 	CompID INT,
 	UserName NVARCHAR(200),
 	LoginName NVARCHAR(200),
-	UserPassword NVARCHAR(200),
+	hashPass BINARY(64),
 	UserRole NVARCHAR(50), --(Admin//Anonymous//CompanyAdmin//SuperUser//User)
 	EntityType NVARCHAR(50), --( Company // Consumer)
 	ManagerID INT, -- (Self Reference)
@@ -78,10 +78,11 @@ CREATE TABLE Users
 	Phone NVARCHAR(50),
 	Mobile NVARCHAR(50),
 	Email NVARCHAR(200), 
-	AccessFailedCount INT, --for stopping the login process 
+	AccessFailedCount INT DEFAULT 0, --for stopping the login process 
 	Title NVARCHAR(5), --(Mr.//Mrs.//Ms.)
 	BranchID INT,
-	[Disabled] BIT, -- For CompanyAdmin Use	
+	Salt UNIQUEIDENTIFIER ,
+	[Disabled] BIT DEFAULT 0, -- For CompanyAdmin Use	
 	CONSTRAINT PK_Users PRIMARY KEY CLUSTERED (UserID)
 )
 CREATE TABLE UserDepts
@@ -182,3 +183,32 @@ ALTER TABLE dbo.ArchiveQueueDetails ADD CONSTRAINT FK_ArchQueueDetails_MainQueue
 ALTER TABLE dbo.ArchiveQueueDetails ADD CONSTRAINT FK_ArchQueueDetails_DeptServices FOREIGN KEY (ServID) REFERENCES dbo.DeptServices(ServID)
 GO
 
+
+ALTER	 PROC AuthenticateUser
+@LoginName NVARCHAR(50), @UserPass NVARCHAR(50) AS
+IF EXISTS (SELECT TOP 1 UserID FROM dbo.Users WHERE LoginName=@LoginName)
+BEGIN
+	DECLARE @userID INT
+	SET @userID=(SELECT UserID FROM dbo.Users WHERE LoginName=@LoginName 
+	AND hashPass=HASHBYTES('SHA2_512', @UserPass+CAST(Salt AS NVARCHAR(36))))
+
+       IF(@userID IS NULL)
+           SELECT 'Authentication failed. Wrong password.' AS Error
+       ELSE 
+           SELECT UserID, UserName, CompID, BranchID, UserRole, EntityType, Salt FROM dbo.Users WHERE UserID = @userID
+END
+ELSE
+    SELECT 'Authentication failed. User not found.' AS Error
+GO
+
+CREATE PROC RegisterUser
+@CompID INT, @BranchID INT, @UserName NVARCHAR(200), @LoginName NVARCHAR(200), @UserPass NVARCHAR(50), @UserRole NVARCHAR(50), @EntityType NVARCHAR(50),
+@ManagerID INT, @Phone NVARCHAR(50),@Mobile NVARCHAR(50),@Email NVARCHAR(200), @Title NVARCHAR(5)
+AS
+DECLARE @Salt UNIQUEIDENTIFIER = NEWID()
+INSERT dbo.Users
+        ( CompID ,BranchID ,UserName ,LoginName ,UserRole ,EntityType ,ManagerID ,Phone ,Mobile ,Email ,Title, 
+		hashPass, Salt )
+VALUES  ( @CompID, @BranchID, @UserName, @LoginName, @UserRole, @EntityType,  @ManagerID, @Phone, @Mobile, @Email, @Title, 
+		HASHBYTES('SHA2_512', @UserPass+CAST(@Salt AS NVARCHAR(36))), @Salt )
+GO

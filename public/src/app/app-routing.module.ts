@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
 
-import { FullLayoutComponent } from "./layouts/full/full-layout.component";
-import { ContentLayoutComponent } from "./layouts/content/content-layout.component";
-import { Full_ROUTES } from "./shared/routes/full-layout.routes";
-import { CONTENT_ROUTES } from "./shared/routes/content-layout.routes";
+import { FullLayoutComponent } from './layouts/full/full-layout.component';
+import { ContentLayoutComponent } from './layouts/content/content-layout.component';
+import { Full_ROUTES } from './shared/routes/full-layout.routes';
+import { CONTENT_ROUTES } from './shared/routes/content-layout.routes';
 
 const appRoutes: Routes = [
   {
     path: '',
-    redirectTo: 'full-layout',
+    redirectTo: 'content-layout/login',
     pathMatch: 'full',
   },
   { path: '', component: FullLayoutComponent, data: { title: 'full Views' }, children: Full_ROUTES },

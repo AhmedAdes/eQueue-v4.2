@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router, ActivatedRoute } from "@angular/router";
+import { Router, ActivatedRoute } from '@angular/router';
+import { AuthenticationService } from '../../services'
 
 @Component({
     selector: 'app-login-page',
@@ -11,13 +12,25 @@ import { Router, ActivatedRoute } from "@angular/router";
 export class LoginPageComponent {
 
     @ViewChild('f') loginForm: NgForm;
+    error = '';
 
     constructor(private router: Router,
-        private route: ActivatedRoute) { }
+        private route: ActivatedRoute, private srvAuth: AuthenticationService) { }
 
-    // On submit button click    
+    // On submit button click
     onSubmit() {
-        this.loginForm.reset();
+        const newuser = {
+            LoginName: this.loginForm.controls['inputEmail'].value,
+            UserPass: this.loginForm.controls['inputPass'].value
+        };
+        this.srvAuth.login(newuser).subscribe(result => {
+            if (result.login === true) {
+                this.router.navigate(['full-layout']);
+            } else {
+                this.error = result.error;
+            }
+        })
+        // this.loginForm.reset();
     }
     // On Forgot password link click
     onForgotPassword() {
