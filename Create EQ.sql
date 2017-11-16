@@ -69,7 +69,6 @@ CREATE TABLE Users
 	UserID INT IDENTITY(1,1) NOT NULL,
 	CompID INT,
 	UserName NVARCHAR(200),
-	LoginName NVARCHAR(200),
 	hashPass BINARY(64),
 	UserRole NVARCHAR(50), --(Admin//Anonymous//CompanyAdmin//SuperUser//User)
 	EntityType NVARCHAR(50), --( Company // Consumer)
@@ -77,7 +76,7 @@ CREATE TABLE Users
 	CreateDate DATETIME2,
 	Phone NVARCHAR(50),
 	Mobile NVARCHAR(50),
-	Email NVARCHAR(200), 
+	Email NVARCHAR(200) NOT NULL UNIQUE, 
 	AccessFailedCount INT DEFAULT 0, --for stopping the login process 
 	Title NVARCHAR(5), --(Mr.//Mrs.//Ms.)
 	BranchID INT,
@@ -184,12 +183,12 @@ ALTER TABLE dbo.ArchiveQueueDetails ADD CONSTRAINT FK_ArchQueueDetails_DeptServi
 GO
 
 
-ALTER	 PROC AuthenticateUser
+CREATE PROC AuthenticateUser
 @LoginName NVARCHAR(50), @UserPass NVARCHAR(50) AS
-IF EXISTS (SELECT TOP 1 UserID FROM dbo.Users WHERE LoginName=@LoginName)
+IF EXISTS (SELECT TOP 1 UserID FROM dbo.Users WHERE Email=@LoginName)
 BEGIN
 	DECLARE @userID INT
-	SET @userID=(SELECT UserID FROM dbo.Users WHERE LoginName=@LoginName 
+	SET @userID=(SELECT UserID FROM dbo.Users WHERE Email=@LoginName 
 	AND hashPass=HASHBYTES('SHA2_512', @UserPass+CAST(Salt AS NVARCHAR(36))))
 
        IF(@userID IS NULL)
@@ -202,13 +201,13 @@ ELSE
 GO
 
 CREATE PROC RegisterUser
-@CompID INT, @BranchID INT, @UserName NVARCHAR(200), @LoginName NVARCHAR(200), @UserPass NVARCHAR(50), @UserRole NVARCHAR(50), @EntityType NVARCHAR(50),
+@CompID INT, @BranchID INT, @UserName NVARCHAR(200), @UserPass NVARCHAR(50), @UserRole NVARCHAR(50), @EntityType NVARCHAR(50),
 @ManagerID INT, @Phone NVARCHAR(50),@Mobile NVARCHAR(50),@Email NVARCHAR(200), @Title NVARCHAR(5)
 AS
 DECLARE @Salt UNIQUEIDENTIFIER = NEWID()
 INSERT dbo.Users
-        ( CompID ,BranchID ,UserName ,LoginName ,UserRole ,EntityType ,ManagerID ,Phone ,Mobile ,Email ,Title, 
+        ( CompID ,BranchID ,UserName ,UserRole ,EntityType ,ManagerID ,Phone ,Mobile ,Email ,Title, 
 		hashPass, Salt )
-VALUES  ( @CompID, @BranchID, @UserName, @LoginName, @UserRole, @EntityType,  @ManagerID, @Phone, @Mobile, @Email, @Title, 
+VALUES  ( @CompID, @BranchID, @UserName, @UserRole, @EntityType,  @ManagerID, @Phone, @Mobile, @Email, @Title, 
 		HASHBYTES('SHA2_512', @UserPass+CAST(@Salt AS NVARCHAR(36))), @Salt )
 GO
