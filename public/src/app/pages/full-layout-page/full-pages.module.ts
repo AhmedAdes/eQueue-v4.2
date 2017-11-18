@@ -9,6 +9,9 @@ import { FullLayoutPageComponent } from './full-layout-page.component';
 import { UsersComponent } from '../users/users.component';
 import { UserService } from '../../services'
 import { AuthenticationService } from '../../services'
+import { CompanyComponent } from '../company/company.component';
+import { FormsModule ,ReactiveFormsModule } from '@angular/forms';
+import { MaterialModule } from 'app/material.module';
 
 const Services = [AuthenticationService, UserService]
 
@@ -16,11 +19,15 @@ const Services = [AuthenticationService, UserService]
     imports: [
         CommonModule,
         FullPagesRoutingModule,
-        Ng2SmartTableModule
+        Ng2SmartTableModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule
     ],
     declarations: [
         FullLayoutPageComponent,
-        UsersComponent
+        UsersComponent,
+        CompanyComponent
     ],
     providers: [
         ...Services
