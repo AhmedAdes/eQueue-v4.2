@@ -7,7 +7,7 @@ export const Full_ROUTES: Routes = [
     loadChildren: './changelog/changelog.module#ChangeLogModule'
   },
   {
-    path: 'full-layout',
+    path: 'home',
     loadChildren: './pages/full-layout-page/full-pages.module#FullPagesModule'
   }
 ];

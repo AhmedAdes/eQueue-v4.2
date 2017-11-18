@@ -48,7 +48,8 @@ export class AuthenticationService {
                     }
                     this.currentUser = {
                         uID: arrRet.user[0].UserID, uName: arrRet.user[0].UserName, uRl: this.getRole(arrRet.user[0].UserRole),
-                        tkn: token, slt: arrRet.user[0].Salt, photo: photo, cID: arrRet.user[0].CompID, bID: arrRet.user[0].BranchID
+                        etyp: arrRet.user[0].EntityType, tkn: token, slt: arrRet.user[0].Salt, photo: photo, 
+                        cID: arrRet.user[0].CompID, bID: arrRet.user[0].BranchID
                     }
 
                     // store username and jwt token in local storage to keep user logged in between page refreshes

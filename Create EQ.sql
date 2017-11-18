@@ -71,7 +71,7 @@ CREATE TABLE Users
 	UserName NVARCHAR(200),
 	hashPass BINARY(64),
 	UserRole NVARCHAR(50), --(Admin//Anonymous//CompanyAdmin//SuperUser//User)
-	EntityType NVARCHAR(50), --( Company // Consumer)
+	EntityType TINYINT, --( Company // Consumer)
 	ManagerID INT, -- (Self Reference)
 	CreateDate DATETIME2,
 	Phone NVARCHAR(50),
@@ -201,7 +201,7 @@ ELSE
 GO
 
 CREATE PROC RegisterUser
-@CompID INT, @BranchID INT, @UserName NVARCHAR(200), @UserPass NVARCHAR(50), @UserRole NVARCHAR(50), @EntityType NVARCHAR(50),
+@CompID INT, @BranchID INT, @UserName NVARCHAR(200), @UserPass NVARCHAR(50), @UserRole NVARCHAR(50), @EntityType TINYINT,
 @ManagerID INT, @Phone NVARCHAR(50),@Mobile NVARCHAR(50),@Email NVARCHAR(200), @Title NVARCHAR(5)
 AS
 DECLARE @Salt UNIQUEIDENTIFIER = NEWID()

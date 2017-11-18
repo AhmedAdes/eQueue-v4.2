@@ -7,8 +7,10 @@ import { FullPagesRoutingModule } from './full-pages-routing.module';
 import { FullLayoutPageComponent } from './full-layout-page.component';
 
 import { UsersComponent } from '../users/users.component';
-import { UserService } from '../../services'
-import { AuthenticationService } from '../../services'
+import { DashboardComponent } from '../dashboard/dashboard.component';
+import { IssueTicketComponent, HistoryComponent, ActiveTicketComponent } from '../customer';
+
+import { AuthenticationService, UserService } from '../../services'
 
 const Services = [AuthenticationService, UserService]
 
@@ -20,7 +22,11 @@ const Services = [AuthenticationService, UserService]
     ],
     declarations: [
         FullLayoutPageComponent,
-        UsersComponent
+        DashboardComponent,
+        UsersComponent,
+        IssueTicketComponent,
+        HistoryComponent,
+        ActiveTicketComponent,
     ],
     providers: [
         ...Services

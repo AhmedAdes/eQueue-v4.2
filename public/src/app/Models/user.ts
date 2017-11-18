@@ -26,6 +26,7 @@ export class CurrentUser {
     uID: number;
     uName: string;
     uRl: number;
+    etyp: number;
     tkn: string;
     slt: string;
     photo: string;

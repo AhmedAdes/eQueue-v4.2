@@ -46,10 +46,12 @@ app.use(express.static(path.join(__dirname, "public/dist")));
 var index = require("./routes/index.js");
 var login = require("./routes/login.js");
 var user = require("./routes/users.js");
+var comp = require("./routes/company.js");
 
 app.use("/", index);
 app.use("/api/auth", login);
 app.use("/api/users", user);
+app.use("/api/comp", comp);
 
 pool.connect(err => {
   if (err) {

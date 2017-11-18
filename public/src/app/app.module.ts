@@ -22,7 +22,7 @@ import * as $ from 'jquery';
     declarations: [
         AppComponent,
         FullLayoutComponent,
-        ContentLayoutComponent,
+        ContentLayoutComponent
         // ChangeLogComponent,
         // FullLayoutPageComponent,
         // ContentLayoutPageComponent
