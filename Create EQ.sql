@@ -200,6 +200,19 @@ ELSE
     SELECT 'Authentication failed. User not found.' AS Error
 GO
 
+
+DECLARE @Salt UNIQUEIDENTIFIER = NEWID()
+INSERT dbo.Users
+        ( UserName ,Email ,hashPass ,Salt ,UserRole )
+VALUES  ( N'Admin' , -- UserName - nvarchar(200)
+          N'admin@admin.com' , -- LoginName - nvarchar(50)
+          HASHBYTES('SHA2_512', N'123456' + CAST(@Salt AS NVARCHAR(36))) , -- hashPassword - binary
+          @Salt  -- Salt - uniqueidentifier
+		  ,'SysAdmin'
+        )	
+GO
+
+
 CREATE PROC RegisterUser
 @CompID INT, @BranchID INT, @UserName NVARCHAR(200), @UserPass NVARCHAR(50), @UserRole NVARCHAR(50), @EntityType TINYINT,
 @ManagerID INT, @Phone NVARCHAR(50),@Mobile NVARCHAR(50),@Email NVARCHAR(200), @Title NVARCHAR(5)

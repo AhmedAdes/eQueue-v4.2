@@ -9,3 +9,22 @@ export const UserRoles = [
     { class: 3, name: 'User' },
     { class: 99, name: 'Anonymous' }
 ]
+
+export const CompanyTypes = [
+    "Client",
+    "Provider"
+]
+
+export const WorkFields = [
+    "Freight Forwarding",
+    "Customs",
+    "Industrial",
+    "Shipping"
+]
+
+export const Languages = [
+    {name:"Arabic" ,abbv:"ar-EG"},
+    {name:"English" ,abbv:"en-UK"},
+    {name:"French" ,abbv:"fr-FR"}
+]
+

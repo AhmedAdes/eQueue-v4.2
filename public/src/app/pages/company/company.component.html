@@ -1,0 +1,198 @@
+<!-- Basic form layout section start -->
+<section id="horizontal-form-layouts">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="content-header">Company Details</div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title" id="horz-layout-basic">First Step : Adding Company INFO</h4>
+          <p class="mb-0">Welcome to eQueueing System , here we go with the first step by completeing all company neccessary data </p>
+        </div>
+        <div class="card-body">
+          <div class="px-3">
+            <form [formGroup]="compForm" class="form form-horizontal">
+              <div class="form-body">
+                <h4 class="form-section">
+                  <i class="ft-box"></i> Main Info</h4>
+
+                <div class="form-group row">
+
+                  <label class="col-md-2 label-control" for="compName">Company Name: </label>
+                  <div class="col-md-9">
+                    <div class="position-relative has-icon-left">
+                      <input formControlName="compName" id="compName" class="form-control">
+                      <div class="form-control-position">
+                        <i class="ft-edit-2"></i>
+                      </div>
+                    </div>
+                    <div class="form-text text-muted danger" *ngIf="compName.touched && compName.invalid">Company Name is required.</div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-md-2 label-control" for="country">Country : </label>
+                  <div class="col-md-4">
+
+                    <div class="position-relative has-icon-left">
+                      <select formControlName="country" id="country" class="form-control">
+                        <option *ngFor="let country of countries" [value]="country.name">{{country.name}}</option>
+                      </select>
+                      <div class="form-control-position">
+                        <i class="ft-globe"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <label class="col-md-1 label-control" for="city">City : </label>
+                  <div class="col-md-4">
+
+                    <div class="position-relative has-icon-left">
+                      <select formControlName="city" id="city" class="form-control">
+                        <option *ngFor="let country of countries" [value]="country.name">{{country.name}}</option>
+                      </select>
+                      <div class="form-control-position">
+                        <i class="icon-home"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-md-2 label-control" for="defaultlanguage">Language : </label>
+                  <div class="col-md-9">
+
+                    <div class="position-relative has-icon-left">
+                      <select formControlName="defaultlanguage" id="defaultlanguage" class="form-control">
+                        <option *ngFor="let language of languages" [value]="language.abbv">{{language.name}}</option>
+                      </select>
+                      <div class="form-control-position">
+                        <i class="ft-volume-2"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-md-2 label-control" for="workfield">Work Field : </label>
+                  <div class="col-md-9">
+                    <select formControlName="workfield" id="workfield" class="form-control">
+                      <option *ngFor="let field of workfields" [value]="field">{{field}}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-md-2 label-control">Company Logo: </label>
+                  <div class="col-md-9">
+                    <label id="projectinput8" class="file center-block">
+                      <input type="file" id="file">
+                      <span class="file-custom"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-md-2 label-control" for="description">Description: </label>
+                  <div class="col-md-9">
+                    <textarea formControlName="description" id="description" rows="5" class="form-control"></textarea>
+                  </div>
+                </div>
+
+                <h4 class="form-section">
+                  <i class="icon-notebook"></i> Contact</h4>
+
+                <div class="form-group row">
+                  <label class="col-md-2 label-control" for="phone">Phone : </label>
+                  <div class="col-md-4">
+
+                    <div class="position-relative has-icon-left">
+                      <input formControlName="phone" id="phone" class="form-control">
+                      <div class="form-control-position">
+                        <i class="ft-phone"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <label class="col-md-1 label-control" for="mobile">Mob : </label>
+                  <div class="col-md-4">
+                    <div class="position-relative has-icon-left">
+                      <input formControlName="mobile" id="mobile" class="form-control">
+                      <div class="form-control-position">
+                        <i class="icon-screen-smartphone"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-md-2 label-control" for="fax">Fax : </label>
+                  <div class="col-md-9">
+                    <div class="position-relative has-icon-left">
+                      <input formControlName="fax" id="fax" class="form-control">
+                      <div class="form-control-position">
+                        <i class="fa fa-fax"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-md-2 label-control" for="website">Website : </label>
+                  <div class="col-md-9">
+                    <div class="position-relative has-icon-left">
+                        <input formControlName="website" id="website" class="form-control">                        
+                        <div class="form-control-position">
+                          <i class="fa fa-internet-explorer  "></i>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+
+
+                <div class="form-group row">
+                  <label class="col-md-2 label-control" for="email">Email : </label>
+                  <div class="col-md-9">
+                    <div class="position-relative has-icon-left">
+                        <input formControlName="email" id="email" class="form-control">                        
+                        <div class="form-control-position">
+                          <i class="ft-at-sign"></i>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label class="col-md-2 label-control" for="compaddress">Address : </label>
+                <div class="col-md-9">
+                  <div class="position-relative has-icon-left">
+                      <textarea formControlName="compaddress" id="compaddress" class="form-control"></textarea>                      
+                      <div class="form-control-position">
+                        <i class="icon-directions"></i>
+                      </div>
+                    </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-raised btn-warning mr-1">
+                  <i class="ft-x"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-raised btn-primary">
+                  <i class="fa fa-check-square-o"></i> Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+<!-- // Basic form layout section end -->

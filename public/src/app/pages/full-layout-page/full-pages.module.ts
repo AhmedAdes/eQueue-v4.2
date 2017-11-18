@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Ng2SmartTableModule } from 'ng2-smart-table'
+import { FormsModule ,ReactiveFormsModule } from '@angular/forms';
+import { MaterialModule } from 'app/material.module';
 
 import { FullPagesRoutingModule } from './full-pages-routing.module';
 
@@ -12,13 +14,18 @@ import { IssueTicketComponent, HistoryComponent, ActiveTicketComponent } from '.
 
 import { AuthenticationService, UserService } from '../../services'
 
+import { CompanyComponent } from '../company/company.component';
+
 const Services = [AuthenticationService, UserService]
 
 @NgModule({
     imports: [
         CommonModule,
         FullPagesRoutingModule,
-        Ng2SmartTableModule
+        Ng2SmartTableModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule
     ],
     declarations: [
         FullLayoutPageComponent,
@@ -27,6 +34,8 @@ const Services = [AuthenticationService, UserService]
         IssueTicketComponent,
         HistoryComponent,
         ActiveTicketComponent,
+        UsersComponent,
+        CompanyComponent
     ],
     providers: [
         ...Services

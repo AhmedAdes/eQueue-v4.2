@@ -14,6 +14,8 @@ import { FullLayoutComponent } from './layouts/full/full-layout.component';
 // import { ContentLayoutPageComponent } from './pages/content-layout-page/content-layout-page.component';
 
 import * as $ from 'jquery';
+import { MaterialModule } from 'app/material.module';
+
 
 
 
@@ -31,6 +33,7 @@ import * as $ from 'jquery';
         BrowserAnimationsModule,
         AppRoutingModule,
         SharedModule,
+        MaterialModule,
         NgbModule.forRoot()
     ],
     providers: [],
