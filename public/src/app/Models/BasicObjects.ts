@@ -11,20 +11,20 @@ export const UserRoles = [
 ]
 
 export const CompanyTypes = [
-    "Client",
-    "Provider"
+    'Client',
+    'Provider'
 ]
 
 export const WorkFields = [
-    "Freight Forwarding",
-    "Customs",
-    "Industrial",
-    "Shipping"
+    'Freight Forwarding',
+    'Customs',
+    'Industrial',
+    'Shipping'
 ]
 
 export const Languages = [
-    {name:"Arabic" ,abbv:"ar-EG"},
-    {name:"English" ,abbv:"en-UK"},
-    {name:"French" ,abbv:"fr-FR"}
+    {name: 'Arabic', abbv: 'ar-EG'},
+    {name: 'English', abbv: 'en-UK'},
+    {name: 'French', abbv: 'fr-FR'}
 ]
 

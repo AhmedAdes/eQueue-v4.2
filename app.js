@@ -47,11 +47,13 @@ var index = require("./routes/index.js");
 var login = require("./routes/login.js");
 var user = require("./routes/users.js");
 var comp = require("./routes/company.js");
+var brnc = require("./routes/branch.js");
 
 app.use("/", index);
 app.use("/api/auth", login);
 app.use("/api/users", user);
 app.use("/api/comp", comp);
+app.use("/api/brnc", brnc);
 
 pool.connect(err => {
   if (err) {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Headers, Response, RequestOptions } from '@angular/http';
 import { User, CurrentUser } from '../Models/user';
-import { UserRoles, NodeUrl } from '../Models/BasicObjects';
+import { UserRoles, CompanyTypes, NodeUrl } from '../Models/BasicObjects';
 import 'rxjs/add/operator/map'
 
 @Injectable()
@@ -13,7 +13,7 @@ export class AuthenticationService {
     headers = new Headers({ 'Access-Control-Allow-Origin': '*' });
     options = new RequestOptions({ headers: this.headers });
 
-    constructor(private http: Http) {
+    constructor(private http?: Http) {
         // set token if saved in local storage
         this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
         this.token = this.currentUser && this.currentUser.tkn;
@@ -22,7 +22,7 @@ export class AuthenticationService {
     login(user: any) {
         return this.http.post(NodeUrl + 'auth', user, this.options)
             .map((response: Response) => {
-                console.log(response.json())
+                // console.log(response.json())
                 const arrRet = response.json();
                 if (arrRet.error) {
                     return { login: false, error: arrRet.error }
@@ -48,7 +48,7 @@ export class AuthenticationService {
                     }
                     this.currentUser = {
                         uID: arrRet.user[0].UserID, uName: arrRet.user[0].UserName, uRl: this.getRole(arrRet.user[0].UserRole),
-                        etyp: arrRet.user[0].EntityType, tkn: token, slt: arrRet.user[0].Salt, photo: photo, 
+                        etyp: this.getType(arrRet.user[0].EntityType), tkn: token, slt: arrRet.user[0].Salt, photo: photo,
                         cID: arrRet.user[0].CompID, bID: arrRet.user[0].BranchID
                     }
 
@@ -71,8 +71,13 @@ export class AuthenticationService {
     }
 
     getRole(job: string): number {
-        let uRoles = UserRoles
-        let ret = uRoles.filter(obj => obj.name == job)[0].class;
+        const uRoles = UserRoles
+        const ret = uRoles.find(obj => obj.name === job).class;
+        return ret;
+    }
+    getType(typ: string): number {
+      const Types = CompanyTypes
+      const ret = Types.indexOf(typ)
         return ret;
     }
 

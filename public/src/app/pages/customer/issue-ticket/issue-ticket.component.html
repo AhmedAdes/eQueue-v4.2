@@ -1,3 +1,68 @@
-<p>
-  issue-ticket works!
-</p>
+<section id="horizontal-form-layouts">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="content-header">Company Details</div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-header">Issue New Ticket</h3>
+        </div>
+        <div class="card-body">
+          <div class="px-3">
+
+            <form class="form form-horizontal" [formGroup]="inFrm" (submit)="HandleForm(inFrm.value)" novalidate>
+              <div class="form-body">
+
+                <div class="form-group row" [ngClass]="{ 'has-danger': submitted && comp.invalid }">
+                  <label for="selComp" class=" label-control col-md-3 col-sm-4">Provider Company</label>
+                  <div class="col-md-9 col-sm-8">
+                    <select class="form-control" name="selComp" [(ngModel)]="selComp" [formControl]="comp">
+                      <option *ngFor="let cmp of compList" [value]="cmp.CompID">{{cmp.CompName}}</option>
+                    </select>
+                    <div class="form-text text-muted danger" *ngIf="comp.touched && comp.invalid">Company is required.</div>
+                  </div>
+                </div>
+
+                <div class="form-group row" [ngClass]="{ 'has-danger': submitted && branch.invalid }">
+                  <label for="selBrnch" class=" label-control col-md-3 col-sm-4">Select a Branch</label>
+                  <div class="col-md-9 col-sm-8">
+                    <select class="form-control" name="selBrnch" [(ngModel)]="selBrnch" [formControl]="branch">
+                      <option *ngFor="let brn of branchList" [value]="brn.BranchID">{{brn.BranchName}}</option>
+                    </select>
+                    <div class="form-text text-muted danger" *ngIf="branch.touched && branch.invalid">Branch is required.</div>
+                  </div>
+                </div>
+
+                <div class="form-group row" [ngClass]="{ 'has-danger': submitted && dept.invalid }">
+                  <label for="selDept" class=" label-control col-md-3 col-sm-4">Select a Department</label>
+                  <div class="col-md-9 col-sm-8">
+                    <select class="form-control" name="selDept" [(ngModel)]="selDept" [formControl]="dept">
+                      <option *ngFor="let dpt of deptList" [value]="dpt.DeptID">{{dpt.DeptName}}</option>
+                    </select>
+                    <div class="form-text text-muted danger" *ngIf="dept.touched && dept.invalid">Department is required.</div>
+                  </div>
+                </div>
+
+                <div class="form-group row" [ngClass]="{ 'has-danger': submitted && vDate.invalid }">
+                    <label for="visitDate" class=" label-control col-md-3 col-sm-4">Pick a Date for you visit</label>
+                    <div class="col-md-9 col-sm-8">
+                        <div class="position-relative has-icon-left">
+                            <input type="date" formControlName="vDate" id="visitDate" class="form-control">
+                            <div class="form-control-position">
+                              <i class="ft-edit-2"></i>
+                            </div>
+                          </div>
+                          <div class="form-text text-muted danger" *ngIf="vDate.touched && vDate.invalid">Visit Date is required.</div>
+                    </div>
+                  </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

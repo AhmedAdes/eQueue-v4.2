@@ -31,7 +31,7 @@ router.get("/", function(req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query(`SELECT * FROM dbo.Company`)
+    .query(`SELECT * FROM dbo.Branch`)
     .then(function(ret) { res.json(ret.recordset); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
@@ -41,27 +41,17 @@ router.get("/:id(\\+D)", function(req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query(`SELECT * FROM dbo.Company Where CompID=${req.params.id}`)
+    .query(`SELECT * FROM dbo.Branch Where BranchID=${req.params.id}`)
     .then(function(recordset) { res.json(recordset); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
 });
-router.get("/allProviders/all", function(req, res, next) {
+router.get("/CompBranch/:id(\\+D)", function(req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query(`SELECT * FROM dbo.Company Where CompType = 'Provider'`)
-    .then(function(ret) { res.json(ret.recordset); })
-    .catch(function(err) {
-      if (err) { res.json({ error: err }); console.log(err); }
-    });
-});
-router.get("/allConsumers/all", function(req, res, next) {
-  res.setHeader("Content-Type", "application/json");
-  var request = new sql.Request(sqlcon);
-  request
-    .query(`SELECT * FROM dbo.Company Where CompType = 'Client'`)
+    .query(`SELECT * FROM dbo.Branch Where CompID = ${req.params.id}`)
     .then(function(ret) { res.json(ret.recordset); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
