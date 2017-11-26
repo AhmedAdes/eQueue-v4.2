@@ -1,47 +1,73 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl,Validators } from '@angular/forms';
+import { FormGroup, FormControl,Validators , ReactiveFormsModule ,FormBuilder} from '@angular/forms';
 import { Countries } from '../../Models/countries';
-import { CompanyTypes ,WorkFields ,Languages} from '../../Models';
+import { CompanyTypes ,WorkFields ,Languages, Company} from '../../Models';
+import { CompanyService } from 'app/services/comp.service';
+
+
 
 @Component({
   selector: 'company',
   templateUrl: './company.component.html',
   styleUrls: ['./company.component.scss']
 })
+
 export class CompanyComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
-  }
   countries = Countries; 
   compType = CompanyTypes;
   workfields = WorkFields;
   languages = Languages;
+  comp : Company;
+  compForm : FormGroup;
 
-  compForm = new FormGroup({
-    id : new FormControl(),
-    compName : new FormControl("",[
-      Validators.required
-    ]),
-    country: new FormControl(),
-    city : new FormControl(),
-    logo: new FormControl (),
-    comptype: new FormControl(),
-    compaddress: new FormControl(),
-    phone: new FormControl(),
-    mobile: new FormControl(),
-    website: new FormControl(),
-    email: new FormControl(),
-    fax : new FormControl(),
-    description: new FormControl(),
-    workfield: new FormControl(),
-    defaultlanguage: new FormControl(),
-    disabled : new FormControl()
-  });
+  constructor(private srvComp: CompanyService,fb : FormBuilder) { 
 
+    this.compForm = fb.group({
+      id : [0],
+      compName :['',
+        [
+          Validators.required,
+          Validators.minLength(5)
+        ]
+      ],
+      country: ['',Validators.required],
+      city : ['',Validators.required],
+      //logo: [],
+      comptype:['',Validators.required],
+      compaddress: [''],
+      phone: [''],
+      mobile: [''],
+      website:[''],
+      email:[''],
+      fax :[''],
+      description: [''],
+      workfield:['',Validators.required],
+      defaultlanguage: ['',Validators.required],
+      disabled : ['']
+    });  
+  }
+  
+  ngOnInit() {
+    console.log('Hello');
+  }
+  
+  OnSubmit(){
+    if(this.id.value == 0 || this.id.value ==undefined )
+    {
+      console.log(this.compForm.value);
+      this.srvComp.InsertComp(this.compForm.value)
+      .subscribe(
+      res=>{
+        console.log('Done');
+      },
+      err=>{
+          console.log("Somthing wrong happened!");
+        });
+    }else
+    {
 
-
+    }
+  }
   
   get id(){return this.compForm.get('id');}
   get compName(){return this.compForm.get('compName');}

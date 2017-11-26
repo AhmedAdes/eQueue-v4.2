@@ -7,14 +7,14 @@
   </div>
   <div class="row">
     <div class="col-md-12">
-      <div class="card">
-        <div class="card-header">
+      <div class="card gradient-light-blue-cyan">
+        <!-- <div class="card-header">
           <h4 class="card-title" id="horz-layout-basic">First Step : Adding Company INFO</h4>
           <p class="mb-0">Welcome to eQueueing System , here we go with the first step by completeing all company neccessary data </p>
-        </div>
+        </div> -->
         <div class="card-body">
           <div class="px-3">
-            <form [formGroup]="compForm" class="form form-horizontal">
+            <form [formGroup]="compForm" class="form" (ngSubmit)="OnSubmit()">
               <div class="form-body">
                 <h4 class="form-section">
                   <i class="ft-box"></i> Main Info</h4>
@@ -24,12 +24,15 @@
                   <label class="col-md-2 label-control" for="compName">Company Name: </label>
                   <div class="col-md-9">
                     <div class="position-relative has-icon-left">
-                      <input formControlName="compName" id="compName" class="form-control">
+                      <input formControlName="compName" id="compName" class="form-control round">
                       <div class="form-control-position">
                         <i class="ft-edit-2"></i>
                       </div>
                     </div>
-                    <div class="form-text text-muted danger" *ngIf="compName.touched && compName.invalid">Company Name is required.</div>
+                    <div class="form-text text-muted danger" *ngIf="compName.touched && compName.invalid">
+                      <div *ngIf="compName.errors.required">Company Name is required. </div>
+                      <div *ngIf="compName.errors.minlength">Company must be at least 5 Characters. </div>                      
+                    </div>
                   </div>
                 </div>
 
@@ -45,6 +48,7 @@
                         <i class="ft-globe"></i>
                       </div>
                     </div>
+                    <div class="form-text text-muted danger" *ngIf="country.touched && country.invalid">Country is required.</div>
                   </div>
 
                   <label class="col-md-1 label-control" for="city">City : </label>
@@ -58,6 +62,7 @@
                         <i class="icon-home"></i>
                       </div>
                     </div>
+                    <div class="form-text text-muted danger" *ngIf="city.touched && city.invalid">City is required.</div>
                   </div>
 
                 </div>
@@ -74,6 +79,7 @@
                         <i class="ft-volume-2"></i>
                       </div>
                     </div>
+                    <div class="form-text text-muted danger" *ngIf="defaultlanguage.touched && defaultlanguage.invalid">defaultlanguage is required.</div>                    
                   </div>
                 </div>
 
@@ -83,21 +89,12 @@
                     <select formControlName="workfield" id="workfield" class="form-control">
                       <option *ngFor="let field of workfields" [value]="field">{{field}}</option>
                     </select>
+                    <div class="form-text text-muted danger" *ngIf="workfield .touched && workfield.invalid">workfield is required.</div>                              
                   </div>
                 </div>
 
                 <div class="form-group row">
-                  <label class="col-md-2 label-control">Company Logo: </label>
-                  <div class="col-md-9">
-                    <label id="projectinput8" class="file center-block">
-                      <input type="file" id="file">
-                      <span class="file-custom"></span>
-                    </label>
-                  </div>
-                </div>
-
-                <div class="form-group row">
-                  <label class="col-md-2 label-control" for="description">Description: </label>
+                  <label class="col-md-2 label-control" for="description">Short Description: </label>
                   <div class="col-md-9">
                     <textarea formControlName="description" id="description" rows="5" class="form-control"></textarea>
                   </div>
@@ -145,11 +142,11 @@
                   <label class="col-md-2 label-control" for="website">Website : </label>
                   <div class="col-md-9">
                     <div class="position-relative has-icon-left">
-                        <input formControlName="website" id="website" class="form-control">                        
-                        <div class="form-control-position">
-                          <i class="fa fa-internet-explorer  "></i>
-                        </div>
+                      <input formControlName="website" id="website" class="form-control">
+                      <div class="form-control-position">
+                        <i class="fa fa-internet-explorer  "></i>
                       </div>
+                    </div>
                   </div>
                 </div>
 
@@ -158,11 +155,11 @@
                   <label class="col-md-2 label-control" for="email">Email : </label>
                   <div class="col-md-9">
                     <div class="position-relative has-icon-left">
-                        <input formControlName="email" id="email" class="form-control">                        
-                        <div class="form-control-position">
-                          <i class="ft-at-sign"></i>
-                        </div>
+                      <input formControlName="email" id="email" class="form-control">
+                      <div class="form-control-position">
+                        <i class="ft-at-sign"></i>
                       </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -171,11 +168,11 @@
                 <label class="col-md-2 label-control" for="compaddress">Address : </label>
                 <div class="col-md-9">
                   <div class="position-relative has-icon-left">
-                      <textarea formControlName="compaddress" id="compaddress" class="form-control"></textarea>                      
-                      <div class="form-control-position">
-                        <i class="icon-directions"></i>
-                      </div>
+                    <textarea formControlName="compaddress" id="compaddress" class="form-control"></textarea>
+                    <div class="form-control-position">
+                      <i class="icon-directions"></i>
                     </div>
+                  </div>
                 </div>
               </div>
 
@@ -183,7 +180,7 @@
                 <button type="button" class="btn btn-raised btn-warning mr-1">
                   <i class="ft-x"></i> Cancel
                 </button>
-                <button type="button" class="btn btn-raised btn-primary">
+                <button type="submit" class="btn btn-raised btn-primary">
                   <i class="fa fa-check-square-o"></i> Save
                 </button>
               </div>

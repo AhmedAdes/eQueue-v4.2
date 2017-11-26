@@ -224,3 +224,44 @@ INSERT dbo.Users
 VALUES  ( @CompID, @BranchID, @UserName, @UserRole, @EntityType,  @ManagerID, @Phone, @Mobile, @Email, @Title, 
 		HASHBYTES('SHA2_512', @UserPass+CAST(@Salt AS NVARCHAR(36))), @Salt )
 GO
+
+
+CREATE  PROC CompanyInsert
+@CompName nvarchar(300),@Country nvarchar(100), @City nvarchar(100), 
+@CompType nvarchar(50),@CompAddress nvarchar(max),@Phone nvarchar(50),@Mobile nvarchar(50),
+@Website nvarchar(50),@Email nvarchar(200),@Fax nvarchar(200),@Description nvarchar(max),
+@WorkField nvarchar(100),@DefaultLanguage nvarchar(20),@Disabled bit AS
+INSERT dbo.Company
+(CompName,Country,City,CompType,CompAddress,Phone,Mobile,Website,Email,Fax,Description,WorkField,	,Disabled)
+Values	
+(@CompName,@Country,@City,@CompType,@CompAddress,@Phone,@Mobile,@Website,@Email,@Fax,@Description,@WorkField,@DefaultLanguage,@Disabled)
+select IDENT_CURRENT('dbo.Company')
+GO
+
+CREATE PROC	CompanyUpdate
+@CompId INT ,@CompName nvarchar(300),@Country nvarchar(100), @City nvarchar(100)
+,@Logo varbinary(max),@CompAddress nvarchar(max),@Phone nvarchar(50),@Mobile nvarchar(50),
+@Website nvarchar(50),@Email nvarchar(200),@Fax nvarchar(200),@Description nvarchar(max),
+@WorkField nvarchar(100),@DefaultLanguage nvarchar(20) AS
+UPDATE dbo.Company 
+SET 
+CompName = @CompName , Country = @Country , City = @City , Logo = @Logo,
+CompAddress = @CompAddress , Phone = @Phone, Mobile = @Mobile , Website = @Website ,
+Email = @Email , Fax = @Fax , [Description] = @Description , WorkField = @WorkField,
+DefaultLanguage = @DefaultLanguage 
+WHERE CompID = @CompId
+GO
+
+CREATE PROC CompanyValidate
+@CompId INT,@Disabled bit AS
+UPDATE dbo.Company
+SET 
+[Disabled] = @Disabled
+WHERE CompID = @CompId
+GO
+
+CREATE PROC CompanyDelete
+@CompId INT AS
+DELETE dbo.Company
+WHERE CompID = @CompId
+GO

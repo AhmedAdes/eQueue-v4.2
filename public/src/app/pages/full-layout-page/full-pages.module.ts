@@ -12,11 +12,12 @@ import { UsersComponent } from '../users/users.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { IssueTicketComponent, HistoryComponent, ActiveTicketComponent } from '../customer';
 
-import { AuthenticationService, UserService } from '../../services'
+import { AuthenticationService, UserService, AuthGuard } from '../../services'
 
 import { CompanyComponent } from '../company/company.component';
+import { CompanyService } from 'app/services/comp.service';
 
-const Services = [AuthenticationService, UserService]
+const Services = [AuthenticationService, UserService , AuthGuard,CompanyService]
 
 @NgModule({
     imports: [
