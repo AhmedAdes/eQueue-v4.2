@@ -25,7 +25,7 @@ export class LoginPageComponent {
         };
         this.srvAuth.login(newuser).subscribe(result => {
             if (result.login === true) {
-                this.router.navigate(['home/dashboard']);
+                this.router.navigate(['home']);
             } else {
                 this.error = result.error;
             }

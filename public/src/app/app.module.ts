@@ -33,7 +33,7 @@ import { MaterialModule } from 'app/material.module';
         BrowserAnimationsModule,
         AppRoutingModule,
         SharedModule,
-        MaterialModule,
+        // MaterialModule,
         NgbModule.forRoot()
     ],
     providers: [],

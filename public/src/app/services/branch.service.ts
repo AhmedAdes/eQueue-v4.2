@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/add/operator/map';
-import { User, NodeUrl } from '../Models';
+import { Branch, NodeUrl } from '../Models';
 import { AuthenticationService } from './auth.service';
 
 @Injectable()
-export class TicketService {
+export class BranchService {
 
-    url = NodeUrl + 'ticket/';
+    url = NodeUrl + 'brnc/';
     headers = new Headers({
         'Authorization': this.authService.token,
         'Salt': this.authService.salt
@@ -16,10 +16,14 @@ export class TicketService {
 
     constructor(private http: Http, private authService: AuthenticationService) { }
 
-    issueTicket() {
-
+    getBranch(id?: number) {
+        let geturl = this.url;
+        if (id != null) {
+            geturl = this.url + id;
+        }
+        return this.http.get(geturl, this.options).map(res => res.json());
     }
-    getActiveTickets(userId: number) {
-
+    getCompBranch(compId: number) {
+        return this.http.get(this.url + 'CompBranch/' + compId, this.options).map(res => res.json());
     }
 }

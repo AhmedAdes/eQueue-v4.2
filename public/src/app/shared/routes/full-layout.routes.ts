@@ -1,6 +1,6 @@
 import { Routes, RouterModule } from '@angular/router';
 
-//Route for content layout with sidebar, navbar and footer
+// Route for content layout with sidebar, navbar and footer
 export const Full_ROUTES: Routes = [
   {
     path: 'changelog',
@@ -10,4 +10,4 @@ export const Full_ROUTES: Routes = [
     path: 'home',
     loadChildren: './pages/full-layout-page/full-pages.module#FullPagesModule'
   }
-];
+]

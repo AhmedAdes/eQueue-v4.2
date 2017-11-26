@@ -4,7 +4,6 @@ var sql = require("mssql");
 var jwt = require("jsonwebtoken");
 var sqlcon = sql.globalPool;
 
-
 router.use(function (req, res, next) {
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers["authorization"];
@@ -32,45 +31,40 @@ router.get("/", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query("SELECT * FROM dbo.Company")
-    .then(function (ret) {
-      res.json(ret.recordset);
-    })
+    .query(`SELECT * FROM dbo.Company`)
+    .then(function (ret) { res.json(ret.recordset); })
     .catch(function (err) {
-      if (err) {
-        res.json({ error: err });
-        console.log(err);
-      }
+      if (err) { res.json({ error: err }); console.log(err); }
     });
 });
 router.get("/:id(\\+D)", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query("SELECT * FROM dbo.Company Where UserID=" + req.params.id)
-    .then(function (recordset) {
-      res.json(recordset);
-    })
+    .query(`SELECT * FROM dbo.Company Where CompID=${req.params.id}`)
+    .then(function (recordset) { res.json(recordset); })
     .catch(function (err) {
-      if (err) {
-        res.json({ error: err });
-        console.log(err);
-      }
+      if (err) { res.json({ error: err }); console.log(err); }
     });
 });
 router.get("/allProviders/all", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query("SELECT * FROM dbo.Company")
-    .then(function (ret) {
-      res.json(ret.recordset);
-    })
+    .query(`SELECT * FROM dbo.Company Where CompType = 'Provider'`)
+    .then(function (ret) { res.json(ret.recordset); })
     .catch(function (err) {
-      if (err) {
-        res.json({ error: err });
-        console.log(err);
-      }
+      if (err) { res.json({ error: err }); console.log(err); }
+    });
+});
+router.get("/allConsumers/all", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  var request = new sql.Request(sqlcon);
+  request
+    .query(`SELECT * FROM dbo.Company Where CompType = 'Client'`)
+    .then(function (ret) { res.json(ret.recordset); })
+    .catch(function (err) {
+      if (err) { res.json({ error: err }); console.log(err); }
     });
 });
 
@@ -101,9 +95,8 @@ router.post("/", function (req, res, next) {
       console.log(recordset);
     })
     .catch(function (err) {
-       res.json({ error: err });
-      console.log(err); 
+      res.json({ error: err });
+      console.log(err);
     });
-  });
-
+});
 module.exports = router;
