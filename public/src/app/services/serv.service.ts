@@ -7,7 +7,7 @@ import { AuthenticationService } from './auth.service';
 @Injectable()
 export class DeptServsService {
 
-    url = NodeUrl + 'brnc/';
+    url = NodeUrl + 'srvc/';
     headers = new Headers({
         'Authorization': this.authService.token,
         'Salt': this.authService.salt

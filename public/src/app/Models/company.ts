@@ -52,4 +52,5 @@ export class Service {
   DeptID: number;
   DeptName: string;
   Disabled: boolean;
+  checked: boolean
 }

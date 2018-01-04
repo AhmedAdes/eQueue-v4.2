@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 var sql = require("mssql");
 var jwt = require("jsonwebtoken"); 
-var sqlcon = sql.globalPool;
+var sqlcon = sql.globalConnection;
 
 router.use(function(req, res, next) {
     // check header or url parameters or post parameters for token
@@ -32,12 +32,12 @@ router.get("/", function(req, res, next) {
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT * FROM dbo.CompDept`)
-    .then(function(ret) { res.json(ret.recordset); })
+    .then(function(ret) { res.json(ret); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
 });
-router.get("/:id(\\+D)", function(req, res, next) {
+router.get("/:id(\\d+)", function(req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
@@ -47,23 +47,23 @@ router.get("/:id(\\+D)", function(req, res, next) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
 });
-router.get("/CompDept/:id(\\+D)", function(req, res, next) {
+router.get("/CompDept/:id(\\d+)", function(req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT * FROM dbo.CompDept Where CompID = ${req.params.id}`)
-    .then(function(ret) { res.json(ret.recordset); })
+    .then(function(ret) { res.json(ret); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
 });
-router.get("/BranchDept/:id(\\+D)", function(req, res, next) {
+router.get("/BranchDept/:id(\\d+)", function(req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT d.* FROM dbo.CompDept d JOIN dbo.BranchDepts b ON b.DeptID = d.DeptID
             WHERE b.BranchID = ${req.params.id}`)
-    .then(function(ret) { res.json(ret.recordset); })
+    .then(function(ret) { res.json(ret); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });

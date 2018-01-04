@@ -6,7 +6,7 @@
   </div>
   <div class="row">
     <div class="col-md-12">
-      <div class="card">
+      <div class="card bg-indigo bg-accent-400">
         <div class="card-header">
           <h3 class="card-header">Issue New Ticket</h3>
         </div>
@@ -20,9 +20,10 @@
                   <label for="selComp" class=" label-control col-md-3 col-sm-4">Provider Company</label>
                   <div class="col-md-9 col-sm-8">
                     <select class="form-control" name="selComp" [(ngModel)]="selComp" [formControl]="comp">
+                      <option [value]="null">Select a Company ...</option>
                       <option *ngFor="let cmp of compList" [value]="cmp.CompID">{{cmp.CompName}}</option>
                     </select>
-                    <div class="form-text text-muted danger" *ngIf="comp.touched && comp.invalid">Company is required.</div>
+                    <div class="form-text text-muted danger" *ngIf="(comp.touched || submitted) && comp.invalid">Company is required.</div>
                   </div>
                 </div>
 
@@ -30,9 +31,10 @@
                   <label for="selBrnch" class=" label-control col-md-3 col-sm-4">Select a Branch</label>
                   <div class="col-md-9 col-sm-8">
                     <select class="form-control" name="selBrnch" [(ngModel)]="selBrnch" [formControl]="branch">
+                        <option [value]="null">Select a Branch ...</option>
                       <option *ngFor="let brn of branchList" [value]="brn.BranchID">{{brn.BranchName}}</option>
                     </select>
-                    <div class="form-text text-muted danger" *ngIf="branch.touched && branch.invalid">Branch is required.</div>
+                    <div class="form-text text-muted danger" *ngIf="(branch.touched || submitted) && branch.invalid">Branch is required.</div>
                   </div>
                 </div>
 
@@ -40,24 +42,53 @@
                   <label for="selDept" class=" label-control col-md-3 col-sm-4">Select a Department</label>
                   <div class="col-md-9 col-sm-8">
                     <select class="form-control" name="selDept" [(ngModel)]="selDept" [formControl]="dept">
+                        <option [value]="null">Select a Department ...</option>
                       <option *ngFor="let dpt of deptList" [value]="dpt.DeptID">{{dpt.DeptName}}</option>
                     </select>
-                    <div class="form-text text-muted danger" *ngIf="dept.touched && dept.invalid">Department is required.</div>
+                    <div class="form-text text-muted danger" *ngIf="(dept.touched || submitted) && dept.invalid">Department is required.</div>
+                  </div>
+                </div>
+
+                <div class="form-group row" [ngClass]="{ 'has-danger': submitted && dept.invalid }">
+                  <label for="selDept" class=" label-control col-md-3 col-sm-4">Select Services</label>
+                  <div class="col-md-9 col-sm-8">
+                    <div class="form-control">
+                      <!-- <div class="btn-group-vertical" data-toggle="buttons">
+                          <label *ngFor="let item of servList" class="btn-raised btn-block btn-secondary" ngbButtonLabel>
+                              <input type="checkbox" [name]="item.ServID" ngbButton [(ngModel)]="item.checked"> {{item.ServName}}
+                          </label>
+                      </div> -->
+                      <ul class="card-block" style="list-style: none">
+                        <li *ngFor="let item of servList" class="">
+                          <input type="checkbox" [name]="item.ServID" [checked]="item.checked" (change)="item.checked = $event.target.checked">
+                          {{item.ServName}}
+                        </li>
+                      </ul>
+                    </div>
+                    <pre>
+                    {{servList | json}}
+                    </pre>
+                    <div class="form-text text-muted danger" *ngIf="(serv.touched || submitted) && serv.invalid">at least one Service is required.</div>
                   </div>
                 </div>
 
                 <div class="form-group row" [ngClass]="{ 'has-danger': submitted && vDate.invalid }">
-                    <label for="visitDate" class=" label-control col-md-3 col-sm-4">Pick a Date for you visit</label>
-                    <div class="col-md-9 col-sm-8">
-                        <div class="position-relative has-icon-left">
-                            <input type="date" formControlName="vDate" id="visitDate" class="form-control">
-                            <div class="form-control-position">
-                              <i class="ft-edit-2"></i>
-                            </div>
-                          </div>
-                          <div class="form-text text-muted danger" *ngIf="vDate.touched && vDate.invalid">Visit Date is required.</div>
+                  <label for="visitDate" class=" label-control col-md-3 col-sm-4">Pick a Date for your visit</label>
+                  <div class="col-md-9 col-sm-8">
+                    <div class="position-relative has-icon-left">
+                      <input type="date" formControlName="vDate" id="visitDate" class="form-control">
+                      <div class="form-control-position">
+                        <i class="ft-edit-2"></i>
+                      </div>
                     </div>
+                    <div class="form-text text-muted danger" *ngIf="(vDate.touched || submitted) && vDate.invalid">Visit Date is required.</div>
                   </div>
+                </div>
+              </div>
+              <div class="form-actions center clearfix">
+                <button type="submit" class="btn btn-lg btn-raised btn-primary">
+                  <i class="fa fa-check-square-o"></i> Issue
+                </button>
               </div>
             </form>
           </div>

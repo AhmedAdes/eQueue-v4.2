@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 var sql = require("mssql");
 var jwt = require("jsonwebtoken"); 
-var sqlcon = sql.globalPool;
+var sqlcon = sql.globalConnection;
 
 router.use(function(req, res, next) {
   // check header or url parameters or post parameters for token
@@ -33,7 +33,7 @@ router.get("/", function(req, res, next) {
   request
     .query("SELECT * FROM dbo.Users")
     .then(function(ret) {
-      res.json(ret.recordset);
+      res.json(ret);
     })
     .catch(function(err) {
       if (err) {
