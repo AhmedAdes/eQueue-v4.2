@@ -26,4 +26,8 @@ export class CompanyService {
     getAllProviders() {
         return this.http.get(this.url + 'allProviders/all', this.options).map(res => res.json());
     }
+   
+    InsertComp(comp){
+        return this.http.post(this.url,comp,this.options).map(res=>res.json());
+    }
 }

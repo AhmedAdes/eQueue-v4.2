@@ -2,13 +2,24 @@
     width:80%;
 }
 .card{
-    padding: 20px;    
+    padding: 20px; 
+    color:#039BE5;
+    border-radius: 40px;    
 }
-
+.content-header{
+    color: white;
+}
+label,h4{
+    color: white;
+}
+input,select{
+    border: 1px solid #26A69A ;
+    border-radius: 50px;
+    color: blue;
+}
 mat-form-field{
     margin: 10px;
 }
-
 mat-card-header{    
     margin: 1px;
     padding: 10px;

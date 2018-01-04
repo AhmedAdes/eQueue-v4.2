@@ -14,8 +14,9 @@ import { DashboardComponent } from '../dashboard/dashboard.component';
 import { AuthenticationService, AuthGuard, UserService } from '../../services'
 
 import { CompanyComponent } from '../company/company.component';
+import { CompanyService } from 'app/services/comp.service';
 
-const Services = [AuthenticationService, AuthGuard, UserService]
+const Services = [AuthenticationService, UserService, AuthGuard, CompanyService]
 
 @NgModule({
     imports: [
