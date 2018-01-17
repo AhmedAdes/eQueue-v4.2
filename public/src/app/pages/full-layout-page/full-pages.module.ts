@@ -14,12 +14,13 @@ import { FullLayoutPageComponent } from './full-layout-page.component';
 import { UsersComponent } from '../users/users.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 
-import { AuthenticationService, AuthGuard, UserService } from '../../services'
+import { AuthenticationService, AuthGuard, UserService, DepartmentService, BranchService, DeptServsService } from '../../services'
 
-import { CompanyComponent } from '../company/company.component';
 import { CompanyService } from 'app/services/comp.service';
+import { CompanySetupModule } from 'app/pages/company-setup/company-setup.module';
 
-const Services = [AuthenticationService, UserService, AuthGuard, CompanyService]
+const Services = [AuthenticationService, UserService, AuthGuard,
+    CompanyService,DepartmentService,BranchService,DeptServsService]
 const firebaseConfig = {
     apiKey: "AIzaSyBEzZp-q-FDr6NipFRU3IHAJ0X0Ul9zNHY",
     authDomain: "equeueing-5acb7.firebaseapp.com",
@@ -28,6 +29,8 @@ const firebaseConfig = {
     storageBucket: "equeueing-5acb7.appspot.com",
     messagingSenderId: "904716700018"
 };
+
+
 
 @NgModule({
     imports: [
@@ -39,16 +42,18 @@ const firebaseConfig = {
         AngularFireModule.initializeApp(firebaseConfig),
         AngularFireDatabaseModule,
         AngularFireAuthModule,
-        // MaterialModule
+        CompanySetupModule        
+        // MaterialModule,
+      
     ],
     declarations: [
         FullLayoutPageComponent,
         DashboardComponent,
-        UsersComponent,
-        CompanyComponent
+        UsersComponent
     ],
     providers: [
         ...Services
     ]
+    
 })
 export class FullPagesModule { }

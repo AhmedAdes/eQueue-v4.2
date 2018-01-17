@@ -13,29 +13,31 @@ export class DashboardComponent implements OnInit {
   constructor(private auth: AuthenticationService) { }
 
   ngOnInit() {
-    if (this.curUser.etyp = 0) {
+    if (this.curUser) {
+      if (this.curUser.etyp = 0) {
 
-    } else if (this.curUser.etyp = 1) {
-      switch (this.curUser.uRl) {
-        case 1: //CompADMIN
-          break;
-        case 2: //SuperUser
-          break;
-        case 3: //User
-          break;
-        default:
-          break;
-      }
-    } else if (this.curUser.etyp = 2) {
-      switch (this.curUser.uRl) {
-        case 1: //CompADMIN
-          break;
-        case 2: //SuperUser
-          break;
-        case 3: //User
-          break;
-        default:
-          break;
+      } else if (this.curUser.etyp = 1) {
+        switch (this.curUser.uRl) {
+          case 1: //CompADMIN
+            break;
+          case 2: //SuperUser
+            break;
+          case 3: //User
+            break;
+          default:
+            break;
+        }
+      } else if (this.curUser.etyp = 2) {
+        switch (this.curUser.uRl) {
+          case 1: //CompADMIN
+            break;
+          case 2: //SuperUser
+            break;
+          case 3: //User
+            break;
+          default:
+            break;
+        }
       }
     }
   }

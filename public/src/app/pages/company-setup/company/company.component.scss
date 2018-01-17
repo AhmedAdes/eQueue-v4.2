@@ -1,0 +1,50 @@
+label{
+  font-weight: bold;
+  color: black;
+  font-size: 12px;
+  letter-spacing: 0cm;
+  text-transform: none;
+}
+.form-section{
+  color: green;
+  font-size: 18px;
+}
+.panel-heading{
+  color: green;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 2px;
+}
+.badge{
+  background-color:lightseagreen;
+  color: white;
+  margin: 2px;
+  padding: 5px;
+}
+.selected{
+  background-color: slateblue;
+}
+.ft{
+  color: white;  
+  cursor: pointer;
+}
+
+.list-group-item{
+  cursor: pointer;
+}
+select ,textarea,input{
+  color: blue;
+}
+.card{
+  font-size: 14px;
+}
+h2{
+  color: green;
+}
+.wrapper .content-header {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  font-size: 1.6rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
+}

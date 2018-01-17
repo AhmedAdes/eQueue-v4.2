@@ -85,4 +85,5 @@ export class AuthenticationService {
         this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
         return this.currentUser;
     }
+    
 }

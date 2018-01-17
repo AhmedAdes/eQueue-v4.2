@@ -16,14 +16,14 @@ export const ROUTES: RouteInfo[] = [
     {
         path: '', title: 'Company Structure', icon: 'ft-codepen', class: 'has-sub', badge: '', badgeClass: '', isExternalLink: false,
         submenu: [
-            { path: '/home/company', title: 'Company', icon: 'ft-box', class: '',
+            { path: '/home/companies', title: 'Company', icon: 'ft-box', class: '',
             badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
-            { path: '', title: 'Departments', icon: 'ft-layers', class: '',
-            badge: '', badgeClass: '', isExternalLink: true, submenu: [] },
-            { path: '', title: 'Branches', icon: 'ft-life-buoy', class: '',
-            badge: '', badgeClass: '', isExternalLink: true, submenu: [] },
-            { path: '', title: 'Users', icon: 'ft-user', class: '',
-            badge: '', badgeClass: '', isExternalLink: true, submenu: [] }
+            { path: '/home/departments', title: 'Departments', icon: 'ft-layers', class: '',
+            badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
+            { path: '/home/branches', title: 'Branches', icon: 'ft-life-buoy', class: '',
+            badge: '', badgeClass: '', isExternalLink: false, submenu: [] },
+            { path: '/home/user', title: 'Users', icon: 'ft-user', class: '',
+            badge: '', badgeClass: '', isExternalLink: false, submenu: [] }
         ]
     },
     {

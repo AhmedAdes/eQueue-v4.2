@@ -1,11 +1,10 @@
 export class User {
     UserID: number;
-    UserName: string;
-    LoginName: string;
-    UserPass: string;
+    UserName: string;    
+    UserPass: string ='cmacgm';
     UserRole: string;
-    EntityType: string;
-    ManagerID: number;
+    EntityType: number;
+    ManagerID: number = null;
     ManagerName: string;
     CreateDate: Date;
     Phone: string;
@@ -20,6 +19,7 @@ export class User {
     photo: string;
     Disabled: boolean;
     Salt: string;
+    Departments:any []=[];
 }
 
 export class CurrentUser {
@@ -33,4 +33,3 @@ export class CurrentUser {
     cID: number;
     bID: number;
 }
-

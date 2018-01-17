@@ -4,6 +4,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { ContentLayoutPageComponent } from './content-layout-page.component';
 import { LoginPageComponent } from '../login/login-page.component';
 
+import { AuthGuard } from 'app/services';
+
 
 const routes: Routes = [
   {
@@ -19,7 +21,8 @@ const routes: Routes = [
     data: {
       title: 'Login Page'
     }
-  }
+  },
+  { path:'companySetup',loadChildren: '../company-setup/company-setup.module#CompanySetupModule'}
 ];
 
 @NgModule({

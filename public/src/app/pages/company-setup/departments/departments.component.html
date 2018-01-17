@@ -1,0 +1,138 @@
+<div>
+    <div class="row">
+        <div class="col-md-8">
+            <form [formGroup]="form" class="editForm">
+                <div class="card form-body">
+                    <div class="alert alert-info" role="alert">
+                        <div class='col-md-offset-1 col-md-10'>
+                            <h3>
+                                <i class="ft-user"></i> Department Info</h3>
+                        </div>
+                    </div>
+
+                    <div class='col-sm-offset-1 col-10'>
+
+                        <div class="form-group">
+                            <label class="form-control-label" for="DeptName">Department Name</label>
+                            <input class="form-control input-md" formControlName="DeptName" id="DeptName" type="text" placeholder="Department Name">
+                            <small class="form-text text-muted danger" *ngIf="DeptName.invalid &&  DeptName.touched ">
+                                <div *ngIf="DeptName.errors.required">Department Name is required. </div>
+                                <div *ngIf="DeptName.errors.minlength">Department Name must be at least 3 Characters. </div>
+                            </small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="RangeFrom">From</label>
+                                    <input class="form-control input-md" formControlName="RangeFrom" id="RangeFrom" type="text" placeholder="From">
+                                    <small class="form-text text-muted danger" *ngIf="!RangeFrom.valid && (RangeFrom.dirty || RangeFrom.touched)">Range From is required!</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group ">
+                                    <label class="form-control-label" for="RangeTo">To</label>
+                                    <input class="form-control input-md" formControlName="RangeTo" id="RangeTo" type="text" placeholder="To">
+                                    <small class="form-text text-muted danger" *ngIf="!RangeTo.valid && (RangeTo.dirty || RangeTo.touched)">Range To is required!</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group ">
+                                    <label class="form-control-label" for="Letter">Letter</label>
+                                    <input class="form-control input-md" formControlName="Letter" id="Letter" placeholder="Letter">
+                                    <small class="form-text text-muted danger" *ngIf="!Letter.valid && (Letter.dirty || Letter.touched)">Letter is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" formControlName="Disabled">Disabled!
+                            </label>
+                        </div>
+                        <div class="services-card">
+                            <div class="card-header">
+                                <div class="form-group ">
+                                    <label class="form-control-label" for="Services">Services</label>
+                                    <div class="input-group">
+                                        <input class="form-control input-md" id="Services" type="text" placeholder="Write Service and Press Enter " #Service (keyup.enter)="AddService(Service)">
+                                        <span class="input-group-btn" id="button-addon4">
+                                            <button class="btn btn-raised btn-primary" type="button" (click)="AddService(Service)">Add</button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body services-card-body">
+                                <div class="row">
+                                    <span [class.srvSelected]="isSrvActive && (Service.ServName ===  service.ServName)" *ngFor="let Service of department.Services"
+                                        class="badge badge-primary">
+                                        <span *ngIf="!(isSrvActive && (Service.ServName ===  service.ServName))">{{Service.ServName }} </span>
+
+                                        <span *ngIf="!(isSrvActive && (Service.ServName ===  service.ServName))">
+                                            <i class="ft ft-edit-2" (click)="OnServEdit(Service)"></i>
+                                            <i class="ft ft-x" (click)="OnServDelete(Service)"></i>
+                                        </span>
+                                        <span *ngIf="isSrvActive && (Service.ServName ===  service.ServName)">
+                                            <i class="ft ft-x" (click)="OnServClose()"></i>
+                                            <mt-wizard-service [service]="Service" (updService)="OnServUpdated($event)">
+                                            </mt-wizard-service>
+                                        </span>
+                                    </span>
+                                </div>
+                                <br>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-raised btn-raised btn-primary" [disabled]="!form.valid" (click)="OnSubmit()">
+                                <i class="fa fa-check-square-o"></i> Save
+                            </button>
+                            <button type="button" class="btn btn-raised btn-raised btn-warning mr-1" (click)="Reset()">
+                                <i class="ft-x"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <div class="form-group text-center">
+
+                        <button type="button" class="btn btn-raised btn-secondary" [disabled]="departments.length == 0" (click)="Previous()">
+                            <span style="margin-left:10px;">
+                                <i class="ft-chevron-left"></i>
+                            </span>
+                            Previous
+                        </button>
+                        <button type="button" class="btn btn-raised btn-info" [disabled]="departments.length == 0" (click)="Next()">
+                            Next
+                            <span style="margin-left:10px;">
+                                <i class="ft-chevron-right"></i>
+                            </span>
+                        </button>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="alert alert-success" role="alert">
+                    <div class='col-md-offset-1 col-md-10'>
+                        <h5>Current Departments</h5>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <ul class=" list-group">
+                        <li [class.Selected]="dept.DeptName === department.DeptName" *ngFor="let dept of departments" class="list-group-item" (click)="OnDeptSelect(dept)">
+                            <span class="badge badge-primary mr-2">
+                                {{dept.RangeFrom+' : ' + dept.RangeTo+' '+dept.Letter}}
+                            </span>
+                            {{dept.DeptName}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Work Tab Form Ends -->

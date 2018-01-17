@@ -12,8 +12,8 @@ const appRoutes: Routes = [
     redirectTo: 'out/login',
     pathMatch: 'full',
   },
+  { path: '', component: ContentLayoutComponent, data: { title: 'content Views' }, children: CONTENT_ROUTES },  
   { path: '', component: FullLayoutComponent, data: { title: 'full Views' }, children: Full_ROUTES },
-  { path: '', component: ContentLayoutComponent, data: { title: 'content Views' }, children: CONTENT_ROUTES },
 ];
 
 @NgModule({

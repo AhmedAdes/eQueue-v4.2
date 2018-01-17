@@ -29,4 +29,13 @@ export class DepartmentService {
     getBranchDepts(brncId: number) {
         return this.http.get(this.url + 'BranchDept/' + brncId, this.options).map(res => res.json());
     }
+    checkCompDepts(compId: number){
+        return this.http.get(this.url + 'CheckCompDept/'+compId,this.options).map(res=>res.json());
+    }
+    createCompDept(dept:Department){
+        return this.http.post(this.url,dept,this.options).map(res=>res.json());
+    }
+    updateCompDept(dept:Department){
+        return this.http.put(this.url+dept.DeptID,dept,this.options).map(res=>res.json());
+    }
 }

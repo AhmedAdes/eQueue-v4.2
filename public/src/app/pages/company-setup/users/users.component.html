@@ -1,0 +1,156 @@
+<!-- Users Component Starts -->
+<div>
+    <div class="row">
+        <div class='col-xs-12 col-sm-12 col-md-8'>
+            <form [formGroup]="form" class="editForm" (ngSubmit)="onSubmit()">
+                <div class="card form-body">
+                    <div class="alert alert-info" role="alert">
+                        <div class='col-md-offset-1 col-md-10'>
+                            <h3>
+                                <i class="ft-user"></i> User Info</h3>
+                        </div>
+                    </div>
+
+                    <div class='col-sm-offset-1 col-10'>
+                        <div class="form-group">
+                            <label class="form-control-label" for="BranchName">Branch Name</label>
+                            <select id="Branch" class="form-control input-md" formControlName="BranchID">
+                                <option value="">Select User's Branch</option>
+                                <option *ngFor="let branch of branches" [value]="branch.BranchID">{{branch.BranchName}} </option>
+                                <small class="form-text text-muted danger" *ngIf="!BranchID.valid && (BranchID.dirty || BranchID.touched)">Please select a Branch!</small>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-control-label" for="UserName">UserName</label>
+                            <input class="form-control input-md" formControlName="UserName" id="UserName" type="UserName" placeholder="UserName">
+                            <small class="form-text text-muted danger" *ngIf="!UserName.valid && (UserName.dirty || UserName.touched)">Please insert UserName!</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-control-label" for="Email">Email</label>
+                            <input class="form-control input-md" formControlName="Email" id="Email" type="email" placeholder="Email">
+                            <small class="form-text text-muted danger" *ngIf="!Email.valid && (Email.dirty || Email.touched)">Please Enter a valid Email!</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-control-label" for="UserPass">Password</label>
+                            <input class="form-control input-md" readonly formControlName="UserPass" id="UserPass" type="password" placeholder="Password">
+                            <small class="form-text text-muted danger" *ngIf="!UserPass.valid && (UserPass.dirty || UserPass.touched)">Please insert Password!</small>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="form-control-label" for="Title">Job Title</label>
+                            <input class="form-control input-md" formControlName="Title" id="Title" type="text" placeholder="Title">
+                            <small class="form-text text-muted danger" *ngIf="!Title.valid && (Title.dirty || Title.touched)">Please insert Title!</small>
+                        </div>
+
+                    </div>
+
+                    <div class='col-sm-offset-1 col-10'>
+
+                        <div class="row">
+                            <div class="form-group col-6">
+                                <label class="form-control-label" for="UserRole">User Role</label>
+                                <select class="form-control input-md" formControlName="UserRole" id="UserRole" type="text">
+                                    <option value>Select Role</option>
+                                    <option *ngFor="let role of roles" [value]="role.name">{{role.name}} </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-6">
+                                <label class="form-control-label" for="ManagerID">Manager Name</label>
+                                <select class="form-control input-md" formControlName="ManagerID" id="ManagerID" type="text">
+                                    <option value="">Select Manager</option>
+                                    <option *ngFor="let manager of managers" [value]="manager.UserID">{{manager.UserName}} </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-6">
+                                <label class="form-control-label" for="Phone">Phone</label>
+                                <input class="form-control input-md" formControlName="Phone" id="Phone" type="text" placeholder="Phone">
+                                <small class="form-text text-muted danger" *ngIf="!Phone.valid && (Phone.dirty || Phone.touched)">Please select a Phone!</small>
+                            </div>
+
+                            <div class="form-group col-6">
+                                <label class="form-control-label" for="Mobile">Mobile</label>
+                                <input class="form-control input-md" formControlName="Mobile" id="Mobile" type="text" placeholder="Mobile">
+                                <small class="form-text text-muted danger" *ngIf="!Mobile.valid && (Mobile.dirty || Mobile.touched)">Please select a Mobile!</small>
+                            </div>
+                        </div>
+
+                        <div *ngIf="branch" class="row">
+                            <div class="form-group col-6">
+                                <label for="Departments">Avilable Departments</label>
+                                <select class="form-control" multiple id="Departments">
+                                    <option *ngFor="let Department of branch.Departments" [value]="Department.DeptID" (click)="addDepartment(Department)">{{Department.DeptName}}</option>
+                                </select>
+                            </div>
+                            <div *ngIf="user.Departments.length>0" class="panel panel-primary col-6">
+                                <div class="panel-heading">Selected Departments</div>
+                                <div class="panel-body">
+                                    <span class="badge badge-primary mr-2" *ngFor="let Department of user.Departments" (click)="removeDepartment(Department)">{{Department.DeptName}} </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label>
+                                <input type="checkbox" formControlName="Disabled"> Disabled
+                            </label>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-raised btn-raised btn-primary" [disabled]="!form.valid" (click)="onSubmit()">
+                                <i class="fa fa-check-square-o"></i> Save
+                            </button>
+                            <button type="button" class="btn btn-raised btn-raised btn-warning mr-1" (click)="reset()">
+                                <i class="ft-x"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="form-actions">
+                    <div class="form-group text-center">
+                        <button type="button" class="btn btn-raised btn-secondary" [disabled]="usersCount==false" (click)="previous()">
+                            <span style="margin-left:10px;">
+                                <i class="ft-chevron-left"></i>
+                            </span>
+                            Previous
+                        </button>
+                        <button type="button" class="btn btn-raised btn-info" [disabled]="usersCount==false" (click)="next()">
+                            Next
+                            <span style="margin-left:10px;">
+                                <i class="ft-chevron-right"></i>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class='col-xs-12 col-sm-12 col-md-4'>
+            <div class="card">
+                <div class="alert alert-success" role="alert">
+                    <div class='col-md-offset-1 col-md-10'>
+                        <h4>Current Branches</h4>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <bootstrap-panel *ngFor="let branch of branches" toggle="true">
+                        <div class="heading">
+                            {{branch.BranchName}}
+                        </div>
+                        <ng-container class="body">                                
+                                <span class="badge badge-primary mr-2" *ngFor="let user of branch.Users" (click)="onUserSelect(user)">{{user.UserName}}</span>
+                        </ng-container>
+                    </bootstrap-panel>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Users Component Ends -->

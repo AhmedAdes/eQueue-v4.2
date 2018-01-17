@@ -10,7 +10,7 @@ CREATE TABLE Company
 	Country NVARCHAR(100),
 	City NVARCHAR(100),
 	Logo VARBINARY(max),
-	CompType NVARCHAR(50),
+	CompType NVARCHAR(50),--Provider , Consumer 
 	CompAddress NVARCHAR(max),
 	Phone NVARCHAR(50),
 	Mobile NVARCHAR(50),
@@ -19,7 +19,7 @@ CREATE TABLE Company
 	Fax NVARCHAR(200), 
 	--Notes NVARCHAR(max),
 	[Description] NVARCHAR(max),
-	WorkField NVARCHAR(100),
+	WorkField NVARCHAR(100), -- Shipping , FrightForwarding , etc..
 	DefaultLanguage NVARCHAR(20),
 	[Disabled] BIT DEFAULT 0,	-- for ADMIN Use Only
 	CONSTRAINT PK_Company PRIMARY KEY CLUSTERED (CompID)
@@ -65,6 +65,7 @@ CREATE TABLE DeptServices
 	[Disabled] BIT DEFAULT 0, -- For CompanyAdmin Use	
 	CONSTRAINT PK_DeptServices PRIMARY KEY CLUSTERED (ServID)
 )
+
 CREATE TABLE Users 
 ( --for each provider company there is a default reception ticketing user
 	UserID INT IDENTITY(1,1) NOT NULL,
@@ -85,6 +86,9 @@ CREATE TABLE Users
 	[Disabled] BIT DEFAULT 0, -- For CompanyAdmin Use	
 	CONSTRAINT PK_Users PRIMARY KEY CLUSTERED (UserID)
 )
+GO
+ALTER TABLE dbo.Users Alter Column Title nvarchar(50) 
+GO
 CREATE TABLE UserDepts
 (
 	UserID INT,
@@ -215,10 +219,9 @@ VALUES  ( N'Admin' , -- UserName - nvarchar(200)
         )	
 GO
 
-
 CREATE PROC RegisterUser
 @CompID INT, @BranchID INT, @UserName NVARCHAR(200), @UserPass NVARCHAR(50), @UserRole NVARCHAR(50), @EntityType TINYINT,
-@ManagerID INT, @Phone NVARCHAR(50),@Mobile NVARCHAR(50),@Email NVARCHAR(200), @Title NVARCHAR(5)
+@ManagerID INT, @Phone NVARCHAR(50),@Mobile NVARCHAR(50),@Email NVARCHAR(200), @Title NVARCHAR(50),@Disabled bit
 AS
 DECLARE @Salt UNIQUEIDENTIFIER = NEWID()
 INSERT dbo.Users
@@ -238,17 +241,17 @@ INSERT dbo.Company
 (CompName,Country,City,CompType,CompAddress,Phone,Mobile,Website,Email,Fax,Description,WorkField, DefaultLanguage	,Disabled)
 Values	
 (@CompName,@Country,@City,@CompType,@CompAddress,@Phone,@Mobile,@Website,@Email,@Fax,@Description,@WorkField,@DefaultLanguage,@Disabled)
-select IDENT_CURRENT('dbo.Company')
+select IDENT_CURRENT('dbo.Company') AS CompId
 GO
 
 CREATE PROC	CompanyUpdate
 @CompId INT ,@CompName nvarchar(300),@Country nvarchar(100), @City nvarchar(100)
-,@Logo varbinary(max),@CompAddress nvarchar(max),@Phone nvarchar(50),@Mobile nvarchar(50),
+,@CompAddress nvarchar(max),@Phone nvarchar(50),@Mobile nvarchar(50),
 @Website nvarchar(50),@Email nvarchar(200),@Fax nvarchar(200),@Description nvarchar(max),
 @WorkField nvarchar(100),@DefaultLanguage nvarchar(20) AS
 UPDATE dbo.Company 
 SET 
-CompName = @CompName , Country = @Country , City = @City , Logo = @Logo,
+CompName = @CompName , Country = @Country , City = @City , 
 CompAddress = @CompAddress , Phone = @Phone, Mobile = @Mobile , Website = @Website ,
 Email = @Email , Fax = @Fax , [Description] = @Description , WorkField = @WorkField,
 DefaultLanguage = @DefaultLanguage 
@@ -349,5 +352,229 @@ as
 	SELECT @cQID, DeptID, ServID, ServCount, Notes FROM @QueueDetails
 
 	Select QID, ServiceNo, UniqueNo, VisitTime, EstUserNo From MainQueue Where QID = @cQID
+GO
+
+CREATE PROC UserCompanyUpdate
+@UserID INT,@CompID INT AS 
+UPDATE dbo.Users 
+SET 
+CompID = @CompID
+WHERE UserID = @UserID
+GO
+
+Create Proc CompanySetupStatus
+@id int
+AS
+Declare @Comp INT ,@Depts INT, @Brnchs INT ,@Users INT;
+BEGIN
+SELECT @Comp = count(CompID) from dbo.Company where CompID = @id;
+SELECT @Depts = count(CompID) from dbo.CompDept where CompID = @id;
+SELECT @Brnchs = count(CompID) from dbo.Branch where CompID = @id;
+
+SELECT @Users = count(CompID) 
+From dbo.Users 
+Where CompID = @id
+And UserRole !='CompAdmin';
+
+SELECT @Comp as Comp,@Depts as Dept,@Brnchs as Brnch,@Users as Usrs;
+END
+Go
+
+-- Create Type for DeptServices 
+Create Type dbo.DeptServices AS Table(
+	DeptID INT,
+	ServName NVARCHAR(300),
+	[Disabled] BIT  -- For CompanyAdmin Use	
+)
+GO
+-----------------------------------------------------------------------
+CREATE PROC CompDeptInsert
+@CompID INT,@DeptName nvarchar(100),@RangeFrom INT,@RangeTo INT,
+@Letter nchar(1),@Disabled bit ,@deptServices deptServices READONLY
+As
+Declare @CompDeptId Int;
+Begin
+
+INSERT dbo.CompDept
+(CompID,DeptName,RangeFrom,RangeTo,Letter,Disabled)
+Values	
+(@CompID,@DeptName,@RangeFrom,@RangeTo,@Letter,@Disabled);
+
+Select @CompDeptId = IDENT_CURRENT('dbo.CompDept') ;
+
+INSERT dbo.DeptServices
+(ServName,DeptID,Disabled)
+SELECT ServName,@CompDeptId,Disabled from @deptServices;
+Select @CompDeptId as DeptID
+End
+GO
+-----------------------------------------------------------------------
+CREATE PROC CompDeptUpdate
+@DeptID INT,@CompID INT,@DeptName nvarchar(100),@RangeFrom INT,@RangeTo INT,
+@Letter nchar(1),@Disabled bit 
+As
+Begin
+Update dbo.CompDept 
+Set DeptName = @DeptName 
+,RangeFrom = @RangeFrom
+,RangeTo = @RangeTo
+,Letter = @Letter
+,Disabled = @Disabled
+Where DeptID = @DeptID
+And CompID = @CompID
+SELECT * from CompDept WHERE DeptID = @DeptID;
+End
+GO
+-----------------------------------------------------------------------
+CREATE PROC DeptServInsert
+@DeptID INT,@ServName nvarchar(100),@Disabled bit
+As
+INSERT dbo.DeptServices
+(DeptID,ServName,Disabled)
+Values	
+(@DeptID,@ServName,@Disabled)
+select IDENT_CURRENT('dbo.DeptServices') AS ServId
+GO
+-----------------------------------------------------------------------
+CREATE PROC DeptServUpdate
+@DeptID INT ,@ServID INT, @ServName nvarchar(100),@Disabled bit
+As
+UPDATE dbo.DeptServices
+Set ServName = @ServName 
+,Disabled = @Disabled
+Where DeptID = @DeptID 
+And ServID = @ServID;
+Select * from dbo.DeptServices Where ServID = @ServID;
+Go
+---------------------------------------------------------------------
+-- Create Type for BranchDept 
+Create Type dbo.BranchDepts AS Table(
+	BranchID INT,
+	DeptID INT
+)
+GO
+-----------------------------------------------------------------------
+CREATE PROC BrnchDeptInsert
+@CompID INT,@BranchName nvarchar(100),@Country nvarchar(100),@City nvarchar(100),
+@BranchAddress nvarchar(100),@Phone nvarchar(50),@Mobile nvarchar(50),@Email nvarchar(200),
+ @Fax nvarchar(50),@Disabled bit ,@BranchDepts BranchDepts READONLY
+As
+Declare @BrnchId Int;
+Begin
+
+INSERT dbo.Branch
+(CompID,BranchName,Country,City,BranchAddress,Phone,Mobile,Email,Fax,Disabled)
+Values	
+(@CompID,@BranchName,@Country,@City,@BranchAddress,@Phone,@Mobile,@Email,@Fax,@Disabled);
+
+Select @BrnchId = IDENT_CURRENT('dbo.Branch') ;
+
+INSERT dbo.BranchDepts
+(BranchID,DeptID)
+SELECT @BrnchId,DeptID from @BranchDepts;
+Select @BrnchId as BrnchID
+End
+GO
+---------------------------------------------------------------------------------------
+CREATE PROC BrnchDeptUpdate
+@BranchID INT,@CompID INT,@BranchName nvarchar(100),@Country nvarchar(100),@City nvarchar(100),
+@BranchAddress nvarchar(100),@Phone nvarchar(50),@Mobile nvarchar(50),@Email nvarchar(200),
+ @Fax nvarchar(50),@Disabled bit ,@BranchDepts BranchDepts READONLY
+As
+Begin
+
+UPDATE dbo.Branch
+SET BranchName = @BranchName , Country = @Country , City = @City ,BranchAddress = @BranchAddress
+,Phone = @Phone , Mobile = @Mobile , Email = @Email ,Fax = @Fax , Disabled = @Disabled
+Where BranchID = @BranchID
+And CompID = @CompID;
+
+Delete From dbo.BranchDepts Where BranchID = @BranchID;
+
+INSERT dbo.BranchDepts
+(BranchID,DeptID)
+SELECT @BranchID,DeptID from @BranchDepts;
+Select @BranchID as BrnchID
+End
+GO
+
+
+---------------------------------------------------------------------
+-- Create Type for UserDept 
+Create Type dbo.UserDepts AS Table(
+	UserID INT,
+	DeptID INT
+)
+GO
+-----------------------------------------------------------------------
+CREATE PROC CompUserInsert
+@CompID INT,@BranchID INT,@ManagerID INT NULL,@UserName nvarchar(100),@UserPass nvarchar(100),@UserRole nvarchar(100),
+@EntityType tinyint,@Phone nvarchar(50),@Mobile nvarchar(50),@Email nvarchar(200),
+@Title nvarchar(100),@Disabled bit ,@UserDepts UserDepts READONLY
+As
+SET Transaction ISOLATION LEVEL READ UNCOMMITTED
+Declare @UserId Int;
+Begin
+--------- Insert User Info in dbo.Users
+EXEC RegisterUser @CompID,@BranchID,@UserName,@UserPass,@UserRole,@EntityType,@ManagerID,@Phone,@Mobile,@Email,@Title,@Disabled ;
+--------- Select @UserID
+SELECT @UserId = IDENT_CURRENT('dbo.Users') ;
+--------- Insert User's Departments
+INSERT dbo.UserDepts
+		(UserID, DeptID)
+SELECT @UserId , DeptID FROM @UserDepts;
+
+SELECT @UserId as UserID;
+End
+GO
+---------------------------------------------------------------------------------------
+CREATE PROC CompUserUpdate
+@UserId INT,@CompID INT,@BranchID INT,@ManagerID INT NULL,@UserName nvarchar(100),@UserRole nvarchar(100),
+@Phone nvarchar(50),@Mobile nvarchar(50),@Email nvarchar(200),
+@Title nvarchar(100),@Disabled bit ,@UserDepts UserDepts READONLY
+As
+SET Transaction ISOLATION LEVEL READ UNCOMMITTED
+Begin
+--Update User Info--
+UPDATE dbo.Users 
+SET BranchID = @BranchID ,
+ManagerID = @ManagerID ,
+UserName = @UserName ,
+UserRole = @UserRole,
+Phone = @Phone,
+Mobile = @Mobile ,
+Email = @Email , 
+Title = @Title, 
+Disabled = @Disabled 
+WHERE UserID = @UserId 
+AND CompID = @CompID;
+--Delete User Depts--
+DELETE dbo.UserDepts Where UserID = @UserId;
+--Insert User New Depts--
+INSERT dbo.UserDepts 
+		(UserID, DeptID)
+SELECT @UserId , DeptID FROM @UserDepts;
+SELECT @UserId as UserID;
+End
+GO
+--------------------------------------------------------------------------------------------
+CREATE PROC BrnchUsersSelect
+@CompID INT
+AS
+SELECT b.BranchID , b.BranchName 
+,bd.DeptID as bdDeptID,bd.BranchID as bdBranchID,cd.DeptName
+,u.UserID,u.BranchID as uBranchID,u.UserName,u.Email,u.Title
+,u.UserRole,u.ManagerID,u.Phone,u.Mobile,u.Disabled
+,ud.DeptID as uDeptID 
+FROM dbo.Branch b left join dbo.Users u
+ON b.BranchID = u.BranchID
+AND b.CompID = @CompID
+JOIN dbo.BranchDepts bd 
+ON b.BranchID = bd.BranchID
+JOIN dbo.CompDept cd 
+ON bd.DeptID = cd.DeptID
+LEFT JOIN dbo.UserDepts ud 
+ON u.UserID = ud.UserID
+and bd.DeptID = ud.DeptID
 GO
 

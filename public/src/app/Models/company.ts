@@ -20,7 +20,6 @@ export class Branch {
   BranchID: number;
   BranchName: string;
   CompID: number;
-  CompName: string;
   Country: string;
   City: string;
   BranchAddress: string;
@@ -29,16 +28,18 @@ export class Branch {
   Email: string;
   Fax: string;
   Disabled: boolean;
+  Departments: any[] = [];
+  Users: any[] = [];
 }
 export class Department {
-  DeptID: number;
-  DeptName: string;
-  CompID: number;
-  CompName: string;
-  RangeFrom: number;
-  RangeTo: number;
-  Letter: string;
-  Disabled: boolean;
+  DeptID: number = 0;
+  DeptName: string = '';
+  CompID: number = 0;
+  RangeFrom: number = 0;
+  RangeTo: number = 0;
+  Letter: string = '';
+  Disabled: boolean = false;
+  Services: Service[] = [];
 }
 export class BranchDept {
   DeptID: number;
@@ -47,11 +48,11 @@ export class BranchDept {
   BranchName: string;
 }
 export class Service {
+  constructor(public ServName: string = '') { }
+  Disabled: boolean = false;
   ServID: number;
-  ServName: string;
   DeptID: number;
   DeptName: string;
-  Disabled: boolean;
 }
 export class QueueService {
   QID: number;
