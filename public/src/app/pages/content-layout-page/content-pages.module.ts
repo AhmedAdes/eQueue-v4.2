@@ -8,7 +8,10 @@ import { RouterModule } from '@angular/router';
 import { ContentPagesRoutingModule } from './content-pages-routing.module';
 import { ContentLayoutPageComponent } from './content-layout-page.component';
 import { LoginPageComponent } from '../login/login-page.component';
-import { AuthenticationService } from '../../services'
+import { AuthenticationService, AuthGuard, DepartmentService, BranchService, DeptServsService } from '../../services'
+
+import { FullPagesModule } from 'app/pages/full-layout-page/full-pages.module';
+import { CompanySetupModule } from 'app/pages/company-setup/company-setup.module';
 
 
 
@@ -16,12 +19,14 @@ import { AuthenticationService } from '../../services'
     imports: [
         CommonModule, HttpModule, RouterModule,
         FormsModule,
-        ContentPagesRoutingModule
+        ContentPagesRoutingModule,
+        FullPagesModule,
+        CompanySetupModule
     ],
     declarations: [
         LoginPageComponent,
         ContentLayoutPageComponent
     ],
-    providers: [AuthenticationService]
+    providers: [AuthenticationService,AuthGuard,DepartmentService,BranchService,DeptServsService]
 })
 export class ContentPagesModule { }

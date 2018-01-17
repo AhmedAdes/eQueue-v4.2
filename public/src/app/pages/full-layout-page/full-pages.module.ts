@@ -11,12 +11,15 @@ import { FullLayoutPageComponent } from './full-layout-page.component';
 import { UsersComponent } from '../users/users.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 
-import { AuthenticationService, AuthGuard, UserService } from '../../services'
+import { AuthenticationService, AuthGuard, UserService, DepartmentService, BranchService, DeptServsService } from '../../services'
 
-import { CompanyComponent } from '../company/company.component';
 import { CompanyService } from 'app/services/comp.service';
+import { CompanySetupModule } from 'app/pages/company-setup/company-setup.module';
 
-const Services = [AuthenticationService, UserService, AuthGuard, CompanyService]
+
+
+const Services = [AuthenticationService, UserService, AuthGuard,
+     CompanyService,DepartmentService,BranchService,DeptServsService]
 
 @NgModule({
     imports: [
@@ -25,16 +28,18 @@ const Services = [AuthenticationService, UserService, AuthGuard, CompanyService]
         Ng2SmartTableModule,
         FormsModule,
         ReactiveFormsModule,
-        // MaterialModule
+        CompanySetupModule        
+        // MaterialModule,
+      
     ],
     declarations: [
         FullLayoutPageComponent,
         DashboardComponent,
-        UsersComponent,
-        CompanyComponent
+        UsersComponent
     ],
     providers: [
         ...Services
     ]
+    
 })
 export class FullPagesModule { }

@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 var sql = require("mssql");
 var jwt = require("jsonwebtoken");
+var cities = require("./cities.json");
 var sqlcon = sql.globalPool;
 
 router.use(function (req, res, next) {
@@ -27,6 +28,11 @@ router.use(function (req, res, next) {
   }
 });
 
+router.get("/CountryCities/:id", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+    res.json(cities.filter(c=>c.country == req.params.id));
+});
+
 router.get("/", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
@@ -37,12 +43,12 @@ router.get("/", function (req, res, next) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
 });
-router.get("/:id(\\+D)", function (req, res, next) {
+router.get("/:id", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT * FROM dbo.Company Where CompID=${req.params.id}`)
-    .then(function (recordset) { res.json(recordset); })
+    .then(function (ret) { res.json(ret.recordset[0]); })
     .catch(function (err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
@@ -67,12 +73,33 @@ router.get("/allConsumers/all", function (req, res, next) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
 });
-
+router.get("/checkCompanySetup/:id",function(req,res,next){
+  res.setHeader("Conten-Type","application/json");
+  var request = new sql.Request(sqlcon);
+  request.input("id",req.params.id);
+  request.execute("CompanySetupStatus")
+  .then(function (ret) {
+    res.json(ret.recordset[0]);      
+  })
+  .catch(function (err) {
+    res.json({ error: err });
+  });
+});
+router.get("/getCompId/:id",function(req,res,next){
+  res.setHeader("Content-Type","application/json");
+  var request = new sql.Request(sqlcon);
+  request
+  .query(`Select CompID from dbo.Users Where UserID =${req.params.id}`)
+  .then(function(ret){
+    res.json(ret.recordset[0]);      
+  })
+  .catch(function(err){
+    if(err){res.json({errpr:err});console.log(err);}
+  });
+});
 router.post("/", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
-
   var comp = req.body;
-  console.log(comp);
   var request = new sql.Request(sqlcon);
   request.input("CompName", comp.compName);
   request.input("Country", comp.country);
@@ -91,12 +118,38 @@ router.post("/", function (req, res, next) {
 
   request.execute("CompanyInsert")
     .then(function (ret) {
-      res.json({ returnValue: ret.returnValue, affected: ret.rowsAffected[0] });
-      console.log(recordset);
+      res.json({ returnValue: ret.returnValue,recordset:ret.recordset, affected: ret.rowsAffected[0] });      
     })
     .catch(function (err) {
       res.json({ error: err });
-      console.log(err);
     });
 });
+
+router.put('/:id', function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  var comp = req.body;
+  var request = new sql.Request(sqlcon);
+  request.input("CompId", comp.id);
+  request.input("CompName", comp.compName);
+  request.input("Country", comp.country);
+  request.input("City", comp.city);
+  request.input("CompAddress", comp.compaddress);
+  request.input("Phone", comp.phone);
+  request.input("Mobile", comp.mobile);
+  request.input("Website", comp.website);
+  request.input("Email", comp.email);
+  request.input("Fax", comp.fax);
+  request.input("Description", comp.description);
+  request.input("WorkField", comp.workfield);
+  request.input("DefaultLanguage", comp.defaultlanguage);
+
+  request.execute("CompanyUpdate")
+    .then(function (ret) {
+      res.json({ returnValue: ret.returnValue, affected: ret.rowsAffected[0] });
+    })
+    .catch(function (err) {
+      res.json({ error: err });
+    });
+});
+
 module.exports = router;

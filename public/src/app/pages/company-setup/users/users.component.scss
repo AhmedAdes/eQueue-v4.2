@@ -1,0 +1,39 @@
+label{
+    font-weight: bold;
+    color: black;
+    font-size: 12px;
+    letter-spacing: 0cm;
+    text-transform: none;
+  }
+  .form-section{
+    color: green;
+    font-size: 18px;
+  }
+  .panel-heading{
+    color: green;
+    font-size: 14px;
+    font-weight: bold;
+    
+  }
+  .badge{
+    cursor: pointer;
+    background-color:lightcoral;
+  }
+  
+  .selected{
+    background-color: slateblue;
+  }
+  .ft{
+    color: white;  
+    cursor: pointer;
+  }
+  
+select,textarea,input{
+    color: blue;
+  }
+  .card{
+    font-size: 14px;
+  }
+  h2{
+    color: green;
+  }

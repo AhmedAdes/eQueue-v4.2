@@ -8,6 +8,7 @@ import { FooterComponent } from "./footer/footer.component";
 import { NavbarComponent } from "./navbar/navbar.component";
 import { SidebarComponent } from "./sidebar/sidebar.component";
 import { ToggleFullscreenDirective } from "./directives/toggle-fullscreen.directive";
+import { BootstrapPanelComponent } from 'app/pages/bootstrap-panel/bootstrap-panel.component';
 
 
 
@@ -17,6 +18,7 @@ import { ToggleFullscreenDirective } from "./directives/toggle-fullscreen.direct
         FooterComponent,
         NavbarComponent,
         SidebarComponent,
+        BootstrapPanelComponent,
         ToggleFullscreenDirective,
         NgbModule
     ],
@@ -29,6 +31,7 @@ import { ToggleFullscreenDirective } from "./directives/toggle-fullscreen.direct
         FooterComponent,
         NavbarComponent,
         SidebarComponent,
+        BootstrapPanelComponent,
         ToggleFullscreenDirective
         ]
 })

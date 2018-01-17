@@ -23,11 +23,23 @@ export class CompanyService {
         }
         return this.http.get(geturl, this.options).map(res => res.json());
     }
+    checkCompanySetup(id:number){
+        return this.http.get(this.url+'checkCompanySetup/'+id,this.options).map(res=>res.json());
+    }
+    getCompanyId(id:number){
+        return this.http.get(this.url+'getCompId/'+id,this.options).map(res=>res.json());
+    }
     getAllProviders() {
         return this.http.get(this.url + 'allProviders/all', this.options).map(res => res.json());
     }
-   
+    getCountryCities(id){
+        return this.http.get(this.url +'CountryCities/'+ id, this.options).map(res=>res.json());
+    }
     InsertComp(comp){
         return this.http.post(this.url,comp,this.options).map(res=>res.json());
+    }
+
+    UpdateComp(comp){
+        return this.http.put(this.url+'/'+comp.id,comp,this.options).map(res=>res.json());
     }
 }

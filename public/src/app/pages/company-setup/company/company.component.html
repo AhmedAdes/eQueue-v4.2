@@ -1,0 +1,150 @@
+<!-- Company Component Starts -->
+<section id="horizontal-form-layouts">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="alert alert-info" role="alert">
+                    <div class='col-md-offset-1 col-md-10'>
+                        <h3>
+                            <i class="ft-user"></i> Company Info</h3>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="px-3">
+                        <form [formGroup]="form" class="form form-horizontal" (ngSubmit)="OnSubmit()">
+                            <div class="form-body">
+                                <div class='row'>
+                                    <div class='col-sm-offset-1 col-10'>
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="compName">Company Name</label>
+                                            <input class="form-control input-md" formControlName="compName" id="compName" type="text" placeholder="Company Name">
+                                            <small class="form-text text-muted danger" *ngIf="!compName.valid && (compName.dirty || compName.touched)">
+                                                <div *ngIf="compName.errors.required">Company Name is required. </div>
+                                                <div *ngIf="compName.errors.minlength">Company must be at least 5 Characters. </div>
+                                            </small>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class='col-xs-12 col-sm-6'>
+                                                <div class="form-group">
+                                                    <label class="form-control-label" for="country">Country</label>
+                                                    <select class="form-control input-md" formControlName="country" id="country">
+                                                        <option value>Select your country</option>
+                                                        <option *ngFor="let country of countries" [value]="country.code">{{country.name}} </option>
+                                                    </select>
+                                                    <small class="form-text text-muted danger" *ngIf="!country.valid && (country.dirty || country.touched)">Please select a country!</small>
+                                                </div>
+                                            </div>
+
+                                            <div class='col-12 col-sm-6'>
+                                                <div class="form-group form-group-style">
+                                                    <label class="form-control-label" for="city">City</label>
+                                                    <select class="form-control input-md" formControlName="city" id="city" type="text">
+                                                        <option value>Select the Main City</option>
+                                                        <option *ngFor="let city of cities" [value]="city.name">{{city.name}}</option>
+                                                    </select>
+                                                    <small class="form-text text-muted danger" *ngIf="!city.valid && (city.dirty || city.touched)">Please select a city!</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="defaultlanguage">Default Language</label>
+                                            <select class="form-control input-md" formControlName="defaultlanguage" id="defaultlanguage" type="text" placeholder="Company Name">
+                                                <option value>Select your default language</option>
+                                                <option *ngFor="let language of languages" [value]="language.name">{{language.name}}</option>
+                                            </select>
+                                            <small class="form-text text-muted danger" *ngIf="!defaultlanguage.valid && (defaultlanguage.dirty || defaultlanguage.touched)">
+                                                <div *ngIf="defaultlanguage.errors.required">Default Language is required. </div>
+                                            </small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="workfield">Workfield</label>
+                                            <select class="form-control input-md" formControlName="workfield" id="workfield" type="text" placeholder="Workfield">
+                                                <option value>Select Work field.</option>
+                                                <option *ngFor="let workfield of workfields" [value]="workfield">{{workfield}} </option>
+                                            </select>
+                                            <small class="form-text text-muted danger" *ngIf="!workfield.valid && (workfield.dirty || workfield.touched)">
+                                                <div *ngIf="workfield.errors.required">Workfield is required. </div>
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class='col-md-offset-1 col-md-10'>
+                                        <br>
+                                        <h4 class="form-section">
+                                            <i class="ft-mail"></i> Contact Info & Bio</h4>
+                                        <br>
+                                    </div>
+                                    <div class='col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8'>
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="compaddress"> Address</label>
+                                            <textarea class="form-control input-md" formControlName="compaddress" id="compaddress" type="text" placeholder="Address"></textarea>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class='col-xs-12 col-sm-4'>
+                                                <div class="form-group">
+                                                    <label class="form-control-label" for="phone">Phone</label>
+                                                    <input class="form-control input-md" formControlName="phone" id="phone" type="text" placeholder="phone">
+                                                </div>
+                                            </div>
+                                            <div class='col-xs-12 col-sm-4'>
+                                                <div class="form-group">
+                                                    <label class="form-control-label" for="fax">Fax</label>
+                                                    <input class="form-control input-md" formControlName="fax" id="fax" type="text" placeholder="fax">
+                                                </div>
+                                            </div>
+                                            <div class='col-xs-12 col-sm-4'>
+                                                <div class="form-group form-group-style">
+                                                    <label class="form-control-label" for="mobile">Mobile</label>
+                                                    <input class="form-control input-md" formControlName="mobile" id="mobile" type="text" placeholder="mobile">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class='col-xs-12 col-sm-6'>
+                                                <div class="form-group">
+                                                    <label class="form-control-label" for="website">Website</label>
+                                                    <input class="form-control input-md" formControlName="website" id="website" type="text" placeholder="website">
+                                                </div>
+                                            </div>
+                                            <div class='col-12 col-sm-6'>
+                                                <div class="form-group form-group-style">
+                                                    <label class="form-control-label" for="email">Email</label>
+                                                    <input class="form-control input-md" formControlName="email" id="email" type="text" placeholder="email">
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="description">Description</label>
+                                            <textarea class="form-control input-md" formControlName="description" id="description" type="text" placeholder="Tell us more about your company"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-actions">
+                                    <div class="form-group text-center">
+                                        <button type="submit" class="btn btn-success btn-raised" [disabled]="!form.valid">
+                                            Next
+                                            <span style="margin-left:10px;">
+                                                <i class="ft-chevron-right"></i>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Company Component Ends -->

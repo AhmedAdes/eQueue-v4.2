@@ -48,12 +48,16 @@ var login = require("./routes/login.js");
 var user = require("./routes/users.js");
 var comp = require("./routes/company.js");
 var brnc = require("./routes/branch.js");
+var dept = require("./routes/department.js");
+var srv = require("./routes/service.js");
 
 app.use("/", index);
 app.use("/api/auth", login);
 app.use("/api/users", user);
 app.use("/api/comp", comp);
 app.use("/api/brnc", brnc);
+app.use("/api/dept", dept);
+app.use("/api/srv", srv);
 
 pool.connect(err => {
   if (err) {
