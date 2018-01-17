@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 var sql = require("mssql");
 var jwt = require("jsonwebtoken");
-var sqlcon = sql.globalConnection;
+var sqlcon = sql.globalPool;
 
 
 var firebase = require("firebase");
@@ -55,7 +55,7 @@ router.get("/ActiveTickets/:id", function (req, res, next) {
     .query(`SELECT * FROM MainQueue WHERE QStatus NOT IN ('Served', 'Not-Attended', 'Transferred') 
             And UserID = ${req.params.id}`)
     .then(function (ret) {
-      res.json(ret);
+      res.json(ret.recordset);
     })
     .catch(function (err) {
       res.json({
@@ -98,7 +98,7 @@ router.post("/IssueNew", function (req, res, next) {
   request
     .execute(`IssueTicket`)
     .then(function (ret) {
-      let qid = ret[0][0].QID
+      let qid = ret.recordset[0].QID
       firebase
         .database()
         .ref("MainQueue/" + qid)
@@ -107,10 +107,10 @@ router.post("/IssueNew", function (req, res, next) {
           VisitDate: det.vDate,
           DeptID: det.dept,
           UserID: det.user,
-          ServiceNo: ret[0][0].ServiceNo,
-          UniqueNo: ret[0][0].UniqueNo
+          ServiceNo: ret.recordset[0].ServiceNo,
+          UniqueNo: ret.recordset[0].UniqueNo
         })
-      res.json(ret[0][0]);
+      res.json(ret.recordset[0]);
     })
     .catch(function (err) {
       res.json({

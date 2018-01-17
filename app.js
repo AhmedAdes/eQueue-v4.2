@@ -11,9 +11,9 @@ var jwt = require("jsonwebtoken"); // used to create, sign, and verify tokens
 
 var sql = require("mssql");
 var con = require("./SQLConfig.js");
-const Connection = new sql.Connection(con.config);
+const Connection = new sql.ConnectionPool(con.config);
 //store the connection
-sql.globalConnection = Connection;
+sql.globalPool = Connection;
 var app = express();
 
 // all environments

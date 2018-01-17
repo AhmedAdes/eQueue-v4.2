@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 var sql = require("mssql");
 var jwt = require("jsonwebtoken"); 
-var sqlcon = sql.globalConnection;
+var sqlcon = sql.globalPool;
 
 router.use(function (req, res, next) {
   // check header or url parameters or post parameters for token
@@ -42,7 +42,7 @@ router.get("/:id(\\d+)", function(req, res, next) {
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT * FROM dbo.Company Where CompID=${req.params.id}`)
-    .then(function (recordset) { res.json(recordset); })
+    .then(function (ret) { res.json(ret.recordset); })
     .catch(function (err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
@@ -52,7 +52,7 @@ router.get("/allProviders/all", function (req, res, next) {
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT * FROM dbo.Company Where CompType = 'Provider'`)
-    .then(function(ret) { res.json(ret); })
+    .then(function(ret) { res.json(ret.recordset); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
@@ -62,7 +62,7 @@ router.get("/allConsumers/all", function (req, res, next) {
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT * FROM dbo.Company Where CompType = 'Client'`)
-    .then(function(ret) { res.json(ret); })
+    .then(function(ret) { res.json(ret.recordset); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });

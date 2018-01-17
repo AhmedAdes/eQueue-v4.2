@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 var sql = require("mssql");
 var jwt = require("jsonwebtoken"); 
-var sqlcon = sql.globalConnection;
+var sqlcon = sql.globalPool;
 
 router.use(function(req, res, next) {
     // check header or url parameters or post parameters for token
@@ -32,7 +32,7 @@ router.get("/", function(req, res, next) {
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT * FROM dbo.DeptServices`)
-    .then(function(ret) { res.json(ret); })
+    .then(function(ret) { res.json(ret.recordset); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
@@ -42,7 +42,7 @@ router.get("/:id(\\d+)", function(req, res, next) {
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT * FROM dbo.DeptServices Where ServID=${req.params.id}`)
-    .then(function(recordset) { res.json(recordset); })
+    .then(function(ret) { res.json(ret.recordset); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
@@ -52,7 +52,7 @@ router.get("/DeptServs/:id(\\d+)", function(req, res, next) {
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT * FROM dbo.DeptServices Where DeptID = ${req.params.id}`)
-    .then(function(ret) { res.json(ret); })
+    .then(function(ret) { res.json(ret.recordset); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
@@ -63,7 +63,7 @@ router.get("/BranchServs/:id(\\d+)", function(req, res, next) {
   request
     .query(`SELECT * FROM dbo.DeptServices s JOIN dbo.BranchDepts b ON b.DeptID = s.DeptID
             WHERE b.BranchID = ${req.params.id}`)
-    .then(function(ret) { res.json(ret); })
+    .then(function(ret) { res.json(ret.recordset); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
