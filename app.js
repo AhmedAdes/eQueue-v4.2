@@ -11,9 +11,9 @@ var jwt = require("jsonwebtoken"); // used to create, sign, and verify tokens
 
 var sql = require("mssql");
 var con = require("./SQLConfig.js");
-const pool = new sql.ConnectionPool(con.config);
+const Connection = new sql.Connection(con.config);
 //store the connection
-sql.globalPool = pool;
+sql.globalConnection = Connection;
 var app = express();
 
 // all environments
@@ -49,7 +49,7 @@ var user = require("./routes/users.js");
 var comp = require("./routes/company.js");
 var brnc = require("./routes/branch.js");
 var dept = require("./routes/department.js");
-var srv = require("./routes/service.js");
+var srvc = require("./routes/service.js");
 
 app.use("/", index);
 app.use("/api/auth", login);
@@ -57,9 +57,9 @@ app.use("/api/users", user);
 app.use("/api/comp", comp);
 app.use("/api/brnc", brnc);
 app.use("/api/dept", dept);
-app.use("/api/srv", srv);
+app.use("/api/srvc", srvc);
 
-pool.connect(err => {
+Connection.connect(err => {
   if (err) {
     console.log("Failed to open a SQL Database connection.", err.stack);
   } else {
@@ -69,6 +69,6 @@ pool.connect(err => {
   }
 });
 
-pool.on("error", function(err) {
+Connection.on("error", function(err) {
   console.log("Sql Connection Error.", err);
 });

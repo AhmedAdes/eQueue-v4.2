@@ -37,7 +37,7 @@ router.get("/", function (req, res, next) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
 });
-router.get("/:id(\\+D)", function (req, res, next) {
+router.get("/:id(\\d+)", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
@@ -47,7 +47,7 @@ router.get("/:id(\\+D)", function (req, res, next) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
 });
-router.get("/DeptServs/:id", function (req, res, next) {
+router.get("/DeptServs/:id(\\d+)", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request

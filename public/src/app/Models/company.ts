@@ -39,7 +39,7 @@ export class Department {
   RangeTo: number = 0;
   Letter: string = '';
   Disabled: boolean = false;
-  Services:  Service[] = [];  
+  Services: Service[] = [];
 }
 export class BranchDept {
   DeptID: number;
@@ -49,7 +49,9 @@ export class BranchDept {
 }
 export class Service {
   constructor(public ServName: string = '') { }
-  ServID;
-  DeptID;
   Disabled: boolean = false;
+  ServID: number;
+  DeptID: number;
+  DeptName: string;
+  checked: boolean
 }

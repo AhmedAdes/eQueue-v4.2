@@ -43,7 +43,7 @@ router.get("/", function (req, res, next) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
 });
-router.get("/:id", function (req, res, next) {
+router.get("/:id(\\d+)", function(req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
@@ -58,8 +58,8 @@ router.get("/allProviders/all", function (req, res, next) {
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT * FROM dbo.Company Where CompType = 'Provider'`)
-    .then(function (ret) { res.json(ret.recordset); })
-    .catch(function (err) {
+    .then(function(ret) { res.json(ret); })
+    .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
 });
@@ -68,8 +68,8 @@ router.get("/allConsumers/all", function (req, res, next) {
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT * FROM dbo.Company Where CompType = 'Client'`)
-    .then(function (ret) { res.json(ret.recordset); })
-    .catch(function (err) {
+    .then(function(ret) { res.json(ret); })
+    .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });
 });
