@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import {
   CustomerLayoutComponent, IssueTicketComponent, HistoryComponent, ActiveTicketComponent
@@ -15,7 +16,8 @@ import {
 @NgModule({
   imports: [CustomerRoutingModule, CommonModule,
     FormsModule, ReactiveFormsModule, HttpModule,
-    RouterModule],
+    RouterModule, NgbModule 
+  ],
   exports: [],
   declarations: [CustomerLayoutComponent, IssueTicketComponent, HistoryComponent, ActiveTicketComponent],
   providers: [CompanyService, BranchService, DepartmentService, DeptServsService, TicketService],

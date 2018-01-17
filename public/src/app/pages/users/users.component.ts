@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { LocalDataSource } from 'ng2-smart-table';
 import { User } from '../../Models'
 import { UserService } from '../../services'
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
+import * as hf from '../helper.functions'
 
 @Component({
   selector: 'app-users',
@@ -46,10 +49,24 @@ export class UsersComponent implements OnInit {
     }
   };
 
-  constructor(private srvUsr: UserService) { }
+  tickets: Observable<any>
+
+  constructor(private srvUsr: UserService, public db: AngularFireDatabase) {
+    this.tickets = db.list('MainQueue',
+      ref => ref.orderByChild('DeptID').equalTo('4')
+    ).valueChanges().map(tkts => { return tkts.filter((tkt) => {
+        if (tkt['VisitDate'] == hf.handleDate(new Date())) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+    })
+  }
 
   ngOnInit() {
     this.srvUsr.getuser().subscribe(cols => this.data = new LocalDataSource(cols))
+    this.tickets.subscribe(k=> console.log(k))
   }
 
 }

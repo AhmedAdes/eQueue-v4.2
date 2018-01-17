@@ -61,6 +61,7 @@ CREATE TABLE DeptServices
 	ServID INT IDENTITY(1,1) NOT NULL,
 	DeptID INT,
 	ServName NVARCHAR(300),
+	ServTime INT, -- in Minutes
 	[Disabled] BIT DEFAULT 0, -- For CompanyAdmin Use	
 	CONSTRAINT PK_DeptServices PRIMARY KEY CLUSTERED (ServID)
 )
@@ -78,7 +79,7 @@ CREATE TABLE Users
 	Mobile NVARCHAR(50),
 	Email NVARCHAR(200) NOT NULL UNIQUE, 
 	AccessFailedCount INT DEFAULT 0, --for stopping the login process 
-	Title NVARCHAR(5), --(Mr.//Mrs.//Ms.)
+	Title NVARCHAR(200), --Job Title
 	BranchID INT,
 	Salt UNIQUEIDENTIFIER ,
 	[Disabled] BIT DEFAULT 0, -- For CompanyAdmin Use	
@@ -97,13 +98,13 @@ CREATE TABLE MainQueue
 	BranchID INT,
 	DeptID INT,
 	QLetter NCHAR(1),
-	QNumber INT,
-	ServiceNo AS QLetter + CAST(QNumber AS NCHAR(5)) PERSISTED,
+	QNumber VarChar(4),
+	ServiceNo AS CAST(QNumber AS NCHAR(4)) +'-'+ QLetter PERSISTED,
 	RequestDate DATETIME2,
 	VisitDate DATE,
 	VisitTime TIME, --(Approx.) updated based on cancelation of previous records
 	StartServeDT DATETIME2,
-	QStatus NVARCHAR(20), -- (Served // Not-Served // Hold // Pending // Not-Attended)
+	QStatus NVARCHAR(20), -- (Served // Hold // Pending // Not-Attended // Waiting // Current // Transferred)
 	EndServeDT DATETIME2, --only with Served//Not-Served//Not-Attended
 	ServingTime INT, --in seconds Only increment with Hold
 	QCurrent BIT,
@@ -111,6 +112,8 @@ CREATE TABLE MainQueue
 	TransferedFrom INT, -- The Primary Key for the original Q
 	UniqueNo NVARCHAR(50),
 	ProvUserID INT, --The Employee Served the Customer 
+	EstUserNo INT,
+	EstServingTime INT,
 	CONSTRAINT PK_MainQueue PRIMARY KEY CLUSTERED (QID)
 )
 CREATE TABLE QueueDetails
@@ -124,13 +127,13 @@ CREATE TABLE QueueDetails
 )
 CREATE TABLE ArchiveMainQueue
 (
-	QID INT IDENTITY(1,1) NOT NULL,
+	QID INT NOT NULL,
 	UserID INT, -- The Customer who issued the Ticket
 	BranchID INT,
 	DeptID INT,
 	QLetter NCHAR(1),
 	QNumber INT,
-	ServiceNo AS QLetter + CAST(QNumber AS NCHAR(5)) PERSISTED,
+	ServiceNo NvarChar(6),
 	RequestDate DATETIME2,
 	VisitDate DATE,
 	VisitTime TIME, --(Approx.) updated based on cancelation of previous records
@@ -178,7 +181,7 @@ ALTER TABLE dbo.ArchiveMainQueue ADD CONSTRAINT FK_ArchMainQueue_Users_provider 
 ALTER TABLE dbo.ArchiveMainQueue ADD CONSTRAINT FK_ArchMainQueue_CompDept FOREIGN KEY (DeptID) REFERENCES dbo.CompDept(DeptID)
 ALTER TABLE dbo.ArchiveMainQueue ADD CONSTRAINT FK_ArchMainQueue_Branch FOREIGN KEY (BranchID) REFERENCES dbo.Branch(BranchID)
 ALTER TABLE dbo.ArchiveQueueDetails ADD CONSTRAINT FK_ArchQueueDetails_CompDept FOREIGN KEY (DeptID) REFERENCES dbo.CompDept(DeptID)
-ALTER TABLE dbo.ArchiveQueueDetails ADD CONSTRAINT FK_ArchQueueDetails_MainQueue FOREIGN KEY (QID) REFERENCES dbo.MainQueue(QID)
+ALTER TABLE dbo.ArchiveQueueDetails ADD CONSTRAINT FK_ArchQueueDetails_ArchiveMainQueue FOREIGN KEY (QID) REFERENCES dbo.ArchiveMainQueue(QID)
 ALTER TABLE dbo.ArchiveQueueDetails ADD CONSTRAINT FK_ArchQueueDetails_DeptServices FOREIGN KEY (ServID) REFERENCES dbo.DeptServices(ServID)
 GO
 
@@ -232,7 +235,7 @@ CREATE  PROC CompanyInsert
 @Website nvarchar(50),@Email nvarchar(200),@Fax nvarchar(200),@Description nvarchar(max),
 @WorkField nvarchar(100),@DefaultLanguage nvarchar(20),@Disabled bit AS
 INSERT dbo.Company
-(CompName,Country,City,CompType,CompAddress,Phone,Mobile,Website,Email,Fax,Description,WorkField,	,Disabled)
+(CompName,Country,City,CompType,CompAddress,Phone,Mobile,Website,Email,Fax,Description,WorkField, DefaultLanguage	,Disabled)
 Values	
 (@CompName,@Country,@City,@CompType,@CompAddress,@Phone,@Mobile,@Website,@Email,@Fax,@Description,@WorkField,@DefaultLanguage,@Disabled)
 select IDENT_CURRENT('dbo.Company')
@@ -265,3 +268,86 @@ CREATE PROC CompanyDelete
 DELETE dbo.Company
 WHERE CompID = @CompId
 GO
+Create Function LPAD(@Num INT, @Replace Char(1), @Length INT)
+Returns NvarChar(max)
+begin
+	Declare @Out NvarChar(max) = right(replicate(@Replace,@Length)+cast(@Num as varchar(15)),@Length)
+	Return @Out
+end
+GO
+
+CREATE TYPE tpQueueDetails AS TABLE
+(
+	QID INT,
+	DeptID INT,
+	ServID INT,
+	ServCount INT,
+	Notes NVARCHAR(max)
+)
+GO
+CREATE PROC UpdateVisitTime (@QID INT, @BranchID INT, @DeptID INT, @VisitDate DATE) 
+AS
+	DECLARE @OpenTime TIME='08:00:00', @Order INT, @VisitTime TIME, @UserNO INT= 0
+	DECLARE @UserCount INT = (SELECT COUNT(ud.UserID) FROM dbo.UserDepts ud JOIN dbo.Users u ON u.UserID = ud.UserID 
+		WHERE DeptID = @DeptID AND u.BranchID=@BranchID)
+
+	DECLARE @tbl TABLE (QID INT, BranchID INT, ServiceNo NVARCHAR(10), VisitTime TIME, QStatus NVARCHAR(20), EstUserNo INT,
+		EstServingTime INT)
+	INSERT @tbl 
+	SELECT QID, BranchID, ServiceNo, VisitTime, QStatus, EstUserNo, EstServingTime 
+	FROM dbo.MainQueue WHERE BranchID=@BranchID AND DeptID=@DeptID AND VisitDate=@VisitDate 
+
+	SELECT @Order = STK.QOrder FROM ( 
+	SELECT QID, QStatus, ROW_NUMBER() OVER ( ORDER BY QID ) AS QOrder  FROM @tbl WHERE QStatus IN ('Waiting') ) STK WHERE STK.QID = @QID
+	IF (@Order = 1) 
+		BEGIN
+			SET @VisitTime = @OpenTime 
+			SET @UserNO = 1
+		END
+		ELSE	
+			IF (@UserCount >= @Order) 
+			BEGIN
+				SET @VisitTime = @OpenTime 
+				IF ( @UserNO < @UserCount ) 
+				BEGIN
+					SET @UserNO = (SELECT MAX(EstUserNo) + 1 FROM @tbl)
+				END
+			END	
+			ELSE
+			BEGIN
+				SELECT TOP 1 @VisitTime = QRY.VisTime, @UserNO = QRY.EstUserNo FROM (
+				SELECT MAX(DATEADD(MINUTE, EstServingTime, VisitTime)) VisTime, EstUserNo 
+				FROM @tbl WHERE VisitTime IS NOT NULL
+				GROUP BY EstUserNo ) QRY ORDER BY QRY.VisTime ASC	
+			END
+	UPDATE dbo.MainQueue SET VisitTime= @VisitTime, EstUserNo=@UserNO WHERE QID=@QID
+GO
+
+ALTER Proc IssueTicket
+	@CompID int, @DeptID INT, @BranchID INT, @UserID INT, @VisitDate DATE, @QueueDetails tpQueueDetails READONLY
+as
+	DECLARE @ServSerial INT,  @VisTime TIME, @cQID INT 
+	DECLARE @UserCount INT = (SELECT COUNT(UserID) FROM dbo.UserDepts WHERE DeptID = @DeptID)
+	Select @ServSerial= ISNULL(MAX(QNumber), 0) +1 FROM MainQueue Where BranchID=@BranchID and DeptID=@DeptID
+	DECLARE @ServLetter nvarchar(5) = (Select Letter From CompDept Where DeptID=@DeptID )
+	DECLARE @TotSrvTime INT = (SELECT SUM(ServCount * s.ServTime) FROM @QueueDetails q JOIN dbo.DeptServices s ON s.ServID = q.ServID)
+	DECLARE @LastServTime TIME = (SELECT ISNULL(VisitTime, '08:00:00') FROM dbo.MainQueue WHERE DeptID=@DeptID AND QNumber=@ServSerial-1)
+
+	INSERT MainQueue 
+			(BranchID, DeptID, VisitDate, VisitTime, UserID, QLetter, QNumber, RequestDate, QStatus, UniqueNo, EstServingTime)
+	VALUES (@BranchID, @DeptID, @VisitDate, DATEADD(MINUTE, 20, @VisTime), @UserID, @ServLetter, dbo.LPAD(@ServSerial, '0', 4), GETDATE(), 
+			'Waiting', ABS(CAST(NEWID() AS binary(6)) % 10000) + 1, @TotSrvTime)
+	SELECT @cQID = IDENT_CURRENT('MainQueue') From MainQueue 
+
+	EXEC dbo.UpdateVisitTime @QID = @cQID, -- int
+		@BranchID = @BranchID, -- int
+		@DeptID = @DeptID, -- int
+		@VisitDate = @VisitDate -- date
+
+	INSERT dbo.QueueDetails
+			( QID, DeptID, ServID, ServCount, Notes )
+	SELECT @cQID, DeptID, ServID, ServCount, Notes FROM @QueueDetails
+
+	Select QID, ServiceNo, UniqueNo, VisitTime, EstUserNo From MainQueue Where QID = @cQID
+GO
+

@@ -21,6 +21,7 @@
     "express": "^4.13.4",
     "express-session": "^1.14.2",
     "express-validator": "^2.21.0",
+    "firebase": "^4.8.2",
     "jsonwebtoken": "^8.1.0",
     "morgan": "^1.7.0",
     "mssql": "^3.3.0",

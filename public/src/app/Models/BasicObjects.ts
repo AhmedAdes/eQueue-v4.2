@@ -11,8 +11,8 @@ export const UserRoles = [
 ]
 
 export const CompanyTypes = [
-    'Client',
-    'Provider'
+    { class: 0, name: 'Client' },
+    { class: 1, name: 'Provider' }
 ]
 
 export const WorkFields = [

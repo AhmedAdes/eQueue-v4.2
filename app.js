@@ -50,6 +50,7 @@ var comp = require("./routes/company.js");
 var brnc = require("./routes/branch.js");
 var dept = require("./routes/department.js");
 var srvc = require("./routes/service.js");
+var tckt = require("./routes/ticket.js");
 
 app.use("/", index);
 app.use("/api/auth", login);
@@ -58,6 +59,7 @@ app.use("/api/comp", comp);
 app.use("/api/brnc", brnc);
 app.use("/api/dept", dept);
 app.use("/api/srvc", srvc);
+app.use("/api/tckt", tckt);
 
 Connection.connect(err => {
   if (err) {

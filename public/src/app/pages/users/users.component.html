@@ -1,1 +1,8 @@
 <ng2-smart-table [settings]="settings" [source]="data"></ng2-smart-table>
+
+<ul class="menu">
+  <li *ngFor="let tkt of tickets | async; let i = index">
+      <h3>{{tkt.ServiceNo}}</h3>
+      <h4>{{tkt.DeptID}}</h4>
+  </li>
+</ul>

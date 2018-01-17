@@ -52,5 +52,13 @@ export class Service {
   DeptID: number;
   DeptName: string;
   Disabled: boolean;
-  checked: boolean
+}
+export class QueueService {
+  QID: number;
+  ServID: number;
+  ServName: string;
+  DeptID: number;
+  checked: boolean;
+  ServCount: number;
+  Notes: string;
 }
