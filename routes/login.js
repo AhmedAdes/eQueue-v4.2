@@ -27,12 +27,12 @@ router.post("/", function (req, res, next) {
           admin: ret.recordset[0].UserName
         };
         var token = jwt.sign(payload, ret.recordset[0].Salt, {
-          expiresIn: 8999996400, // expires in 86400 sec = 1440 min = 24 hours
+          expiresIn: 86400, // expires in 86400 sec = 1440 min = 24 hours
           algorithm: 'HS384'
         });
 
         res.json({
-          user: ret[0],
+          user: ret.recordset,
           tkn: token,
           salt: ret.recordset[0].Salt
         });

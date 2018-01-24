@@ -13,6 +13,11 @@ export function handleTime(time) {
   const mm = tt.getMinutes();
   return pad('00', hh, true) + ':' + pad('00', mm, true);
 }
+export function changeToServerTime(t) {
+  let vt = new Date(t)
+  let no = vt.setMinutes(vt.getMinutes() + vt.getTimezoneOffset()) 
+  return new Date(no).toISOString()
+}
 
 export function pad(padding, str, padLeft) {
   if (typeof str === 'undefined') {

@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { CurrentUser, Ticket, Company, Department, Service, Branch } from 'app/Models';
+import * as hf from '../../helper.functions'
+import { TicketService, AuthenticationService } from 'app/services';
 
 @Component({
   selector: 'app-history',
@@ -7,9 +10,92 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HistoryComponent implements OnInit {
 
-  constructor() { }
+  currentUser: CurrentUser = this.auth.getUser()
+  chkDate = true
+  chkComp = false
+  chkBrnc = false
+  chkDept = false
+  chkServ = false
+  selDate: string
+  selComp: number
+  selDept: number
+  selBrnc: number
+  selServ: number
+  allList: any[]
+  compList: Company[] = []
+  brncList: Branch[] = []
+  deptList: Department[] = []
+  servList: Service[] = []
+  ticketList: Ticket[] = []
+  Ticketmodel = new Ticket()
+  showDetails = false
+
+  constructor(private srvTkt: TicketService, private auth: AuthenticationService) { }
 
   ngOnInit() {
+    this.selDate = hf.handleDate(new Date())
+    this.srvTkt.getUserSrchDetails(this.currentUser.uID).subscribe(cols => {
+      this.allList = cols
+      this.compList = cols[0]
+      this.brncList = cols[1]
+      this.deptList = cols[2]
+      this.servList = cols[3]
+    })
+    this.ViewReport()
   }
-
+  ViewReport() {
+    this.srvTkt.getTicketHistory(
+      this.chkDate ? this.selDate : undefined,
+      this.chkComp ? this.selComp : undefined,
+      this.chkBrnc ? this.selBrnc : undefined,
+      this.chkDept ? this.selDept : undefined,
+      this.chkServ ? this.selServ : undefined,
+      this.currentUser.uID).subscribe(t => {
+        if (t.error) {
+          hf.handleError(t.error)
+          this.ticketList = []
+          return
+        }
+        this.ticketList = t
+      }, err => hf.handleError(err))
+  }
+  onCompChange(val) {
+    if (val) {
+      this.brncList = this.allList[1].filter(b => b.CompID == val)
+    }
+  }
+  onCompCheck(chk) {
+    if (!chk) {
+      this.brncList = this.allList[1]
+      this.selComp = undefined
+    }
+  }
+  onBranchChange(val) {
+    if (val) {
+      this.deptList = this.allList[2].filter(d => d.BranchID == val)
+    }
+  }
+  onBranchCheck(chk) {
+    if (!chk) {
+      this.deptList = this.allList[2]
+      this.selBrnc = undefined
+    }
+  }
+  onDeptChange(val) {
+    if (val) {
+      this.servList = this.allList[3].filter(s => s.DeptID == val)
+    }
+  }
+  onDeptCheck(chk) {
+    if (!chk) {
+      this.servList = this.allList[3]
+      this.selDept = undefined
+    }
+  }
+  getTicketDetials(t: Ticket) {
+    this.srvTkt.getTicketDetails(t.QID).subscribe(t => {
+      if (t.error) { hf.handleError(t.error); return }
+      this.Ticketmodel = t
+    }, err => hf.handleError(err))
+  }
 }

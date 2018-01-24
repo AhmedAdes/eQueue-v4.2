@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthenticationService, DepartmentService, BranchService, UserService, CompanyService } from '../../services'
 import { User } from 'app/Models';
 import { WorkflowService } from 'app/pages/company-setup/workflow/workflow.service';
+import * as hf from '../helper.functions'
 
 @Component({
     selector: 'app-login-page',
@@ -58,20 +59,24 @@ export class LoginPageComponent {
         this.srvUser.CheckCompAdmin(this.srvAuth.currentUser.uID)
             .subscribe(res => {
                 //Get Not Completed Step. 
-                companyID = res.CompID;
-                if (companyID == null)
-                    companyID = 0;
-                this.srvComp.checkCompanySetup(companyID)
-                    .subscribe(
-                    res => {
-                        console.log(res);
-                        step = this.srvWorkFlow.getLoginFirstInvalidStep(res);
-                        if (step != null)
-                            this.router.navigate([`out/companySetup/${step}`]);
-                        else
-                            this.router.navigate([`home/dashboard`]);
-                    });
+                if (res.error) { hf.handleError(res.error); return }
+
+                if (res[0].UserRole !== 'CompAdmin') {
+                    this.router.navigate([`home/dashboard`]);
+                } else {
+                    companyID = res.CompID;
+                    if (companyID == null)
+                        companyID = 0;
+                    this.srvComp.checkCompanySetup(companyID)
+                        .subscribe(
+                        res => {
+                            step = this.srvWorkFlow.getLoginFirstInvalidStep(res);
+                            if (step != null)
+                                this.router.navigate([`out/companySetup/${step}`]);
+                            else
+                                this.router.navigate([`home/dashboard`]);
+                        });
+                }
             });
     }
-
 }

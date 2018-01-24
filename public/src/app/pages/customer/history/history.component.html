@@ -1,3 +1,158 @@
-<p>
-  history works!
-</p>
+<section id="horizontal-form-layouts">
+  <div class="row">
+    <div class="col-md-12" *ngIf="!showDetails">
+      <div class="card bg-grey bg-lighten-2">
+        <div class="card-body justify-content-center">
+          <div class="px-3">
+            <h3 class="card-title">
+              Filter By:
+            </h3>
+            <div class="form-group row">
+              <label for="selDate" class="col-3 text-right">
+                Select Date
+              </label>
+              <div class="col-7">
+                <div class="input-group my-0">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      <input type="checkbox" name="chkDate" id="chkDate" [(ngModel)]="chkDate">
+                    </div>
+                  </div>
+                  <input type="date" class="form-control" [disabled]="!chkDate" name="selDate" [(ngModel)]="selDate">
+                </div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="selComp" class="col-3 text-right">
+                Select Company
+              </label>
+              <div class="col-7">
+                <div class="input-group my-0">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      <input type="checkbox" name="chkComp" id="chkComp" [(ngModel)]="chkComp" (change)="onCompCheck($event.target.checked)">
+                    </div>
+                  </div>
+                  <select class="form-control" [disabled]="!chkComp" name="selComp" id="selComp" [(ngModel)]="selComp" (change)="onCompChange($event.target.value)">
+                    <option [value]="undefined">Select a Company...</option>
+                    <option *ngFor="let item of compList" [value]="item.CompID">{{item.CompName}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="selBrnc" class="col-3 text-right">
+                Select Branch
+              </label>
+              <div class="col-7">
+                <div class="input-group my-0">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      <input type="checkbox" name="chkBrnc" id="chkBrnc" [(ngModel)]="chkBrnc" (change)="onBranchCheck($event.target.checked)">
+                    </div>
+                  </div>
+                  <select class="form-control" [disabled]="!chkBrnc" name="selBrnc" id="selBrnc" [(ngModel)]="selBrnc" (change)="onBranchChange($event.target.value)">
+                    <option [value]="undefined">Select a Branch...</option>
+                    <option *ngFor="let item of brncList" [value]="item.BranchID">{{item.BranchName}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="selDept" class="col-3 text-right">
+                Select Department
+              </label>
+              <div class="col-7">
+                <div class="input-group my-0">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      <input type="checkbox" name="chkDept" id="chkDept" [(ngModel)]="chkDept" (change)="onDeptCheck($event.target.checked)">
+                    </div>
+                  </div>
+                  <select class="form-control" [disabled]="!chkDept" name="selDept" id="selDept" [(ngModel)]="selDept" (change)="onDeptChange($event.target.value)">
+                    <option [value]="undefined">Select a Department...</option>
+                    <option *ngFor="let item of deptList" [value]="item.DeptID">{{item.DeptName}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="selServ" class="col-3 text-right">
+                Select Service
+              </label>
+              <div class="col-7">
+                <div class="input-group my-0">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      <input type="checkbox" name="chkServ" id="chkServ" [(ngModel)]="chkServ">
+                    </div>
+                  </div>
+                  <select class="form-control" [disabled]="!chkServ" name="selServ" id="selServ" [(ngModel)]="selServ">
+                    <option [value]="undefined">Select a Service...</option>
+                    <option *ngFor="let item of servList" [value]="item.ServID">{{item.ServName}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="form-group row justify-content-center">
+              <button class="col col-4 btn btn-raised btn-success btn-block" (click)="ViewReport()">
+                <i class="fa fa-search"></i> Start Search</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card bg-grey bg-lighten-2">
+        <div class="card-body">
+          <div class="p-2">
+            <table class="table table-hover">
+              <thead class="thead-dark text-center">
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Company</th>
+                  <th scope="col">Branch</th>
+                  <th scope="col">Department</th>
+                  <th scope="col">Visit Date</th>
+                  <th scope="col">Ticket No</th>
+                  <th scope="col">Visit Status</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody class="text-center">
+                <tr *ngFor="let tkt of ticketList; let i = index;">
+                  <th scope="row">{{i+1}}</th>
+                  <td>{{tkt.CompName}}</td>
+                  <td>{{tkt.BranchName}}</td>
+                  <td>{{tkt.DeptName}}</td>
+                  <td>{{tkt.VisitDate | date: 'dd-MM-yyyy'}}</td>
+                  <td>{{tkt.ServiceNo}}</td>
+                  <td>{{tkt.QStatus}}</td>
+                  <td>
+                    <button class="btn btn-raised btn-success btn-round" title="More Details">
+                      <i class="icon fa fa-arrow-circle-right"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12" *ngIf="showDetails">
+      <div class="card bg-grey bg-lighten-2">
+        <div class="card-header">
+          <h3> Ticket No.: {{Ticketmodel.ServiceNo}}</h3>
+        </div>
+        <div class="card-body">
+          <label class="control-label">Company: {{Ticketmodel.CompName}}</label>
+          <label class="control-label">Branch: {{Ticketmodel.BranchName}}</label>
+          <label class="control-label">Department: {{Ticketmodel.DeptName}}</label>
+          <label class="control-label">Booking Date: {{Ticketmodel.RequestDate}}</label>          
+          <label class="control-label">Visit Date: {{Ticketmodel.VisitDate}}</label>
+          <label class="control-label">Ticket Status: {{Ticketmodel.QStatus}}</label>
+          <label class="control-label">Company Name: {{Ticketmodel.CompName}}</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

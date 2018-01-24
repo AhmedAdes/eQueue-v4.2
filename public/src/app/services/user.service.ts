@@ -45,22 +45,4 @@ export class UserService {
     UpdateCompUser(id: number, user) {
         return this.http.put(this.url +'RegUserComp/'+ id,{ basic: user } , this.options).map(res => res.json());
     }
-    DeleteUser(id: number) {
-        return this.http.delete(this.url + id, this.options).map(res => res.json());
-    }
-
-    ApproveUser(id: number, ApproveUser: number) {
-        // this.options.headers.append("Content-type", "application/json");
-        return this.http.put(this.url + 'Approve/' + id, { id: id, appuser: ApproveUser }, this.options).map(res => res.json());
-    }
-    DisableUser(id: number) {
-        // this.options.headers.append("Content-type", "application/json");
-        return this.http.put(this.url + 'Disable/' + id, { id: id }, this.options).map(res => res.json());
-    }
-    RotateUsers(id1: number, id2: number) {
-        return this.http.put(this.url + 'Replace/' + id1, { id1: id1, id2: id2 }, this.options).map(res => res.json());
-    }
-    changePass(mod: User) {
-        return this.http.put(this.url + 'ChangePass/' + mod.UserID, mod, this.options).map(res => res.json());
-    }
 }

@@ -77,9 +77,9 @@ router.get("/compAdm/:id", function(req, res, next) {
   
   var request = new sql.Request(sqlcon);
   request
-    .query(`SELECT * FROM dbo.Users Where UserID=${req.params.id} And UserRole ='CompAdmin'`)
+    .query(`SELECT UserRole, ISNULL(CompID, 0) CompID FROM dbo.Users Where UserID=${req.params.id}`)
     .then(function(ret) {
-      res.json(ret.recordset[0]);
+      res.json(ret.recordset);
     })
     .catch(function(err) {
       if (err) {
@@ -89,7 +89,7 @@ router.get("/compAdm/:id", function(req, res, next) {
     });
 });
 // Update CompID in dbo.users once Company Created 
-router.put("RegUserComp/:id",function(req,res,next){
+router.put("/RegUserComp/:id",function(req,res,next){
    res.setHeader("Content-Type","application/json");
    var user = req.body;
    var request= new sql.Request(sqlcon);

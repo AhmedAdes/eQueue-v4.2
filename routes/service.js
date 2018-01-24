@@ -51,7 +51,7 @@ router.get("/DeptServs/:id(\\d+)", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query(`SELECT * FROM dbo.DeptServices Where DeptID = ${req.params.id}`)
+    .query(`SELECT * FROM dbo.DeptServices Where DeptID = ${req.params.id} AND Disabled=0`)
     .then(function (ret) { res.json(ret.recordset); })
     .catch(function (err) {
       if (err) { res.json({ error: err }); console.log(err); }

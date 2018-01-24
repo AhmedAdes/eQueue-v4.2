@@ -166,7 +166,7 @@ export class IssueTicketComponent implements OnInit {
       }
       this.servNo = cols.ServiceNo
       this.uniqueNo = cols.UniqueNo
-      this.visitTime = cols.VisitTime
+      this.visitTime = hf.changeToServerTime(cols.VisitTime)
       this.showForm = false
     }, err => hf.handleError(err))
   }

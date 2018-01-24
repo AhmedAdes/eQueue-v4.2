@@ -14,7 +14,19 @@ export class ActiveTicketComponent implements OnInit {
   constructor(private srvTkt: TicketService, private auth: AuthenticationService) { }
 
   ngOnInit() {
-    this.srvTkt.getActiveTickets(this.currentUser.uID).subscribe(cols => this.tickets = cols)
+    this.srvTkt.getActiveTickets(this.currentUser.uID).subscribe(cols => {
+      this.tickets = cols;
+      if (this.tickets) {
+        this.tickets.forEach(t => t['visTimeChngd'] = hf.changeToServerTime(t.VisitTime))
+      }
+    }, err => hf.handleError(err))
   }
-
+  CancelTicket(tkt: Ticket) {
+    this.srvTkt.CancelTicket(tkt.QID).subscribe(ret => {
+      if (ret.error) { hf.handleError(ret.error) }
+      if (ret.affected > 0) {
+        this.ngOnInit()
+      }
+    }, err => hf.handleError(err))
+  }
 }

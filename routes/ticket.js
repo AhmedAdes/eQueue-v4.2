@@ -52,8 +52,56 @@ router.get("/ActiveTickets/:id", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query(`SELECT * FROM MainQueue WHERE QStatus NOT IN ('Served', 'Not-Attended', 'Transferred') 
-            And UserID = ${req.params.id}`)
+    .query(`SELECT * FROM vwActiveTickets WHERE UserID = ${req.params.id};
+            SELECT * FROM vwActiveTicketsServices WHERE UserID = ${req.params.id};`)
+    .then(function (ret) {
+      let Que = ret.recordsets[0]
+      let Srv = ret.recordsets[1]
+      Que.forEach(q => {
+        q.Services = Srv.filter(s => s.QID == q.QID)
+      })
+      res.json(Que);
+    })
+    .catch(function (err) {
+      res.json({
+        error: err
+      });
+      console.log(err);
+    });
+});
+router.get("/TicketDetails/:id", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  var request = new sql.Request(sqlcon);
+  request
+    .query(`SELECT * FROM vwAllQueue WHERE QID = ${req.params.id};
+            SELECT * FROM vwAllQueueDetails WHERE QID = ${req.params.id};`)
+    .then(function (ret) {
+      let Que = ret.recordsets[0]
+      let Srv = ret.recordsets[1]
+      Que.forEach(q => {
+        q.Services = Srv.filter(s => s.QID == q.QID)
+      })
+      res.json(Que);
+    })
+    .catch(function (err) {
+      res.json({
+        error: err
+      });
+      console.log(err);
+    });
+});
+router.get("/TicketsHistory/:id/:vdate/:comp/:branc/:dept/:serv", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  var request = new sql.Request(sqlcon);
+  // @UserID INT, @CompID INT, @BranchID INT, @DeptID INT, @VisitDate DATE
+  request.input('UserID', req.params.id)
+  request.input('CompID', req.params.comp == 'undefined'? null : req.params.comp)
+  request.input('BranchID', req.params.branc == 'undefined'? null : req.params.branc)
+  request.input('DeptID', req.params.dept == 'undefined'? null : req.params.dept)
+  request.input('ServID', req.params.serv == 'undefined'? null : req.params.serv)
+  request.input('VisitDate', req.params.vdate == 'undefined'? null : req.params.vdate)
+  request
+    .execute(`SearchUserTickets`)
     .then(function (ret) {
       res.json(ret.recordset);
     })
@@ -64,7 +112,26 @@ router.get("/ActiveTickets/:id", function (req, res, next) {
       console.log(err);
     });
 });
-
+router.get("/SearchDetails/:id", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  var request = new sql.Request(sqlcon);
+  request
+    .query(`SELECT DISTINCT c.CompID, c.CompName FROM dbo.vwAllQueue q JOIN dbo.Branch b ON b.BranchID = q.BranchID 
+    JOIN dbo.Company c ON c.CompID = b.CompID WHERE UserID = ${req.params.id};
+    SELECT DISTINCT b.CompID, q.BranchID, b.BranchName FROM dbo.vwAllQueue q JOIN dbo.Branch b ON b.BranchID = q.BranchID WHERE UserID = ${req.params.id} ;
+    SELECT DISTINCT q.BranchID, q.DeptID, d.DeptName FROM dbo.vwAllQueue q JOIN dbo.CompDept d ON d.DeptID = q.DeptID WHERE UserID = ${req.params.id};
+    SELECT DISTINCT s.DeptID, q.ServID, s.ServName FROM dbo.vwAllQueueDetails q JOIN dbo.DeptServices s ON s.ServID = q.ServID
+    WHERE q.QID IN (SELECT QID FROM dbo.vwAllQueue WHERE UserID = ${req.params.id});`)
+    .then(function (ret) {
+      res.json(ret.recordsets);
+    })
+    .catch(function (err) {
+      res.json({
+        error: err
+      });
+      console.log(err);
+    });
+});
 router.get("/getToday", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   res.json(new Date());
@@ -72,7 +139,7 @@ router.get("/getToday", function (req, res, next) {
 router.post("/IssueNew", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   let det = req.body.tckt
-  
+
   let tvp = new sql.Table()
   tvp.columns.add('QID', sql.Int)
   tvp.columns.add('DeptID', sql.Int)
@@ -82,8 +149,8 @@ router.post("/IssueNew", function (req, res, next) {
 
   for (let i = 0; i < det.srvfrm.length; i++) {
     let r = det.srvfrm[i]
-    if(r.checked) {
-      tvp.rows.add(r.QID, det.dept, r.ServID, r.ServCount, r.Notes) ;
+    if (r.checked) {
+      tvp.rows.add(r.QID, det.dept, r.ServID, r.ServCount, r.Notes);
     }
   }
 
@@ -104,11 +171,13 @@ router.post("/IssueNew", function (req, res, next) {
         .ref("MainQueue/" + qid)
         .set({
           QID: qid,
-          VisitDate: det.vDate,
+          VisitDate: det.vDate.split('T')[0],
           DeptID: det.dept,
+          BranchID: det.branch,
           UserID: det.user,
           ServiceNo: ret.recordset[0].ServiceNo,
-          UniqueNo: ret.recordset[0].UniqueNo
+          UniqueNo: ret.recordset[0].UniqueNo,
+          QStatus: 'Waiting'
         })
       res.json(ret.recordset[0]);
     })
@@ -119,4 +188,31 @@ router.post("/IssueNew", function (req, res, next) {
       console.log(err);
     })
 })
+
+router.put("/CancelTicket/:id", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  var request = new sql.Request(sqlcon);
+  request.input('QID', req.params.id)
+  request
+    .execute(`CancelTicket`)
+    .then(function (ret) {
+      firebase
+        .database()
+        .ref("MainQueue/" + req.params.id)
+        .update({
+          QStatus: 'Cancelled'
+        })
+
+      res.json({
+        affected: ret.rowsAffected[0]
+      });
+    })
+    .catch(function (err) {
+      res.json({
+        error: err
+      });
+      console.log(err);
+    });
+});
+// CancelTicket
 module.exports = router;

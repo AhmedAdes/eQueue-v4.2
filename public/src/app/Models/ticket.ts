@@ -1,10 +1,19 @@
-
+import { QueueService } from './company'
 export class Ticket {
     QID: number;
-    VisitDate: string;
+    VisitDate: Date;
+    VisitTime: string;
     DeptID: number;
-    SerialNo: string;
+    DeptName: string;
+    BranchID: number;
+    BranchName: string;
+    CompID: number;
+    CompName: string;
+    ServiceNo: string;
     UniqueNo: string;
     UserID: number;
-    Status: string;
+    QStatus: string;
+    BranchAddress: string;
+    RequestDate: Date;
+    Services: QueueService[];
 }
