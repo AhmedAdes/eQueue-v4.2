@@ -35,7 +35,8 @@ export class AuthenticationService {
                 if (token) {
                     // set token property
                     this.token = token;
-                    this.salt = arrRet.user[0].Salt
+                    console.log(arrRet);
+                    this.salt = arrRet.salt
                     // var tt = new Buffer(arrRet.user[0].UserPhoto, 'base64')
                     let base64String
                     let photo
@@ -48,7 +49,7 @@ export class AuthenticationService {
                     }
                     this.currentUser = {
                         uID: arrRet.user[0].UserID, uName: arrRet.user[0].UserName, uRl: this.getRole(arrRet.user[0].UserRole),
-                        etyp: arrRet.user[0].EntityType, tkn: token, slt: arrRet.user[0].Salt, photo: photo,
+                        etyp: arrRet.user[0].EntityType, tkn: token, slt: arrRet.salt, photo: photo,
                         cID: arrRet.user[0].CompID, bID: arrRet.user[0].BranchID
                     }
 

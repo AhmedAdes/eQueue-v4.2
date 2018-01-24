@@ -6,6 +6,7 @@ import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import * as hf from '../helper.functions'
 
+
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
@@ -50,11 +51,13 @@ export class UsersComponent implements OnInit {
   };
 
   tickets: Observable<any>
-
+  
   constructor(private srvUsr: UserService, public db: AngularFireDatabase) {
+
     this.tickets = db.list('MainQueue',
       ref => ref.orderByChild('DeptID').equalTo('4')
-    ).valueChanges().map(tkts => { return tkts.filter((tkt) => {
+    ).valueChanges().map(tkts => {
+      return tkts.filter((tkt) => {
         if (tkt['VisitDate'] == hf.handleDate(new Date())) {
           return true;
         } else {
@@ -66,7 +69,7 @@ export class UsersComponent implements OnInit {
 
   ngOnInit() {
     this.srvUsr.getuser().subscribe(cols => this.data = new LocalDataSource(cols))
-    this.tickets.subscribe(k=> console.log(k))
+    this.tickets.subscribe(k => console.log(k))
   }
 
 }

@@ -1,0 +1,134 @@
+<div class="row">
+  <div class="px-1 py-0 col-md-12 col-sm-12 col-xs-12">
+    <div class="row" matchHeight="card">
+
+      <div class=" col-md-4 col-sm-6 col-xs-12">
+        <div class="card">
+          <div class="card-head py-0 px-0  bg-cyan white">
+            <div class="row px-2 py-1">
+              <div>
+                <i class="icon-user font-large-1"></i>
+              </div>
+              <h5 class="px-2">
+                <b>Client Details</b>
+              </h5>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="px-2 py-1">
+              <div class="media">
+                <div class="media-body text-left">
+                  <div class="row">
+                    <p class="mx-0 my-0 info">Company </p>
+                    <p class="mx-0 my-0 px-1 danger">{{sTicket.CompName}}</p>
+                  </div>
+                  <div class="row">
+                    <p class="mx-0 my-0 py-1 info">Unique No
+                      <span class="badge badge-primary ">{{sTicket.UniqueNo}} </span>
+                    </p>
+                  </div>
+                  <div class="row">
+                    <p class="mx-0 my-0 info">Booked By
+                      <span class="badge badge-info">{{sTicket.UserID}} </span>
+                    </p>
+                  </div>
+                  <div class="row">
+                    <p class="mx-0 my-0 py-1 info">Served By</p>
+                    <p class="mx-0 my-0 py-1 px-1 danger">{{sTicket.pUserName}}Islam</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class=" col-md-4 col-sm-6 col-xs-12">
+        <div class="card">
+
+          <div class="card-head py-0 px-0  bg-cyan white">
+            <div class="row px-2 py-1">
+              <div class="align-self-center">
+                <i class="icon-speech white font-large-1 float-right"></i>
+              </div>
+              <h5 class="px-2">
+                <b> Required Services</b>
+              </h5>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="px-2 py-1">
+              <div class="media">
+                <div class="media-body text-left">
+                  <div class="row" *ngFor="let srv of sTicket.Services">
+                    <div class="col-12">
+                      <p class=" mx-0 my-0 info">{{srv.ServName}}
+                        <span class="badge badge-success mr-1">{{srv.ServCount}} </span>
+                      </p>
+                    </div>
+                    <div class="col-12">
+                      <textarea *ngIf="srv.Notes" class="form-control">{{srv.Notes}} </textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class=" col-md-4 col-sm-6 col-xs-12">
+        <div class="card">
+
+          <div class="card-head py-0 px-0  bg-cyan white">
+            <div class="row px-2 py-1">
+
+              <div class="align-self-center">
+                <i class="ft-watch white font-large-1 float-right"></i>
+              </div>
+              <h5 class="px-2">
+                <b> Event Details</b>
+              </h5>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="px-2 py-1">
+              <div class="media">
+                <div class="media-body text-left">
+                  <div class="row">
+                    <p class="col-6 mx-0 my-0 info">Request Date</p>
+                    <p class="col-6 mx-0 my-0 px-1 danger">{{sTicket.RequestDate | date:'mediumDate'}} </p>
+
+                  </div>
+                  <div class="row">
+                    <p class="col-6 mx-0 my-0 info">Visit Date</p>
+                    <p class="col-6 mx-0 my-0 px-1 danger">{{sTicket.VisitDate | date:'mediumDate'}} </p>
+                  </div>
+                  <div class="row">
+                    <p class="col-6 mx-0 my-0 info">Est Visit Time</p>
+                    <p class="col-6 mx-0 my-0 px-1 danger">{{sTicket.VisitTime | date:'shortTime'}} </p>
+                  </div>
+                  <div *ngIf="sTicket.StartServeDT" class="row">
+                    <p class="col-6 mx-0 my-0 info">Start Time</p>
+                    <p class="col-6 mx-0 my-0 px-1 danger">{{sTicket.StartServeDT | date:'shortTime'}} </p>
+                  </div>
+                  <div *ngIf="sTicket.EndServeDT" class="row">
+                    <p class="mx-0 my-0 info">End Time</p>
+                    <p class="mx-0 my-0 px-1 danger">{{sTicket.EndServeDT | date:'shortTime'}} </p>
+                  </div>
+                  <div *ngIf="sTicket.ServingTime" class="row">
+                    <p class="mx-0 my-0 info">Serving Time</p>
+                    <p class="mx-0 my-0 px-1 danger">{{sTicket.ServingTime | date:'shortTime'}} </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>

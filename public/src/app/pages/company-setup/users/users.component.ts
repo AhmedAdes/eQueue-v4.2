@@ -34,16 +34,6 @@ export class UserComponent implements OnInit {
           this.companyId = res.CompID;
           this.getAllBranches();
         });
-
-      this.BranchID.valueChanges.subscribe(val => {
-
-        this.branches.filter(obj => obj.BranchID == val).map(b => {
-          this.branch.BranchID = b.BranchID;
-          this.branch.BranchName = b.BranchName;
-          this.branch.Departments = b.Departments;
-          this.branch.Users = b.Users;
-        });
-      });
     }
   }
   createForm() {
@@ -65,6 +55,17 @@ export class UserComponent implements OnInit {
       Departments: this.fb.array([], Validators.required),
       Disabled: [false]
     });
+    
+    
+      this.BranchID.valueChanges.subscribe(val => {
+        
+        this.branches.filter(obj => obj.BranchID == val).map(b => {
+          this.branch.BranchID = b.BranchID;
+          this.branch.BranchName = b.BranchName;
+          this.branch.Departments = b.Departments;
+          this.branch.Users = b.Users;
+        });
+      });    
   }
   getAllBranches() {
     this.srvBrnch.getBrnchsDepts(this.companyId)

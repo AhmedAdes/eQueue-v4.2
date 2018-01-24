@@ -65,7 +65,6 @@ CREATE TABLE DeptServices
 	[Disabled] BIT DEFAULT 0, -- For CompanyAdmin Use	
 	CONSTRAINT PK_DeptServices PRIMARY KEY CLUSTERED (ServID)
 )
-
 CREATE TABLE Users 
 ( --for each provider company there is a default reception ticketing user
 	UserID INT IDENTITY(1,1) NOT NULL,
@@ -120,6 +119,7 @@ CREATE TABLE MainQueue
 	EstServingTime INT,
 	CONSTRAINT PK_MainQueue PRIMARY KEY CLUSTERED (QID)
 )
+
 CREATE TABLE QueueDetails
 (
 	QID INT,
@@ -230,8 +230,7 @@ INSERT dbo.Users
 VALUES  ( @CompID, @BranchID, @UserName, @UserRole, @EntityType,  @ManagerID, @Phone, @Mobile, @Email, @Title, 
 		HASHBYTES('SHA2_512', @UserPass+CAST(@Salt AS NVARCHAR(36))), @Salt )
 GO
-
-
+-------------------------------------------------------------------
 CREATE  PROC CompanyInsert
 @CompName nvarchar(300),@Country nvarchar(100), @City nvarchar(100), 
 @CompType nvarchar(50),@CompAddress nvarchar(max),@Phone nvarchar(50),@Mobile nvarchar(50),
@@ -243,7 +242,28 @@ Values
 (@CompName,@Country,@City,@CompType,@CompAddress,@Phone,@Mobile,@Website,@Email,@Fax,@Description,@WorkField,@DefaultLanguage,@Disabled)
 select IDENT_CURRENT('dbo.Company') AS CompId
 GO
-
+----------------Alter CompanyInsert 
+ALTER PROC CompanyInsert
+@UserID INT,@CompName nvarchar(300),@Country nvarchar(100), @City nvarchar(100), 
+@CompType nvarchar(50),@CompAddress nvarchar(max),@Phone nvarchar(50),@Mobile nvarchar(50),
+@Website nvarchar(50),@Email nvarchar(200),@Fax nvarchar(200),@Description nvarchar(max),
+@WorkField nvarchar(100),@DefaultLanguage nvarchar(20),@Disabled bit 
+AS
+DECLARE @CompID INT
+-----Create New Company
+INSERT dbo.Company
+(CompName,Country,City,CompType,CompAddress,Phone,Mobile,Website,Email,Fax,Description,WorkField, DefaultLanguage	,Disabled)
+Values	
+(@CompName,@Country,@City,@CompType,@CompAddress,@Phone,@Mobile,@Website,@Email,@Fax,@Description,@WorkField,@DefaultLanguage,@Disabled);
+-----SELECT CompID 
+SELECT @CompID = IDENT_CURRENT('dbo.Company');
+-----Update CompID in CompAdmin User
+UPDATE dbo.Users 
+SET CompID = @CompID 
+WHERE UserID = @UserID;
+select IDENT_CURRENT('dbo.Company') AS CompId
+GO
+-------------------------------------------------------------------
 CREATE PROC	CompanyUpdate
 @CompId INT ,@CompName nvarchar(300),@Country nvarchar(100), @City nvarchar(100)
 ,@CompAddress nvarchar(max),@Phone nvarchar(50),@Mobile nvarchar(50),
@@ -315,7 +335,7 @@ AS
 				BEGIN
 					SET @UserNO = (SELECT MAX(EstUserNo) + 1 FROM @tbl)
 				END
-			END	
+			END		
 			ELSE
 			BEGIN
 				SELECT TOP 1 @VisitTime = QRY.VisTime, @UserNO = QRY.EstUserNo FROM (
@@ -326,7 +346,7 @@ AS
 	UPDATE dbo.MainQueue SET VisitTime= @VisitTime, EstUserNo=@UserNO WHERE QID=@QID
 GO
 
-ALTER Proc IssueTicket
+Create Proc IssueTicket
 	@CompID int, @DeptID INT, @BranchID INT, @UserID INT, @VisitDate DATE, @QueueDetails tpQueueDetails READONLY
 as
 	DECLARE @ServSerial INT,  @VisTime TIME, @cQID INT 

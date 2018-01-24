@@ -1,0 +1,31 @@
+.badge{
+    margin: 2px;
+    padding: 5px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+.waiting{
+    color: red;
+    background-color: white;
+    border: solid 1px blue;
+}
+.served{
+    color: white;
+    background-color: green;
+} 
+.current{
+    color: white;
+    background-color: darkorange;
+}
+.pending{
+    color: white;
+    background-color: blue;
+}
+.notAttend{
+    color: white;
+    background-color: black;
+}
+.hold{
+    color: white;
+    background-color: deeppink;
+}

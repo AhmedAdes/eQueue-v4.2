@@ -95,11 +95,11 @@ router.get("/TicketsHistory/:id/:vdate/:comp/:branc/:dept/:serv", function (req,
   var request = new sql.Request(sqlcon);
   // @UserID INT, @CompID INT, @BranchID INT, @DeptID INT, @VisitDate DATE
   request.input('UserID', req.params.id)
-  request.input('CompID', req.params.comp == 'undefined'? null : req.params.comp)
-  request.input('BranchID', req.params.branc == 'undefined'? null : req.params.branc)
-  request.input('DeptID', req.params.dept == 'undefined'? null : req.params.dept)
-  request.input('ServID', req.params.serv == 'undefined'? null : req.params.serv)
-  request.input('VisitDate', req.params.vdate == 'undefined'? null : req.params.vdate)
+  request.input('CompID', req.params.comp == 'undefined' ? null : req.params.comp)
+  request.input('BranchID', req.params.branc == 'undefined' ? null : req.params.branc)
+  request.input('DeptID', req.params.dept == 'undefined' ? null : req.params.dept)
+  request.input('ServID', req.params.serv == 'undefined' ? null : req.params.serv)
+  request.input('VisitDate', req.params.vdate == 'undefined' ? null : req.params.vdate)
   request
     .execute(`SearchUserTickets`)
     .then(function (ret) {
@@ -132,6 +132,23 @@ router.get("/SearchDetails/:id", function (req, res, next) {
       console.log(err);
     });
 });
+router.get("/SelectedTicket/:id", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  var request = new sql.Request(sqlcon);
+  request
+    .query(`SELECT * FROM vwDailyTickets  WHERE QID = ${req.params.id};
+            SELECT * FROM vwDailyTicketsServices WHERE QID =  ${req.params.id};`)
+    .then(function (ret) {
+      res.json(ret.recordsets);
+    })
+    .catch(function (err) {
+      res.json({
+        error: err
+      });
+      console.log(err);
+    });
+});
+
 router.get("/getToday", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   res.json(new Date());
@@ -188,7 +205,6 @@ router.post("/IssueNew", function (req, res, next) {
       console.log(err);
     })
 })
-
 router.put("/CancelTicket/:id", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
@@ -215,4 +231,29 @@ router.put("/CancelTicket/:id", function (req, res, next) {
     });
 });
 // CancelTicket
+router.put("/updateTicket/:id", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  let ticket = req.body;
+  let request = new sql.Request(sqlcon);
+
+  request.input("QID", ticket.QID);
+  request.input("StartServeDT", ticket.StartServeDT);
+  request.input("EndServeDT", ticket.EndServeDT);
+  request.input("QStatus", ticket.QStatus);
+  request.input("QCurrent", ticket.QCurrent);
+  request.input("QTransfer", ticket.QTransfer);
+  request.input("ProvUserID", ticket.ProvUserID);
+  request.input("CallTime", ticket.CallTime);
+
+  request.execute("TicketUpdate")
+    .then(function (ret) {
+      firebase
+        .database()
+        .ref("MainQueue/" + ticket.QID)
+        .update({
+          QStatus: 'Waiting'
+        })
+      res.json(ret.rowsAffected[0]);
+    })
+})
 module.exports = router;

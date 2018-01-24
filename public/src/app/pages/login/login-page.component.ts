@@ -4,7 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthenticationService, DepartmentService, BranchService, UserService, CompanyService } from '../../services'
 import { User } from 'app/Models';
 import { WorkflowService } from 'app/pages/company-setup/workflow/workflow.service';
-import * as hf from '../helper.functions'
+import * as hf from '../helper.functions';
 
 @Component({
     selector: 'app-login-page',

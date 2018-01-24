@@ -1,0 +1,68 @@
+<div>
+  <div *ngIf="sTk.QID>0" class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <active-queue [tId]="sTk.QID"></active-queue>
+    </div>
+  </div>
+  <div class="row">
+
+    <div class="card col-md-12 col-sm-12 col-xs-12">
+      <div class="block-button px-3 py-3">
+        <a [class.active]="(sDept && (dept.DeptName == sDept.DeptName))" class="btn btn-outline-danger btn-lg btn-round " href="javascript:void(0)"
+          *ngFor="let dept of depts" (click)="onDeptSelect(dept)">{{dept.DeptName}} </a>
+      </div>
+      <div *ngIf="sDept" class="card-body">
+        <div class="card-block">
+
+          <div class="row">
+            <div class="col-md-3">
+              <button class="btn btn-primary btn-raised btn-block" (click)="changeList(0)">
+                All Queue
+                <span class="badge badge-pill badge-danger">{{all}} </span>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-primary btn-raised btn-block" (click)="changeList(1)">Hold Queue
+                <span class="badge badge-pill badge-danger">{{hold}} </span>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-primary btn-raised btn-block" (click)="changeList(2)">Transferred Queue
+                <span class="badge badge-pill badge-danger">{{trans}} </span>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-primary btn-raised btn-block" (click)="changeList(3)">VIP Queue
+                <span class="badge badge-pill badge-danger">{{vip}} </span>
+              </button>
+            </div>
+          </div>
+
+          <div class="row">
+            <span *ngFor="let t of sTkts" class="badge badge-danger" 
+              [class.waiting]="t.QStatus == 'Waiting'" [class.served]="t.QStatus == 'Served'"
+              [class.current]="t.QStatus == 'Current' && t.ProvUserID == currentUser.uID" 
+              [class.otherCurrent]="t.QStatus == 'Current' && t.ProvUserID != currentUser.uID"
+              [class.pending]="t.QStatus == 'Pending'" 
+              [class.notAttend]="t.QStatus == 'Not-Attended'" 
+              [class.hold]="t.QStatus == 'Hold'"
+              [class.hold]="(sTk) && t.QID == sTk.QID" 
+              (click)="onQSelect(t)">
+              {{t.ServiceNo}}
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+      <div class="card-footer ">
+        <div class="block-button position-sticky px-3 py-3">
+          <a class="col-md-2 btn btn-outline-info btn-lg btn-round " href="javascript:void(0)" (click)="nextQ()">NEXT Q</a>
+          <a class="col-md-2  btn btn-outline-success btn-lg btn-round " href="javascript:void(0)">Start</a>
+          <a class="col-md-2 btn btn-outline-warning btn-lg btn-round " href="javascript:void(0)">Transfer</a>
+          <a class="col-md-2 btn btn-outline-primary btn-lg btn-round " href="javascript:void(0)">Hold</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
