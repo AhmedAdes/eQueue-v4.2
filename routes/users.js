@@ -77,8 +77,8 @@ router.get("/compAdm/:id", function (req, res, next) {
 
   var request = new sql.Request(sqlcon);
   request
-    .query(`SELECT UserRole, ISNULL(CompID,0) CompID FROM dbo.Users Where UserID=${req.params.id}`)
-    .then(function (ret) {
+    .query(`SELECT UserRole, ISNULL(CompID, 0) CompID FROM dbo.Users Where UserID=${req.params.id}`)
+    .then(function(ret) {
       res.json(ret.recordset);
     })
     .catch(function (err) {

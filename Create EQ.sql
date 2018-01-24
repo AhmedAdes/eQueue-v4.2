@@ -107,7 +107,7 @@ CREATE TABLE MainQueue
 	VisitDate DATE,
 	VisitTime TIME, --(Approx.) updated based on cancelation of previous records
 	StartServeDT DATETIME2,
-	QStatus NVARCHAR(20), -- (Served // Hold // Pending // Not-Attended // Waiting // Current // Transferred)
+	QStatus NVARCHAR(20), -- (Served // Hold // Pending // Not-Attended // Waiting // Current // Transferred // Cancelled)
 	EndServeDT DATETIME2, --only with Served//Not-Served//Not-Attended
 	ServingTime INT, --in seconds Only increment with Hold
 	QCurrent BIT,
@@ -231,19 +231,8 @@ VALUES  ( @CompID, @BranchID, @UserName, @UserRole, @EntityType,  @ManagerID, @P
 		HASHBYTES('SHA2_512', @UserPass+CAST(@Salt AS NVARCHAR(36))), @Salt )
 GO
 -------------------------------------------------------------------
-CREATE  PROC CompanyInsert
-@CompName nvarchar(300),@Country nvarchar(100), @City nvarchar(100), 
-@CompType nvarchar(50),@CompAddress nvarchar(max),@Phone nvarchar(50),@Mobile nvarchar(50),
-@Website nvarchar(50),@Email nvarchar(200),@Fax nvarchar(200),@Description nvarchar(max),
-@WorkField nvarchar(100),@DefaultLanguage nvarchar(20),@Disabled bit AS
-INSERT dbo.Company
-(CompName,Country,City,CompType,CompAddress,Phone,Mobile,Website,Email,Fax,Description,WorkField, DefaultLanguage	,Disabled)
-Values	
-(@CompName,@Country,@City,@CompType,@CompAddress,@Phone,@Mobile,@Website,@Email,@Fax,@Description,@WorkField,@DefaultLanguage,@Disabled)
-select IDENT_CURRENT('dbo.Company') AS CompId
-GO
 ----------------Alter CompanyInsert 
-ALTER PROC CompanyInsert
+CREATE PROC CompanyInsert
 @UserID INT,@CompName nvarchar(300),@Country nvarchar(100), @City nvarchar(100), 
 @CompType nvarchar(50),@CompAddress nvarchar(max),@Phone nvarchar(50),@Mobile nvarchar(50),
 @Website nvarchar(50),@Email nvarchar(200),@Fax nvarchar(200),@Description nvarchar(max),
@@ -349,11 +338,12 @@ GO
 Create Proc IssueTicket
 	@CompID int, @DeptID INT, @BranchID INT, @UserID INT, @VisitDate DATE, @QueueDetails tpQueueDetails READONLY
 as
-	DECLARE @ServSerial INT,  @VisTime TIME, @cQID INT 	
+	DECLARE @ServSerial INT,  @VisTime TIME, @cQID INT 
 	Select @ServSerial= ISNULL(MAX(QNumber), 0) +1 FROM MainQueue Where BranchID=@BranchID and DeptID=@DeptID AND VisitDate = @VisitDate
 	DECLARE @ServLetter nvarchar(5) = (Select Letter From CompDept Where DeptID=@DeptID )
 	DECLARE @TotSrvTime INT = (SELECT SUM(ServCount * s.ServTime) FROM @QueueDetails q JOIN dbo.DeptServices s ON s.ServID = q.ServID)
-	
+	DECLARE @VIP BIT = (SELECT CAST(ISNULL(CompID, 0) AS BIT) FROM dbo.Company WHERE CompID = @UserID)
+
 	INSERT MainQueue 
 			(BranchID, DeptID, VisitDate, VisitTime, UserID, QLetter, QNumber, RequestDate, QStatus, UniqueNo, EstServingTime)
 	VALUES (@BranchID, @DeptID, @VisitDate, DATEADD(MINUTE, 20, @VisTime), @UserID, @ServLetter, dbo.LPAD(@ServSerial, '0', 4), GETDATE(), 
@@ -369,7 +359,7 @@ as
 			( QID, DeptID, ServID, ServCount, Notes )
 	SELECT @cQID, DeptID, ServID, ServCount, Notes FROM @QueueDetails
 
-	Select QID, ServiceNo, UniqueNo, VisitTime, EstUserNo From MainQueue Where QID = @cQID
+	Select QID, ServiceNo, UniqueNo, VisitTime, EstUserNo, @VIP VIP From MainQueue Where QID = @cQID
 GO
 
 CREATE PROC UserCompanyUpdate
@@ -692,7 +682,47 @@ FROM MainQueue q
 JOIN dbo.QueueDetails qd ON qd.QID = q.QID
 JOIN dbo.DeptServices s ON s.ServID = qd.ServID
 GO
+--------------------------------------20-1-2018--------------------------------------------
 
+-------------------------------------------------------------------------
+ALTER VIEW vwActiveTickets 
+AS
+SELECT QID ,q.UserID, u.UserName ,q.BranchID, b.BranchName ,q.DeptID, d.DeptName ,QLetter ,QNumber ,ServiceNo ,RequestDate ,VisitDate ,VisitTime ,
+       QStatus ,QCurrent ,QTransfer ,UniqueNo , b.BranchAddress ,EstUserNo ,EstServingTime ,c.CompID, c.CompName
+FROM MainQueue q 
+JOIN dbo.Users u ON u.UserID = q.UserID
+JOIN dbo.CompDept d ON d.DeptID = q.DeptID
+JOIN dbo.Branch b ON b.BranchID = q.BranchID
+JOIN dbo.Company c ON c.CompID = b.CompID
+WHERE QStatus NOT IN ('Served', 'Cancelled', 'Not-Attended', 'Transferred') 
+GO
+
+ALTER VIEW vwActiveTicketsServices
+AS
+SELECT q.QID, q.UserID, qd.ServID, s.ServName, qd.ServCount, qd.Notes 
+FROM MainQueue q 
+JOIN dbo.QueueDetails qd ON qd.QID = q.QID
+JOIN dbo.DeptServices s ON s.ServID = qd.ServID
+GO
+-------------------------------------------------------------------------
+CREATE VIEW vwAllQueue
+AS
+SELECT QID, UserID, BranchID, DeptID, ServiceNo, RequestDate, VisitDate, VisitTime, StartServeDT, EndServeDT, 
+	QStatus, ServingTime, QCurrent, QTransfer, TransferedFrom, UniqueNo, ProvUserID 
+FROM dbo.MainQueue
+UNION ALL
+SELECT QID, UserID, BranchID, DeptID, ServiceNo, RequestDate, VisitDate, VisitTime, StartServeDT, EndServeDT, 
+	QStatus, ServingTime, QCurrent, QTransfer, TransferedFrom, UniqueNo, ProvUserID 
+FROM dbo.ArchiveMainQueue
+GO
+CREATE VIEW vwAllQueueDetails
+AS
+SELECT QID, ServID, ServCount, Notes
+FROM dbo.QueueDetails
+UNION ALL
+SELECT QID, ServID, ServCount, Notes
+FROM dbo.ArchiveQueueDetails
+GO
 -------------------------------------------------------------------------
 CREATE PROC CancelTicket 
 (@QID INT) AS
@@ -700,12 +730,13 @@ UPDATE dbo.MainQueue SET QStatus = 'Cancelled' WHERE QID=@QID
 GO
 -------------------------------------------------------------------------
 CREATE PROC SearchUserTickets
-@UserID INT, @CompID INT, @BranchID INT, @DeptID INT, @VisitDate DATE
+@UserID INT, @CompID INT, @BranchID INT, @DeptID INT, @ServID INT, @VisitDate DATE
 AS
 DECLARE @str NVARCHAR(max)= 
 	'SELECT QID ,q.UserID, u.UserName ,q.BranchID, b.BranchName ,q.DeptID, d.DeptName ,ServiceNo ,RequestDate ,VisitDate ,VisitTime ,
 		   QStatus ,QCurrent ,QTransfer ,UniqueNo , b.BranchAddress ,c.CompID, c.CompName
 	FROM dbo.vwAllQueue q 
+	LEFT JOIN dbo.vwAllQueueDetails qd ON qd.QID = q.QID
 	JOIN dbo.Users u ON u.UserID = q.UserID
 	JOIN dbo.CompDept d ON d.DeptID = q.DeptID
 	JOIN dbo.Branch b ON b.BranchID = q.BranchID
@@ -727,6 +758,11 @@ DECLARE @str NVARCHAR(max)=
 	BEGIN
 		SET @str += ' And q.DeptID= ' + CAST(@DeptID AS VARCHAR(9))
 	END
+	IF (@ServID IS NOT NULL)
+	BEGIN
+		SET @str += ' And qd.ServID= ' + CAST(@ServID AS VARCHAR(9))
+	END
+
 	EXEC sp_executesql @str
 GO
 -----------------------------------------------------

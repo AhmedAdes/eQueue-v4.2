@@ -57,7 +57,7 @@ router.get("/allProviders/all", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query(`SELECT * FROM dbo.Company Where CompType = 'Provider'`)
+    .query(`SELECT * FROM dbo.Company Where CompType = 'Provider' AND Disabled=0`)
     .then(function(ret) { res.json(ret.recordset); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
@@ -67,7 +67,7 @@ router.get("/allConsumers/all", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query(`SELECT * FROM dbo.Company Where CompType = 'Client'`)
+    .query(`SELECT * FROM dbo.Company Where CompType = 'Client' AND Disabled=0`)
     .then(function(ret) { res.json(ret.recordset); })
     .catch(function(err) {
       if (err) { res.json({ error: err }); console.log(err); }
@@ -79,6 +79,7 @@ router.get("/checkCompanySetup/:id",function(req,res,next){
   request.input("id",req.params.id);
   request.execute("CompanySetupStatus")
   .then(function (ret) {
+    console.log(ret.recordset)
     res.json(ret.recordset[0]);      
   })
   .catch(function (err) {

@@ -22,11 +22,24 @@ export class TicketService {
     getActiveTickets(userId: number) {
         return this.http.get(this.url + 'ActiveTickets/' + userId, this.options).map(res => res.json());
     }
+    getTicketHistory(vDate, compId, branchId, deptId, servId, userId: number) {
+        return this.http.get(this.url + 'TicketsHistory/' + userId + '/' + vDate + '/' + compId
+            + '/' + branchId + '/' + deptId + '/' + servId, this.options).map(res => res.json());
+    }
+    CancelTicket(QID: number) {
+        return this.http.put(this.url + 'CancelTicket/' + QID, { id: QID }, this.options).map(res => res.json())
+    }
+    getTicketDetails(id: number) {
+        return this.http.get(this.url + 'TicketDetails/' + id, this.options).map(res => res.json());
+    }
     getSelectedTicket(id: number) {
         return this.http.get(this.url + 'SelectedTicket/' + id, this.options).map(res => res.json());
     }
     GetToday(): any {
         return this.http.get(this.url + 'getToday/', this.options).map(res => res.json());
+    }
+    getUserSrchDetails(userId: number) {
+        return this.http.get(this.url + 'SearchDetails/' + userId, this.options).map(res => res.json());
     }
     updateTicket(id: number, ticket: Ticket) {
         return this.http.put(this.url + 'updateTicket/' + id, ticket, this.options).map(res => res.json());

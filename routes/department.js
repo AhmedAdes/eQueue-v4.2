@@ -101,7 +101,7 @@ router.get("/BranchDept/:id(\\d+)", function (req, res, next) {
   var request = new sql.Request(sqlcon);
   request
     .query(`SELECT d.* FROM dbo.CompDept d JOIN dbo.BranchDepts b ON b.DeptID = d.DeptID
-            WHERE b.BranchID = ${req.params.id}`)
+            WHERE b.BranchID = ${req.params.id} AND d.Disabled=0`)
     .then(function (ret) { res.json(ret.recordset); })
     .catch(function (err) {
       if (err) { res.json({ error: err }); console.log(err); }

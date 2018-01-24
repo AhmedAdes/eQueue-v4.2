@@ -98,7 +98,6 @@
 
               </div>
               <div class="form-actions center clearfix">
-                <pre>{{inFrm.invalid | json}}</pre>
                 <button type="submit" class="btn btn-lg btn-raised btn-primary">
                   <i class="fa fa-check-square-o"></i> Issue
                 </button>
@@ -111,7 +110,7 @@
                 <h2> Your Ticket No is </h2>
                 <h2 class="display-1"> {{servNo}} </h2>
                 <h3> Your Estimated Visit Time is </h3>
-                <h2 class="display-1"> {{visitTime}} </h2>
+                <h2 class="display-1"> {{visitTime | date: 'shortTime'}} </h2>
                 <p>Please come before your estimated time by around 10 minutes</p>
                 <p>Please Remember the following number:
                   <u class="font-weight-bold text-danger">{{uniqueNo}}</u>
