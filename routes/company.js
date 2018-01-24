@@ -99,26 +99,28 @@ router.get("/getCompId/:id",function(req,res,next){
 });
 router.post("/", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
-  var comp = req.body;
+  var comp = req.body.basic;
+  var userID = req.body.userID;
   var request = new sql.Request(sqlcon);
-  request.input("CompName", comp.compName);
-  request.input("Country", comp.country);
-  request.input("City", comp.city);
-  request.input("CompType", comp.comptype);
-  request.input("CompAddress", comp.compaddress);
-  request.input("Phone", comp.phone);
-  request.input("Mobile", comp.mobile);
-  request.input("Website", comp.website);
-  request.input("Email", comp.email);
-  request.input("Fax", comp.fax);
-  request.input("Description", comp.description);
-  request.input("WorkField", comp.workfield);
-  request.input("DefaultLanguage", comp.defaultlanguage);
-  request.input("Disabled", comp.disabled);
+  request.input("UserID", userID);  
+  request.input("CompName", comp.CompName);
+  request.input("Country", comp.Country);
+  request.input("City", comp.City);
+  request.input("CompType", comp.CompType);
+  request.input("CompAddress", comp.CompAddress);
+  request.input("Phone", comp.Phone);
+  request.input("Mobile", comp.Mobile);
+  request.input("Website", comp.Website);
+  request.input("Email", comp.Email);
+  request.input("Fax", comp.Fax);
+  request.input("Description", comp.Description);
+  request.input("WorkField", comp.WorkField);
+  request.input("DefaultLanguage", comp.DefaultLanguage);
+  request.input("Disabled", comp.Disabled);
 
   request.execute("CompanyInsert")
     .then(function (ret) {
-      res.json({ returnValue: ret.returnValue,recordset:ret.recordset, affected: ret.rowsAffected[0] });      
+      res.json(ret.recordset);      
     })
     .catch(function (err) {
       res.json({ error: err });

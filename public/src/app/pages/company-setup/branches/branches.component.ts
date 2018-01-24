@@ -130,8 +130,7 @@ export class BranchesComponent implements OnInit {
         this.branch = branch;
         this.branch.Country = this.countries.find(c=>c.name == branch.Country).code;
         this.SetDepartments(this.branch.Departments);
-        this.form.patchValue(this.branch);
-        console.log(this.branch);
+        this.form.patchValue(this.branch);        
     }
     OnSubmit() {
         this.assignBranchValue();

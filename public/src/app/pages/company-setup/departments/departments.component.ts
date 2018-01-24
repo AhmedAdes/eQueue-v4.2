@@ -23,11 +23,11 @@ export class DepartmentsComponent implements OnInit {
     services: any[] = [];
     department = new Department();
     service = new Service();
-    
+
     form: FormGroup;
 
     constructor(private router: Router,
-        private route: ActivatedRoute, 
+        private route: ActivatedRoute,
         private srvComp: CompanyService, private srvDept: DepartmentService, private srvServ: DeptServsService,
         private srvAuth: AuthenticationService, private fb: FormBuilder) {
 
@@ -47,6 +47,7 @@ export class DepartmentsComponent implements OnInit {
     }
 
     ngOnInit() {
+        console.log(this.companyId)
         if (this.companyId == 0) {
             this.srvComp.getCompanyId(this.srvAuth.getUser().uID)
                 .subscribe(res => {
@@ -55,6 +56,8 @@ export class DepartmentsComponent implements OnInit {
                     this.form.patchValue({ CompID: this.companyId });
 
                     this.getAllDepts();
+                    console.log(this.companyId)
+
                 });
         }
     }
@@ -180,11 +183,11 @@ export class DepartmentsComponent implements OnInit {
         }
         this.Reset();
     }
-    Next(){
+    Next() {
         this.router.navigateByUrl('/out/companySetup/branches', { relativeTo: this.route.parent, skipLocationChange: true });
     }
-    Previous(){
-        this.router.navigateByUrl('/out/companySetup/companies', { relativeTo: this.route.parent, skipLocationChange: true });        
+    Previous() {
+        this.router.navigateByUrl('/out/companySetup/companies', { relativeTo: this.route.parent, skipLocationChange: true });
     }
     get DeptName() { return this.form.get('DeptName'); }
     get CompID() { return this.form.get('CompID'); }

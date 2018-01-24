@@ -5,6 +5,7 @@ import { AuthGuard } from '../../services/auth.guard';
 import { FullLayoutPageComponent } from 'app/pages/full-layout-page/full-layout-page.component';
 import { UsersComponent } from '../users/users.component';
 import { CustomerLayoutComponent } from '../customer'
+import { QueueLayoutComponent } from '../queue'
 import { CompanyComponent } from 'app/pages/company-setup/company/company.component';
 import { DepartmentsComponent } from 'app/pages/company-setup/departments/departments.component';
 import { BranchesComponent } from 'app/pages/company-setup/branches/branches.component';
@@ -23,19 +24,20 @@ const routes: Routes = [
   }
   ,
   { path: 'customer', loadChildren: '../customer/customer.module#CustomerModule' },
+  { path: 'queue', loadChildren: '../queue/queue.module#QueueModule' },
   {
-    path: 'companies', component: CompanyComponent, canActivate: [AuthGuard]    
+    path: 'companies', component: CompanyComponent, canActivate: [AuthGuard]
   },
   {
-    path: 'departments', component: DepartmentsComponent, canActivate: [AuthGuard]    
+    path: 'departments', component: DepartmentsComponent, canActivate: [AuthGuard]
   }
   ,
   {
-    path: 'branches', component: BranchesComponent, canActivate: [AuthGuard]    
+    path: 'branches', component: BranchesComponent, canActivate: [AuthGuard]
   }
   ,
   {
-    path: 'user', component: UserComponent, canActivate: [AuthGuard]    
+    path: 'user', component: UserComponent, canActivate: [AuthGuard]
   }
 ];
 

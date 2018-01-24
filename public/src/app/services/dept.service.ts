@@ -26,16 +26,19 @@ export class DepartmentService {
     getCompDepts(compId: number) {
         return this.http.get(this.url + 'CompDept/' + compId, this.options).map(res => res.json());
     }
+    getUserDepts(userId: number) {
+        return this.http.get(this.url+ 'UserDept/' + userId, this.options).map(res => res.json());
+    }
     getBranchDepts(brncId: number) {
         return this.http.get(this.url + 'BranchDept/' + brncId, this.options).map(res => res.json());
     }
-    checkCompDepts(compId: number){
-        return this.http.get(this.url + 'CheckCompDept/'+compId,this.options).map(res=>res.json());
+    checkCompDepts(compId: number) {
+        return this.http.get(this.url + 'CheckCompDept/' + compId, this.options).map(res => res.json());
     }
-    createCompDept(dept:Department){
-        return this.http.post(this.url,dept,this.options).map(res=>res.json());
+    createCompDept(dept: Department) {
+        return this.http.post(this.url, dept, this.options).map(res => res.json());
     }
-    updateCompDept(dept:Department){
-        return this.http.put(this.url+dept.DeptID,dept,this.options).map(res=>res.json());
+    updateCompDept(dept: Department) {
+        return this.http.put(this.url + dept.DeptID, dept, this.options).map(res => res.json());
     }
 }

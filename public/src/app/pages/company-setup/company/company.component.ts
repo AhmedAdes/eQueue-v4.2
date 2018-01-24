@@ -14,7 +14,7 @@ import { Input } from '@angular/core';
 })
 
 export class CompanyComponent implements OnInit {
-    @Input() companyId: any;
+    @Input() companyId: number = 0;
 
     company = new Company();
     countries = Countries;
@@ -31,10 +31,11 @@ export class CompanyComponent implements OnInit {
         this.createForm();
     }
 
-    ngOnInit() {
+    ngOnInit() {        
         this.srvComp.getCompanyId(this.srvAuth.getUser().uID)
             .subscribe(res => {
                 this.companyId = res.CompID;
+                console.log(this.companyId)
                 if (this.companyId == null)
                     this.spinner = false;
                 this.getData();
@@ -43,29 +44,26 @@ export class CompanyComponent implements OnInit {
 
     createForm() {
         this.form = this.fb.group({
-            id: [0],
-            compName: ['',
+            CompName: ['',
                 [
                     Validators.required,
                     Validators.minLength(5)
                 ]
             ],
-            country: ['', Validators.required],
-            city: ['', Validators.required],
+            Country: ['', Validators.required],
+            City: ['', Validators.required],
             //logo: [],
-            comptype: ['Provider', Validators.required],
-            compaddress: [''],
-            phone: [''],
-            mobile: [''],
-            website: [''],
-            email: [''],
-            fax: [''],
-            description: [''],
-            workfield: ['', Validators.required],
-            defaultlanguage: ['', Validators.required],
-            disabled: ['']
+            CompAddress: [''],
+            Phone: [''],
+            Mobile: [''],
+            Website: [''],
+            Email: [''],
+            Fax: [''],
+            Description: [''],
+            WorkField: ['', Validators.required],
+            DefaultLanguage: ['', Validators.required]
         });
-        this.country.valueChanges.subscribe(val => {
+        this.Country.valueChanges.subscribe(val => {
             this.onCountryChange(val);
         })
     }
@@ -73,63 +71,33 @@ export class CompanyComponent implements OnInit {
         if (!val) return
         this.srvComp.getCountryCities(val)
             .subscribe(res => {
-                this.cities = res;                
+                this.cities = res;
             })
     }
     loadForm() {
-        this.form.setValue({
-            id: this.company.CompID,
-            compName: this.company.CompName,
-            country: this.countries.find(c=>c.name==this.company.Country).code,
-            city: this.cities,
-            comptype: this.company.CompType,
-            compaddress: this.company.CompAddress,
-            phone: this.company.Phone,
-            mobile: this.company.Mobile,
-            website: this.company.Website,
-            email: this.company.Email,
-            fax: this.company.Fax,
-            description: this.company.Description,
-            workfield: this.company.WorkField,
-            defaultlanguage: this.company.DefaultLanguage,
-            disabled: this.company.Disabled
-        });
+        this.form.patchValue(this.company);
         this.spinner = false;
     }
     getData() {
         if (this.companyId > 0 && this.companyId != null && this.companyId != undefined) {
-
             this.srvComp.getComp(this.companyId)
                 .subscribe((data) => {
+                    console.log(data);
                     this.company = data;
                     this.loadForm();
                     this.spinner = false;
                 });
         }
     }
-
     OnSubmit() {
-        if (this.id.value == 0 || this.id.value == undefined) {
-            this.srvComp.InsertComp(this.form.value)
-                .subscribe(
-                (res) => {
-                    let compId = res.recordset[0].CompId;
-                    let currUser = this.srvAuth.getUser();
-                    currUser.cID = compId;
-                    localStorage.setItem('currentUser', JSON.stringify(currUser));
+        this.assignValue();
+        if (this.companyId == 0 || this.companyId == null) {
+            let currUser = this.srvAuth.getUser();
 
-                    this.srvUsr.UpdateCompUser(currUser.uID, currUser)
-                        .subscribe(
-                        () => {
-                            this.router.navigateByUrl('/out/companySetup/departments', { relativeTo: this.route.parent, skipLocationChange: true });
-                        },
-                        (err) => {
-                            console.log(err);
-                        }
-                        );
-                },
-                (err) => {
-                    console.log(err);
+            this.srvComp.InsertComp(this.company, currUser.uID)
+                .subscribe(
+                res => {
+                    this.router.navigateByUrl('/out/companySetup/departments', { relativeTo: this.route.parent, skipLocationChange: true });
                 });
         }
         else {
@@ -142,22 +110,32 @@ export class CompanyComponent implements OnInit {
                 });
         }
     }
-    //Save button event Ends
-
-    get id() { return this.form.get('id'); }
-    get compName() { return this.form.get('compName'); }
-    get country() { return this.form.get('country'); }
-    get city() { return this.form.get('city'); }
-    get logo() { return this.form.get('logo'); }
-    get comptype() { return this.form.get('comptype'); }
-    get compaddress() { return this.form.get('compaddress'); }
-    get phone() { return this.form.get('phone'); }
-    get mobile() { return this.form.get('mobile'); }
-    get website() { return this.form.get('website'); }
-    get email() { return this.form.get('email'); }
-    get fax() { return this.form.get('fax'); }
-    get description() { return this.form.get('description'); }
-    get workfield() { return this.form.get('workfield'); }
-    get defaultlanguage() { return this.form.get('defaultlanguage'); }
-    get disabled() { return this.form.get('disabled'); }
+    assignValue() {
+        this.company.CompName = this.CompName.value;
+        this.company.Country = this.Country.value;
+        this.company.City = this.City.value;
+        this.company.CompType = 'Provider';
+        this.company.CompAddress = this.CompAddress.value;
+        this.company.Phone = this.Phone.value;
+        this.company.Mobile = this.Mobile.value;
+        this.company.Website = this.Website.value;
+        this.company.Email = this.Email.value;
+        this.company.Fax = this.Fax.value;
+        this.company.Description = this.Description.value;
+        this.company.WorkField = this.WorkField.value;
+        this.company.DefaultLanguage = this.DefaultLanguage.value;
+        this.company.Disabled = false;
+    }
+    get CompName() { return this.form.get('CompName'); }
+    get Country() { return this.form.get('Country'); }
+    get City() { return this.form.get('City'); }
+    get CompAddress() { return this.form.get('CompAddress'); }
+    get Phone() { return this.form.get('Phone'); }
+    get Mobile() { return this.form.get('Mobile'); }
+    get Website() { return this.form.get('Website'); }
+    get Email() { return this.form.get('Email'); }
+    get Fax() { return this.form.get('Fax'); }
+    get Description() { return this.form.get('Description'); }
+    get WorkField() { return this.form.get('WorkField'); }
+    get DefaultLanguage() { return this.form.get('DefaultLanguage'); }
 }

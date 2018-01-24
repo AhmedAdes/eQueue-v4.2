@@ -53,6 +53,7 @@ export class Service {
   ServID: number;
   DeptID: number;
   DeptName: string;
+  ServTime: Number;
 }
 export class QueueService {
   QID: number;

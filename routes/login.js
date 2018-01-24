@@ -32,7 +32,7 @@ router.post("/", function (req, res, next) {
         });
 
         res.json({
-          user: ret[0],
+          user: ret.recordset,
           tkn: token,
           salt: ret.recordset[0].Salt
         });

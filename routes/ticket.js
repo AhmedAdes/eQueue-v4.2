@@ -64,6 +64,22 @@ router.get("/ActiveTickets/:id", function (req, res, next) {
       console.log(err);
     });
 });
+router.get("/SelectedTicket/:id", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  var request = new sql.Request(sqlcon);
+  request
+    .query(`SELECT * FROM vwDailyTickets  WHERE QID = ${req.params.id};
+            SELECT * FROM vwDailyTicketsServices WHERE QID =  ${req.params.id};`)
+    .then(function (ret) {
+      res.json(ret.recordsets);
+    })
+    .catch(function (err) {
+      res.json({
+        error: err
+      });
+      console.log(err);
+    });
+});
 
 router.get("/getToday", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
@@ -72,7 +88,7 @@ router.get("/getToday", function (req, res, next) {
 router.post("/IssueNew", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   let det = req.body.tckt
-  
+
   let tvp = new sql.Table()
   tvp.columns.add('QID', sql.Int)
   tvp.columns.add('DeptID', sql.Int)
@@ -82,8 +98,8 @@ router.post("/IssueNew", function (req, res, next) {
 
   for (let i = 0; i < det.srvfrm.length; i++) {
     let r = det.srvfrm[i]
-    if(r.checked) {
-      tvp.rows.add(r.QID, det.dept, r.ServID, r.ServCount, r.Notes) ;
+    if (r.checked) {
+      tvp.rows.add(r.QID, det.dept, r.ServID, r.ServCount, r.Notes);
     }
   }
 
@@ -104,11 +120,13 @@ router.post("/IssueNew", function (req, res, next) {
         .ref("MainQueue/" + qid)
         .set({
           QID: qid,
-          VisitDate: det.vDate,
+          VisitDate: det.vDate.split('T')[0],
           DeptID: det.dept,
+          BranchID: det.branch,
           UserID: det.user,
           ServiceNo: ret.recordset[0].ServiceNo,
-          UniqueNo: ret.recordset[0].UniqueNo
+          UniqueNo: ret.recordset[0].UniqueNo,
+          QStatus: 'Waiting'
         })
       res.json(ret.recordset[0]);
     })
@@ -117,6 +135,31 @@ router.post("/IssueNew", function (req, res, next) {
         error: err
       });
       console.log(err);
+    })
+})
+router.put("/updateTicket/:id", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  let ticket = req.body;
+  let request = new sql.Request(sqlcon);
+
+  request.input("QID", ticket.QID);
+  request.input("StartServeDT", ticket.StartServeDT);
+  request.input("EndServeDT", ticket.EndServeDT);
+  request.input("QStatus", ticket.QStatus);
+  request.input("QCurrent", ticket.QCurrent);
+  request.input("QTransfer", ticket.QTransfer);
+  request.input("ProvUserID", ticket.ProvUserID);
+  request.input("CallTime", ticket.CallTime);
+
+  request.execute("TicketUpdate")
+    .then(function (ret) {
+      firebase
+        .database()
+        .ref("MainQueue/" + ticket.QID)
+        .update({          
+          QStatus: 'Waiting'
+        })
+        res.json(ret.rowsAffected[0]);
     })
 })
 module.exports = router;

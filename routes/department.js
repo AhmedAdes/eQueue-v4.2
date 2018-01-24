@@ -48,6 +48,16 @@ router.get("/:id(\\d+)", function (req, res, next) {
     });
 });
 
+router.get("/UserDept/:userId", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  var request = new sql.Request(sqlcon);
+  request
+    .query(`Select d.DeptName ,d.DeptID  ,u.BranchID from dbo.CompDept d join dbo.UserDepts ud on d.DeptID = ud.DeptID And ud.UserID = ${req.params.userId} join dbo.Users u on u.UserID = ud.UserID `)
+    .then(function (ret) { res.json(ret.recordset) })
+    .catch(function (err) {
+      if (err) { res.json({ error: err }); console.log(err); }
+    });
+});
 router.get("/CompDept/:compId(\\d+)", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
@@ -55,11 +65,11 @@ router.get("/CompDept/:compId(\\d+)", function (req, res, next) {
   var departments = [];
   var services = [];
   var depts_services = [];
-  
+
   request
     .query(`SELECT * FROM dbo.CompDept Where CompID = ${req.params.compId}`) // Getting All Departments for specific Company 
     .then(function (ret) {
-      
+
       departments = ret.recordset;
 
       var request = new sql.Request(sqlcon);
@@ -69,11 +79,11 @@ router.get("/CompDept/:compId(\\d+)", function (req, res, next) {
           services = ret.recordset;
 
           for (var i = 0; i < departments.length; i++) {
-            
+
             depts_services.push(departments[i]);
 
-            depts_services[i].Services = services.filter(function(obj){
-              if(depts_services[i].DeptID === obj.DeptID){                
+            depts_services[i].Services = services.filter(function (obj) {
+              if (depts_services[i].DeptID === obj.DeptID) {
                 return true;
               }
             });
@@ -86,7 +96,7 @@ router.get("/CompDept/:compId(\\d+)", function (req, res, next) {
     });
 });
 
-router.get("/BranchDept/:id(\\+D)", function (req, res, next) {
+router.get("/BranchDept/:id(\\d+)", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
@@ -116,12 +126,12 @@ router.post("/", function (req, res, next) {
 
   // Create Table Variable Parameter to Hold Bulk Data (Services)
   var tvp = new sql.Table();
-  tvp.columns.add('DeptID', sql.Int);  
+  tvp.columns.add('DeptID', sql.Int);
   tvp.columns.add('ServName', sql.NVarChar(300));
   tvp.columns.add('Disabled', sql.Bit);
   //Add Data to the Table 
   for (var i = 0; i < dept.Services.length; i++) {
-    var deptID = dept.Services[i].DeptID;    
+    var deptID = dept.Services[i].DeptID;
     var servName = dept.Services[i].ServName;
     var disabled = dept.Services[i].Disabled;
     tvp.rows.add(deptID, servName, disabled);
@@ -150,14 +160,14 @@ router.put("/:DeptID", function (req, res, next) {
   var dept = req.body;
 
   var request = new sql.Request(sqlcon);
-  
-  request.input("DeptID", dept.DeptID);  
+
+  request.input("DeptID", dept.DeptID);
   request.input("CompID", dept.CompID);
   request.input("DeptName", dept.DeptName);
   request.input("RangeFrom", dept.RangeFrom);
   request.input("RangeTo", dept.RangeTo);
   request.input("Letter", dept.Letter);
-  request.input("Disabled", dept.Disabled);  
+  request.input("Disabled", dept.Disabled);
   request.execute("CompDeptUpdate").
     then(function (ret) {
       res.json(ret.recordset[0]);

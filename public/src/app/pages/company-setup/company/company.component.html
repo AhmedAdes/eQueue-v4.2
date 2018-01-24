@@ -16,57 +16,57 @@
                                 <div class='row'>
                                     <div class='col-sm-offset-1 col-10'>
                                         <div class="form-group">
-                                            <label class="form-control-label" for="compName">Company Name</label>
-                                            <input class="form-control input-md" formControlName="compName" id="compName" type="text" placeholder="Company Name">
-                                            <small class="form-text text-muted danger" *ngIf="!compName.valid && (compName.dirty || compName.touched)">
-                                                <div *ngIf="compName.errors.required">Company Name is required. </div>
-                                                <div *ngIf="compName.errors.minlength">Company must be at least 5 Characters. </div>
+                                            <label class="form-control-label" for="CompName">Company Name</label>
+                                            <input class="form-control input-md" formControlName="CompName" id="CompName" type="text" placeholder="Company Name">
+                                            <small class="form-text text-muted danger" *ngIf="!CompName.valid && (CompName.dirty || CompName.touched)">
+                                                <div *ngIf="CompName.errors.required">Company Name is required. </div>
+                                                <div *ngIf="CompName.errors.minlength">Company must be at least 5 Characters. </div>
                                             </small>
                                         </div>
 
                                         <div class="row">
                                             <div class='col-xs-12 col-sm-6'>
                                                 <div class="form-group">
-                                                    <label class="form-control-label" for="country">Country</label>
-                                                    <select class="form-control input-md" formControlName="country" id="country">
-                                                        <option value>Select your country</option>
-                                                        <option *ngFor="let country of countries" [value]="country.code">{{country.name}} </option>
+                                                    <label class="form-control-label" for="Country">Country</label>
+                                                    <select class="form-control input-md" formControlName="Country" id="Country">
+                                                        <option value>Select your Country</option>
+                                                        <option *ngFor="let Country of countries" [value]="Country.code">{{Country.name}} </option>
                                                     </select>
-                                                    <small class="form-text text-muted danger" *ngIf="!country.valid && (country.dirty || country.touched)">Please select a country!</small>
+                                                    <small class="form-text text-muted danger" *ngIf="!Country.valid && (Country.dirty || Country.touched)">Please select a country!</small>
                                                 </div>
                                             </div>
 
                                             <div class='col-12 col-sm-6'>
                                                 <div class="form-group form-group-style">
-                                                    <label class="form-control-label" for="city">City</label>
-                                                    <select class="form-control input-md" formControlName="city" id="city" type="text">
+                                                    <label class="form-control-label" for="City">City</label>
+                                                    <select class="form-control input-md" formControlName="City" id="City" type="text">
                                                         <option value>Select the Main City</option>
-                                                        <option *ngFor="let city of cities" [value]="city.name">{{city.name}}</option>
+                                                        <option *ngFor="let City of cities" [value]="City.name">{{City.name}}</option>
                                                     </select>
-                                                    <small class="form-text text-muted danger" *ngIf="!city.valid && (city.dirty || city.touched)">Please select a city!</small>
+                                                    <small class="form-text text-muted danger" *ngIf="!City.valid && (City.dirty || City.touched)">Please select a city!</small>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="form-group">
-                                            <label class="form-control-label" for="defaultlanguage">Default Language</label>
-                                            <select class="form-control input-md" formControlName="defaultlanguage" id="defaultlanguage" type="text" placeholder="Company Name">
+                                            <label class="form-control-label" for="DefaultLanguage">Default Language</label>
+                                            <select class="form-control input-md" formControlName="DefaultLanguage" id="DefaultLanguage" type="text" placeholder="Company Name">
                                                 <option value>Select your default language</option>
                                                 <option *ngFor="let language of languages" [value]="language.name">{{language.name}}</option>
                                             </select>
-                                            <small class="form-text text-muted danger" *ngIf="!defaultlanguage.valid && (defaultlanguage.dirty || defaultlanguage.touched)">
-                                                <div *ngIf="defaultlanguage.errors.required">Default Language is required. </div>
+                                            <small class="form-text text-muted danger" *ngIf="!DefaultLanguage.valid && (DefaultLanguage.dirty || DefaultLanguage.touched)">
+                                                <div *ngIf="DefaultLanguage.errors.required">Default Language is required. </div>
                                             </small>
                                         </div>
 
                                         <div class="form-group">
-                                            <label class="form-control-label" for="workfield">Workfield</label>
-                                            <select class="form-control input-md" formControlName="workfield" id="workfield" type="text" placeholder="Workfield">
+                                            <label class="form-control-label" for="WorkField">WorkField</label>
+                                            <select class="form-control input-md" formControlName="WorkField" id="WorkField" type="text" placeholder="WorkField">
                                                 <option value>Select Work field.</option>
-                                                <option *ngFor="let workfield of workfields" [value]="workfield">{{workfield}} </option>
+                                                <option *ngFor="let workField of workfields" [value]="workField">{{workField}} </option>
                                             </select>
-                                            <small class="form-text text-muted danger" *ngIf="!workfield.valid && (workfield.dirty || workfield.touched)">
-                                                <div *ngIf="workfield.errors.required">Workfield is required. </div>
+                                            <small class="form-text text-muted danger" *ngIf="!WorkField.valid && (WorkField.dirty || WorkField.touched)">
+                                                <div *ngIf="WorkField.errors.required">Workfield is required. </div>
                                             </small>
                                         </div>
                                     </div>
@@ -78,27 +78,27 @@
                                     </div>
                                     <div class='col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8'>
                                         <div class="form-group">
-                                            <label class="form-control-label" for="compaddress"> Address</label>
-                                            <textarea class="form-control input-md" formControlName="compaddress" id="compaddress" type="text" placeholder="Address"></textarea>
+                                            <label class="form-control-label" for="CompAddress"> Address</label>
+                                            <textarea class="form-control input-md" formControlName="CompAddress" id="CompAddress" type="text" placeholder="Address"></textarea>
                                         </div>
 
                                         <div class="row">
                                             <div class='col-xs-12 col-sm-4'>
                                                 <div class="form-group">
-                                                    <label class="form-control-label" for="phone">Phone</label>
-                                                    <input class="form-control input-md" formControlName="phone" id="phone" type="text" placeholder="phone">
+                                                    <label class="form-control-label" for="Phone">Phone</label>
+                                                    <input class="form-control input-md" formControlName="Phone" id="Phone" type="text" placeholder="phone">
                                                 </div>
                                             </div>
                                             <div class='col-xs-12 col-sm-4'>
                                                 <div class="form-group">
-                                                    <label class="form-control-label" for="fax">Fax</label>
-                                                    <input class="form-control input-md" formControlName="fax" id="fax" type="text" placeholder="fax">
+                                                    <label class="form-control-label" for="Fax">Fax</label>
+                                                    <input class="form-control input-md" formControlName="Fax" id="Fax" type="text" placeholder="fax">
                                                 </div>
                                             </div>
                                             <div class='col-xs-12 col-sm-4'>
                                                 <div class="form-group form-group-style">
-                                                    <label class="form-control-label" for="mobile">Mobile</label>
-                                                    <input class="form-control input-md" formControlName="mobile" id="mobile" type="text" placeholder="mobile">
+                                                    <label class="form-control-label" for="Mobile">Mobile</label>
+                                                    <input class="form-control input-md" formControlName="Mobile" id="Mobile" type="text" placeholder="mobile">
                                                 </div>
                                             </div>
                                         </div>
@@ -106,23 +106,23 @@
                                         <div class="row">
                                             <div class='col-xs-12 col-sm-6'>
                                                 <div class="form-group">
-                                                    <label class="form-control-label" for="website">Website</label>
-                                                    <input class="form-control input-md" formControlName="website" id="website" type="text" placeholder="website">
+                                                    <label class="form-control-label" for="Website">Website</label>
+                                                    <input class="form-control input-md" formControlName="Website" id="Website" type="text" placeholder="website">
                                                 </div>
                                             </div>
                                             <div class='col-12 col-sm-6'>
                                                 <div class="form-group form-group-style">
-                                                    <label class="form-control-label" for="email">Email</label>
-                                                    <input class="form-control input-md" formControlName="email" id="email" type="text" placeholder="email">
+                                                    <label class="form-control-label" for="Email">Email</label>
+                                                    <input class="form-control input-md" formControlName="Email" id="Email" type="text" placeholder="Email">
                                                 </div>
                                             </div>
                                         </div>
 
 
                                         <div class="form-group">
-                                            <label class="form-control-label" for="description">Description</label>
-                                            <textarea class="form-control input-md" formControlName="description" id="description" type="text" placeholder="Tell us more about your company"></textarea>
-                                        </div>
+                                            <label class="form-control-label" for="Description">Description</label>
+                                            <textarea class="form-control input-md" formControlName="Description" id="Description" type="text" placeholder="Tell us more about your company"></textarea>
+                                        </div>                                        
                                     </div>
                                 </div>
 
