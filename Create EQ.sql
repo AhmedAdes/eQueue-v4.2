@@ -335,14 +335,15 @@ AS
 	UPDATE dbo.MainQueue SET VisitTime= @VisitTime, EstUserNo=@UserNO WHERE QID=@QID
 GO
 
-Create Proc IssueTicket
+ALter Proc IssueTicket
 	@CompID int, @DeptID INT, @BranchID INT, @UserID INT, @VisitDate DATE, @QueueDetails tpQueueDetails READONLY
 as
-	DECLARE @ServSerial INT,  @VisTime TIME, @cQID INT 
+	DECLARE @ServSerial INT,  @VisTime TIME, @cQID INT
 	Select @ServSerial= ISNULL(MAX(QNumber), 0) +1 FROM MainQueue Where BranchID=@BranchID and DeptID=@DeptID AND VisitDate = @VisitDate
 	DECLARE @ServLetter nvarchar(5) = (Select Letter From CompDept Where DeptID=@DeptID )
 	DECLARE @TotSrvTime INT = (SELECT SUM(ServCount * s.ServTime) FROM @QueueDetails q JOIN dbo.DeptServices s ON s.ServID = q.ServID)
 	DECLARE @VIP BIT = (SELECT CAST(ISNULL(CompID, 0) AS BIT) FROM dbo.Company WHERE CompID = @UserID)
+	DECLARE @WaitingList INT = (SELECT COUNT(DISTINCT ServiceNo) FROM dbo.vwActiveTickets Where BranchID=@BranchID and DeptID=@DeptID AND VisitDate = @VisitDate)
 
 	INSERT MainQueue 
 			(BranchID, DeptID, VisitDate, VisitTime, UserID, QLetter, QNumber, RequestDate, QStatus, UniqueNo, EstServingTime)
@@ -359,7 +360,7 @@ as
 			( QID, DeptID, ServID, ServCount, Notes )
 	SELECT @cQID, DeptID, ServID, ServCount, Notes FROM @QueueDetails
 
-	Select QID, ServiceNo, UniqueNo, VisitTime, EstUserNo, @VIP VIP From MainQueue Where QID = @cQID
+	Select QID, ServiceNo, UniqueNo, VisitTime, EstUserNo, @WaitingList Waiting, @VIP VIP From MainQueue Where QID = @cQID
 GO
 
 CREATE PROC UserCompanyUpdate

@@ -46,7 +46,7 @@ export class UsersComponent implements OnInit {
       },
     },
     attr: {
-      class: 'table table-responsive'
+      class: 'table table-hover'
     }
   };
 
