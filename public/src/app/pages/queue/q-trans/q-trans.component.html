@@ -1,0 +1,16 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+  <div class="form-group">
+    <label for="DeptID">Department</label>
+    <select formControlName="DeptID" id="DeptID" class="form-control">
+      <option *ngFor="let dept of Depts" [value]="dept.DeptID">{{dept.DeptName}} </option>
+    </select>
+  </div>
+  <div class="row" formArrayName="Services">
+    <div class="col-md-6 form-group" *ngFor="let Serv of Services.controls;index as i" [formGroup]="Serv">
+      <label>{{Serv.get('ServName').value}} </label>
+      <input type="text" class="form-control" formControlName="ServCount">
+    </div>
+  </div>
+  <button [disabled]="form.invalid" type="submit" class="btn btn-outline-primary">Submit</button>
+</form>

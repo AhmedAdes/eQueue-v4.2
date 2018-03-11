@@ -18,9 +18,10 @@ import { AuthenticationService, AuthGuard, UserService, DepartmentService, Branc
 
 import { CompanyService } from 'app/services/comp.service';
 import { CompanySetupModule } from 'app/pages/company-setup/company-setup.module';
+import { AudioService } from 'app/services/audio.service';
 
 const Services = [AuthenticationService, UserService, AuthGuard,
-    CompanyService,DepartmentService,BranchService,DeptServsService]
+    CompanyService,DepartmentService,BranchService,DeptServsService,AudioService]
 const firebaseConfig = {
     apiKey: "AIzaSyBEzZp-q-FDr6NipFRU3IHAJ0X0Ul9zNHY",
     authDomain: "equeueing-5acb7.firebaseapp.com",

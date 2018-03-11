@@ -1,4 +1,4 @@
-import { Component, OnInit ,Input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'bootstrap-panel',
@@ -7,10 +7,13 @@ import { Component, OnInit ,Input } from '@angular/core';
 })
 export class BootstrapPanelComponent {
   constructor() { }
-  @Input() toggle :boolean;
+  @Input() toggle = false;
+  @Input() hBackColor = '#0277BD';
+  @Input() hColor = 'white';  
+  @Input() bBackColor = 'white';
+  @Input() bColor = 'blue';  
 
-
-  OnToggle(){
+  OnToggle() {
     this.toggle = !this.toggle;
   }
 }

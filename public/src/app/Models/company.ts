@@ -15,6 +15,7 @@ export class Company {
   WorkField: string;
   DefaultLanguage: string;
   Disabled: boolean;
+  MaxPend:number= 0;
 }
 export class Branch {
   BranchID: number;

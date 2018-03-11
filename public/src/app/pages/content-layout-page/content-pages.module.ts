@@ -12,6 +12,9 @@ import { AuthenticationService, AuthGuard, DepartmentService, BranchService, Dep
 
 import { FullPagesModule } from 'app/pages/full-layout-page/full-pages.module';
 import { CompanySetupModule } from 'app/pages/company-setup/company-setup.module';
+import { MainDisplayComponent } from 'app/pages/queue';
+import { SharedModule } from 'app/shared/shared.module';
+
 
 
 
@@ -21,11 +24,13 @@ import { CompanySetupModule } from 'app/pages/company-setup/company-setup.module
         FormsModule,
         ContentPagesRoutingModule,
         FullPagesModule,
-        CompanySetupModule
+        CompanySetupModule,
+        SharedModule
     ],
     declarations: [
         LoginPageComponent,
-        ContentLayoutPageComponent
+        ContentLayoutPageComponent,        
+        MainDisplayComponent
     ],
     providers: [AuthenticationService,AuthGuard,DepartmentService,BranchService,DeptServsService]
 })

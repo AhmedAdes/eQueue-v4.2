@@ -16,9 +16,12 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
-import {
-  CompanyService, BranchService, DepartmentService, DeptServsService, TicketService
-} from '../../services'
+import {CompanyService, BranchService, DepartmentService, DeptServsService, TicketService } from '../../services'
+import { SharedModule } from 'app/shared/shared.module';
+import { QInActionComponent } from './q-in-action/q-in-action.component';
+import { QTransComponent } from './q-trans/q-trans.component';
+
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyBEzZp-q-FDr6NipFRU3IHAJ0X0Ul9zNHY",
@@ -37,9 +40,14 @@ const firebaseConfig = {
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireDatabaseModule,
     AngularFireAuthModule,
+    SharedModule
   ],
   exports:[],
-  declarations: [QueueLayoutComponent,MainQueueComponent, QueueHistoryComponent, QueueScheduleComponent, ActiveQueueComponent, HoldQueueComponent, TransferredQueueComponent, VipQueueComponent, AllQueueComponent],
+  declarations: [QueueLayoutComponent,MainQueueComponent, QueueHistoryComponent,
+     QueueScheduleComponent, 
+    ActiveQueueComponent, HoldQueueComponent,
+     TransferredQueueComponent, VipQueueComponent, AllQueueComponent, 
+     QInActionComponent, QTransComponent],
   providers: [CompanyService, BranchService, DepartmentService, DeptServsService, TicketService],  
 })
 export class QueueModule { }

@@ -90,6 +90,22 @@ router.get("/TicketDetails/:id", function (req, res, next) {
       console.log(err);
     });
 });
+// Check if Ticket Already Transferred Before 
+router.get("/CheckTransQ/:id", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  var request = new sql.Request(sqlcon);
+  request
+    .query(`SELECT ISNULL(OQTransferred,0) as OQTransferred FROM MainQueue WHERE QID = ${req.params.id};`)
+    .then(function (ret) {
+      res.json(ret.recordset[0]);
+    })
+    .catch(function (err) {
+      res.json({
+        error: err
+      });
+      console.log(err);
+    });
+});
 router.get("/TicketsHistory/:id/:vdate/:comp/:branc/:dept/:serv", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
@@ -149,6 +165,21 @@ router.get("/SelectedTicket/:id", function (req, res, next) {
     });
 });
 
+router.get("/HoldEvents/:id", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  var request = new sql.Request(sqlcon);
+  request
+    .query(`SELECT StartTime,EndTime FROM QueueHoldDetails WHERE QID = ${req.params.id};`)
+    .then(function (ret) {
+      res.json(ret.recordset);
+    })
+    .catch(function (err) {
+      res.json({
+        error: err
+      });
+      console.log(err);
+    });
+});
 router.get("/getToday", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   res.json(new Date());
@@ -194,7 +225,8 @@ router.post("/IssueNew", function (req, res, next) {
           UserID: det.user,
           ServiceNo: ret.recordset[0].ServiceNo,
           UniqueNo: ret.recordset[0].UniqueNo,
-          QStatus: 'Waiting'
+          QStatus: 'Waiting',
+          QTransfer: false
         })
       res.json(ret.recordset[0]);
     })
@@ -231,29 +263,127 @@ router.put("/CancelTicket/:id", function (req, res, next) {
     });
 });
 // CancelTicket
+
 router.put("/updateTicket/:id", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   let ticket = req.body;
   let request = new sql.Request(sqlcon);
 
   request.input("QID", ticket.QID);
-  request.input("StartServeDT", ticket.StartServeDT);
-  request.input("EndServeDT", ticket.EndServeDT);
   request.input("QStatus", ticket.QStatus);
   request.input("QCurrent", ticket.QCurrent);
   request.input("QTransfer", ticket.QTransfer);
   request.input("ProvUserID", ticket.ProvUserID);
-  request.input("CallTime", ticket.CallTime);
+  request.input("FirstPendQ", ticket.FirstPendQ);
+  request.input("Qtask", ticket.Qtask);
 
   request.execute("TicketUpdate")
     .then(function (ret) {
+      switch (ticket.Qtask) {
+        case 'NEXT':
+
+          if (ticket.QTransfer == false) {
+            firebase
+              .database()
+              .ref("MainQueue/" + ticket.lastCurQ)
+              .update({
+                QStatus: 'Pending'
+              });
+            firebase
+              .database()
+              .ref("MainQueue/" + ticket.QID)
+              .update({
+                QStatus: ticket.QStatus,
+                ProvUserID: ticket.ProvUserID
+              });
+            firebase
+              .database()
+              .ref("MainQueue/" + ticket.FirstPendQ)
+              .update({
+                QStatus: 'NotAttended'
+              })
+          } else {
+            firebase
+              .database()
+              .ref("MainQueue/" + ticket.lastCurQ)
+              .update({
+                QStatus: 'NotAttended'
+              });
+            firebase
+              .database()
+              .ref("MainQueue/" + ticket.QID)
+              .update({
+                QStatus: ticket.QStatus,
+                ProvUserID: ticket.ProvUserID
+              });
+          };
+          break;
+        default:
+          firebase
+            .database()
+            .ref("MainQueue/" + ticket.QID)
+            .update({
+              QStatus: ticket.QStatus,
+              ProvUserID: ticket.ProvUserID
+            });
+          break;
+      }
+
+      res.json(ret.recordset[0]);
+    })
+})
+
+router.put("/transferTicket", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  let ticket = req.body;
+
+  let tvp = new sql.Table()
+  tvp.columns.add('QID', sql.Int)
+  tvp.columns.add('DeptID', sql.Int)
+  tvp.columns.add('ServID', sql.Int)
+  tvp.columns.add('ServCount', sql.Int)
+  tvp.columns.add('Notes', sql.NVarChar)
+
+  for (let i = 0; i < ticket.Services.length; i++) {
+    tvp.rows.add(
+      ticket.QID, ticket.DeptID,
+      ticket.Services[i].ServID, ticket.Services[i].ServCount,
+      "");
+  }
+  let request = new sql.Request(sqlcon);
+
+  request.input("QID", ticket.QID);
+  request.input("DeptID", ticket.DeptID);
+  request.input("NQTransferredFrom", ticket.NQTransferredFrom);
+  request.input("NQTransferredBy", ticket.NQTransferredBy);
+  request.input("OQTransferredBy", ticket.OQTransferredBy);
+  request.input("OQTransferredTo", ticket.OQTransferredTo);
+  request.input("QueueDetails", tvp);
+
+  request.execute("QTransfer")
+    .then(function (ret) {
+      let qid = ret.recordset[0].QID
       firebase
         .database()
-        .ref("MainQueue/" + ticket.QID)
-        .update({
-          QStatus: 'Waiting'
+        .ref("MainQueue/" + qid)
+        .set({
+          QID: qid,
+          VisitDate: ticket.VisitDate,
+          DeptID: ticket.DeptID,
+          BranchID: ticket.BranchID,
+          UserID: ticket.UserID,
+          ServiceNo: ticket.ServiceNo,
+          UniqueNo: ticket.UniqueNo,
+          QStatus: 'Transferred',
+          QTransfer: true
         })
-      res.json(ret.rowsAffected[0]);
+      res.json(ret.recordset[0]);
+    })
+    .catch(function (err) {
+      res.json({
+        error: err
+      });
+      console.log(err);
     })
 })
 module.exports = router;

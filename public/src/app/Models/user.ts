@@ -32,4 +32,5 @@ export class CurrentUser {
     photo: string;
     cID: number;
     bID: number;
+    uWD : number;
 }

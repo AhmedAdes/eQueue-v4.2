@@ -24,6 +24,7 @@ CREATE TABLE Company
 	[Disabled] BIT DEFAULT 0,	-- for ADMIN Use Only
 	CONSTRAINT PK_Company PRIMARY KEY CLUSTERED (CompID)
 )
+ALTER TABLE Company ADD MaxPend INT
 CREATE TABLE Branch
 (
 	BranchID INT IDENTITY(1,1) NOT NULL,
@@ -81,6 +82,7 @@ CREATE TABLE Users
 	AccessFailedCount INT DEFAULT 0, --for stopping the login process 
 	Title NVARCHAR(200), --Job Title
 	BranchID INT,
+	Window INT,
 	Salt UNIQUEIDENTIFIER ,
 	[Disabled] BIT DEFAULT 0, -- For CompanyAdmin Use	
 	CONSTRAINT PK_Users PRIMARY KEY CLUSTERED (UserID)
@@ -111,13 +113,19 @@ CREATE TABLE MainQueue
 	EndServeDT DATETIME2, --only with Served//Not-Served//Not-Attended
 	ServingTime INT, --in seconds Only increment with Hold
 	QCurrent BIT,
-	QTransfer BIT,
-	TransferedFrom INT, -- The Primary Key for the original Q
+	QCall Bit, -- true for first time to call the ticket then to be false , in case call again to change to true then false
+	QTransfer BIT,  -- to be used for NQTransfer Not for OQTransfer
+	NQTransferedFrom NVARCHAR(50), --  DeptName that Makes the Transfer for this New Q 
+	NQTransferedBy NVARCHAR(100) , -- The User Who Makes The Transfer for this New Q 
 	UniqueNo NVARCHAR(50),
 	ProvUserID INT, --The Employee Served the Customer 
 	EstUserNo INT,
 	EstServingTime INT,
 	CallTime DATETIME2,
+	OQTransferred BIT, -- To Know i'ts transferred to other Dept for OLD Q 
+	OQTransferredBy NVARCHAR(100), -- The Name of Employee who make the Trans for OLD Q 
+	OQTransferredTo NVARCHAR(50), -- The Name of Department ,these data for info only no need for ID for OLD Q 
+	OQTransferDT DATETIME2,
 	CONSTRAINT PK_MainQueue PRIMARY KEY CLUSTERED (QID)
 )
 CREATE TABLE QueueDetails
@@ -128,6 +136,20 @@ CREATE TABLE QueueDetails
 	ServCount INT,
 	Notes NVARCHAR(max),
 	CONSTRAINT PK_QueueDetails PRIMARY KEY CLUSTERED (QID,DeptID,ServID)
+)
+CREATE TABLE QueueHoldDetails
+(
+	QID INT,
+	StartTime DATETIME2,
+	EndTime DATETIME2 NULL,	
+	CONSTRAINT PK_QueueHoldDetails PRIMARY KEY CLUSTERED (QID,StartTime)
+)
+CREATE TABLE ArchiveQueueHoldDetails
+(
+	QID INT,
+	StartTime DATETIME2,
+	EndTime DATETIME2 NULL,	
+	CONSTRAINT PK_ArchiveQueueHoldDetails PRIMARY KEY CLUSTERED (QID,StartTime)
 )
 CREATE TABLE ArchiveMainQueue
 (
@@ -179,6 +201,7 @@ ALTER TABLE dbo.MainQueue ADD CONSTRAINT FK_MainQueue_Branch FOREIGN KEY (Branch
 ALTER TABLE dbo.QueueDetails ADD CONSTRAINT FK_QueueDetails_CompDept FOREIGN KEY (DeptID) REFERENCES dbo.CompDept(DeptID)
 ALTER TABLE dbo.QueueDetails ADD CONSTRAINT FK_QueueDetails_MainQueue FOREIGN KEY (QID) REFERENCES dbo.MainQueue(QID)
 ALTER TABLE dbo.QueueDetails ADD CONSTRAINT FK_QueueDetails_DeptServices FOREIGN KEY (ServID) REFERENCES dbo.DeptServices(ServID)
+ALTER TABLE dbo.QueueHoldDetails ADD CONSTRAINT FK_QueueHoldDetails_MainQueue FOREIGN KEY (QID) REFERENCES dbo.MainQueue(QID)
 -------------------------------------------
 ALTER TABLE dbo.ArchiveMainQueue ADD CONSTRAINT FK_ArchMainQueue_Users_customer FOREIGN KEY (UserID) REFERENCES dbo.Users(UserID)
 ALTER TABLE dbo.ArchiveMainQueue ADD CONSTRAINT FK_ArchMainQueue_Users_provider FOREIGN KEY (ProvUserID) REFERENCES dbo.Users(UserID)
@@ -190,7 +213,7 @@ ALTER TABLE dbo.ArchiveQueueDetails ADD CONSTRAINT FK_ArchQueueDetails_DeptServi
 GO
 
 
-CREATE PROC AuthenticateUser
+ALTER PROC AuthenticateUser
 @LoginName NVARCHAR(50), @UserPass NVARCHAR(50) AS
 IF EXISTS (SELECT TOP 1 UserID FROM dbo.Users WHERE Email=@LoginName)
 BEGIN
@@ -201,7 +224,7 @@ BEGIN
        IF(@userID IS NULL)
            SELECT 'Authentication failed. Wrong password.' AS Error
        ELSE 
-           SELECT UserID, UserName, CompID, BranchID, UserRole, EntityType, Salt FROM dbo.Users WHERE UserID = @userID
+           SELECT UserID, UserName, CompID, BranchID, UserRole, EntityType, Salt ,Window FROM dbo.Users WHERE UserID = @userID
 END
 ELSE
     SELECT 'Authentication failed. User not found.' AS Error
@@ -236,14 +259,14 @@ CREATE PROC CompanyInsert
 @UserID INT,@CompName nvarchar(300),@Country nvarchar(100), @City nvarchar(100), 
 @CompType nvarchar(50),@CompAddress nvarchar(max),@Phone nvarchar(50),@Mobile nvarchar(50),
 @Website nvarchar(50),@Email nvarchar(200),@Fax nvarchar(200),@Description nvarchar(max),
-@WorkField nvarchar(100),@DefaultLanguage nvarchar(20),@Disabled bit 
+@WorkField nvarchar(100),@DefaultLanguage nvarchar(20),@Disabled bit ,@MaxPend INT 
 AS
 DECLARE @CompID INT
 -----Create New Company
 INSERT dbo.Company
-(CompName,Country,City,CompType,CompAddress,Phone,Mobile,Website,Email,Fax,Description,WorkField, DefaultLanguage	,Disabled)
+(CompName,Country,City,CompType,CompAddress,Phone,Mobile,Website,Email,Fax,Description,WorkField, DefaultLanguage,Disabled,MaxPend)
 Values	
-(@CompName,@Country,@City,@CompType,@CompAddress,@Phone,@Mobile,@Website,@Email,@Fax,@Description,@WorkField,@DefaultLanguage,@Disabled);
+(@CompName,@Country,@City,@CompType,@CompAddress,@Phone,@Mobile,@Website,@Email,@Fax,@Description,@WorkField,@DefaultLanguage,@Disabled,@MaxPend);
 -----SELECT CompID 
 SELECT @CompID = IDENT_CURRENT('dbo.Company');
 -----Update CompID in CompAdmin User
@@ -257,13 +280,13 @@ CREATE PROC	CompanyUpdate
 @CompId INT ,@CompName nvarchar(300),@Country nvarchar(100), @City nvarchar(100)
 ,@CompAddress nvarchar(max),@Phone nvarchar(50),@Mobile nvarchar(50),
 @Website nvarchar(50),@Email nvarchar(200),@Fax nvarchar(200),@Description nvarchar(max),
-@WorkField nvarchar(100),@DefaultLanguage nvarchar(20) AS
+@WorkField nvarchar(100),@DefaultLanguage nvarchar(20),@MaxPend INT AS
 UPDATE dbo.Company 
 SET 
 CompName = @CompName , Country = @Country , City = @City , 
 CompAddress = @CompAddress , Phone = @Phone, Mobile = @Mobile , Website = @Website ,
 Email = @Email , Fax = @Fax , [Description] = @Description , WorkField = @WorkField,
-DefaultLanguage = @DefaultLanguage 
+DefaultLanguage = @DefaultLanguage , MaxPend = @MaxPend
 WHERE CompID = @CompId
 GO
 
@@ -310,7 +333,7 @@ AS
 	FROM dbo.MainQueue WHERE BranchID=@BranchID AND DeptID=@DeptID AND VisitDate=@VisitDate 
 
 	SELECT @Order = STK.QOrder FROM ( 
-	SELECT QID, QStatus, ROW_NUMBER() OVER ( ORDER BY QID ) AS QOrder  FROM @tbl WHERE QStatus IN ('Waiting') ) STK WHERE STK.QID = @QID
+	SELECT QID, QStatus, ROW_NUMBER() OVER ( ORDER BY QID ) AS QOrder  FROM @tbl ) STK WHERE STK.QID = @QID
 	IF (@Order = 1) 
 		BEGIN
 			SET @VisitTime = @OpenTime 
@@ -586,20 +609,160 @@ ON u.UserID = ud.UserID
 and bd.DeptID = ud.DeptID
 GO
 -----------------------------------------------------
-CREATE PROC TicketUpdate
-@QID INT , @StartServeDT DATETIME2 NULL , @EndServeDT DATETIME2 NULL,@QStatus NVARCHAR(20),@QCurrent BIT NULL
-,@QTransfer BIT NULL ,@ProvUserID INT,@CallTime INT
+-------SP Updated----------
+ALTER PROC TicketUpdate
+@QID INT ,@QStatus NVARCHAR(20),@QCurrent BIT NULL
+,@QTransfer BIT NULL ,@ProvUserID INT ,@Qtask NVARCHAR(40),@FirstPendQ INT
 AS
-UPDATE dbo.MainQueue 
-SET 
-StartServeDT = @StartServeDT ,
-EndServeDT = @EndServeDT ,
-QStatus = @QStatus ,
-QCurrent = @QCurrent ,
-QTransfer = @QTransfer,
-ProvUserID = @ProvUserID,
-CallTime = @CallTime
-WHERE QID = @QID;
+IF @Qtask ='NEXT'
+	Begin
+		IF @QTransfer = 0
+			Begin
+				UPDATE dbo.MainQueue 
+				SET 
+				QStatus = 'Pending'
+				,QCurrent =0
+				WHERE QSTATUS = 'Current'
+				AND StartServeDT IS NULL 
+				AND ProvUserID = @ProvUserID;
+
+				UPDATE dbo.MainQueue 
+				SET 		
+				QStatus = @QStatus ,
+				QCurrent = @QCurrent ,		
+				ProvUserID = @ProvUserID,
+				CallTime = GETDATE()
+				WHERE QID = @QID
+				AND QStatus = 'Waiting';
+
+				UPDATE dbo.MainQueue
+				SET
+				QStatus = 'NotAttended'
+				WHERE QID = @FirstPendQ; 
+			END
+		ELSE 
+			BEGIN			
+				UPDATE dbo.MainQueue 
+				SET 
+				QStatus = 'NotAttended'
+				,QCurrent =0
+				WHERE QSTATUS = 'Current'
+				AND StartServeDT IS NULL 
+				AND ProvUserID = @ProvUserID;
+
+				UPDATE dbo.MainQueue 
+				SET 		
+				QStatus = @QStatus ,
+				QCurrent = @QCurrent ,		
+				ProvUserID = @ProvUserID,
+				CallTime = GETDATE()
+				WHERE QID = @QID
+				AND QStatus = 'Transferred';		
+			END
+END
+ELSE IF @Qtask ='START'
+	BEGIN
+		UPDATE dbo.MainQueue 
+		SET 
+		StartServeDT = GETDATE(),		
+		QStatus = @QStatus,
+		QCurrent = @QCurrent ,		
+		ProvUserID = @ProvUserID		
+		WHERE QID = @QID
+		AND QStatus in ('Pending','Current');
+	END
+ELSE IF @Qtask in ('STOP' ,'HOLD')
+	BEGIN
+		UPDATE dbo.MainQueue 
+		SET 
+		EndServeDT = GETDATE(),		
+		QStatus = @QStatus,
+		QCurrent = @QCurrent,
+		ServingTime = DATEDIFF(second,StartServeDT,GETDATE())
+		WHERE QID = @QID
+		AND QStatus in ('Current')
+		AND ProvUserID = @ProvUserID;
+	END
+ELSE IF @Qtask = 'RESUMEQ'
+	BEGIN
+		UPDATE dbo.MainQueue 
+		SET 		
+		QStatus = @QStatus,
+		QCurrent = @QCurrent 		
+		WHERE QID = @QID
+		AND QStatus in ('Hold')
+		AND ProvUserID = @ProvUserID;
+		
+		INSERT INTO dbo.QueueHoldDetails
+			(QID,StartTime,EndTime)
+		VALUES 
+			(@QID , GETDATE(),NULL);
+	END
+ELSE IF @Qtask = 'ENDQ'
+	BEGIN
+		UPDATE dbo.MainQueue 
+		SET 		
+		QStatus = @QStatus,
+		QCurrent = @QCurrent 		
+		WHERE QID = @QID
+		AND QStatus in ('Hold')
+		AND ProvUserID = @ProvUserID;
+		
+		UPDATE dbo.QueueHoldDetails
+		SET EndTime = GETDATE()
+		WHERE QID = @QID AND EndTime is null;	
+
+		UPDATE dbo.MainQueue
+		SET ServingTime = (
+			(DATEDIFF(second,StartServeDT,EndServeDT)) + 
+			(Select Sum(DATEDIFF(second,StartTime,EndTime)) From QueueHoldDetails Where QID = @QID)
+		)
+		Where QID = @QID;
+	END
+SELECT @QID ; 
+GO
+-----------------------------------------------------
+---------------Transfer -----------------------------
+ALTER PROC QTransfer 
+@QID INT ,@DeptID INT ,@NQTransferredFrom NVARCHAR(50),@NQTransferredBy NVARCHAR(100),
+@OQTransferredBy NVARCHAR(100) ,@OQTransferredTo NVARCHAR(50),
+@QueueDetails tpQueueDetails READONLY
+AS
+DECLARE @NQID INT;
+DECLARE @TransBefore BIT;
+
+SELECT @TransBefore = ISNULL(OQTransferred,0) From dbo.MainQueue WHERE QID = @QID;
+IF @TransBefore = 0 
+	BEGIN
+		--1-- Update The Old Q 
+		UPDATE dbo.MainQueue 
+		SET 
+		OQTransferred = 1,
+		OQTransferredBY = @OQTransferredBy,
+		OQTransferredTo = @OQTransferredTo,
+		OQTransferDT = GETDATE()
+		WHERE QID = @QID ;
+
+		--2-- Insert The New Q 
+		INSERT dbo.MainQueue 
+		(UserID,BranchID,DeptID,QLetter,QNumber,RequestDate,VisitDate,
+		VisitTime,QStatus,QTransfer,UniqueNo,NQTransferredFrom,NQTransferredBy)
+		(SELECT 
+		UserID,BranchID,@DeptID,QLetter,QNumber,GETDATE(),VisitDate,
+		VisitTime,'Transferred',1,UniqueNo,@NQTransferredFrom,@NQTransferredBy
+		FROM dbo.MainQueue
+		WHERE QID = @QID
+		);
+
+		--3-- SELECT The Insert QID
+		SELECT @NQID = IDENT_CURRENT('MainQueue');
+
+		--4-- INSERTING The QDTls for Transferred Q 
+		INSERT dbo.QueueDetails
+		( QID, DeptID, ServID, ServCount, Notes )
+		SELECT @NQID, DeptID, ServID, ServCount, Notes FROM @QueueDetails;
+	END
+		SELECT IDENT_CURRENT('MainQueue')AS QID;
 GO
 -----------------------------------------------------
 CREATE	 PROC EndDay
@@ -655,10 +818,12 @@ FROM dbo.ArchiveMainQueue
 GO
 
 -------------------------------------------------------------------------
-CREATE VIEW vwDailyTickets 
+-----------View Updated-----------------------
+ALTER VIEW vwDailyTickets 
 AS
 SELECT QID ,q.UserID , cu.CompName as cCompName, u.UserName as cUserName,q.BranchID, b.BranchName ,q.DeptID, d.DeptName ,QLetter ,QNumber ,ServiceNo ,RequestDate ,VisitDate ,VisitTime 
 ,StartServeDT,EndServeDT,ServingTime,QStatus ,QCurrent ,QTransfer ,UniqueNo , b.BranchAddress ,EstUserNo ,EstServingTime ,c.CompID, c.CompName ,q.ProvUserID,p.UserName as pUserName
+,q.CallTime,q.NQTransferredBy,q.NQTransferredFrom,q.OQTransferDT,q.OQTransferred,q.OQTransferredBy,q.OQTransferredTo
 FROM MainQueue q 
 JOIN dbo.Users u ON u.UserID = q.UserID
 JOIN dbo.CompDept d ON d.DeptID = q.DeptID

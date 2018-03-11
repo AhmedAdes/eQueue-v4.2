@@ -118,6 +118,7 @@ router.post("/", function (req, res, next) {
   request.input("WorkField", comp.WorkField);
   request.input("DefaultLanguage", comp.DefaultLanguage);
   request.input("Disabled", comp.Disabled);
+  request.input("MaxPend", comp.MaxPend);
 
   request.execute("CompanyInsert")
     .then(function (ret) {
@@ -131,21 +132,23 @@ router.post("/", function (req, res, next) {
 router.put('/:id', function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var comp = req.body;
+  console.log(comp);
   var request = new sql.Request(sqlcon);
-  request.input("CompId", comp.id);
-  request.input("CompName", comp.compName);
-  request.input("Country", comp.country);
-  request.input("City", comp.city);
-  request.input("CompAddress", comp.compaddress);
-  request.input("Phone", comp.phone);
-  request.input("Mobile", comp.mobile);
-  request.input("Website", comp.website);
-  request.input("Email", comp.email);
-  request.input("Fax", comp.fax);
-  request.input("Description", comp.description);
-  request.input("WorkField", comp.workfield);
-  request.input("DefaultLanguage", comp.defaultlanguage);
-
+  request.input("CompId", comp.CompID);
+  request.input("CompName", comp.CompName);
+  request.input("Country", comp.Country);
+  request.input("City", comp.City);
+  request.input("CompAddress", comp.CompAddress);
+  request.input("Phone", comp.Phone);
+  request.input("Mobile", comp.Mobile);
+  request.input("Website", comp.Website);
+  request.input("Email", comp.Email);
+  request.input("Fax", comp.Fax);
+  request.input("Description", comp.Description);
+  request.input("WorkField", comp.WorkField);
+  request.input("DefaultLanguage", comp.DefaultLanguage);
+  request.input("MaxPend", comp.MaxPend);
+  
   request.execute("CompanyUpdate")
     .then(function (ret) {
       res.json({ returnValue: ret.returnValue, affected: ret.rowsAffected[0] });

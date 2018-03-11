@@ -35,6 +35,9 @@ export class TicketService {
     getSelectedTicket(id: number) {
         return this.http.get(this.url + 'SelectedTicket/' + id, this.options).map(res => res.json());
     }
+    getHoldEvents(id: number) {
+        return this.http.get(this.url + 'HoldEvents/' + id, this.options).map(res => res.json());
+    }
     GetToday(): any {
         return this.http.get(this.url + 'getToday/', this.options).map(res => res.json());
     }
@@ -43,5 +46,11 @@ export class TicketService {
     }
     updateTicket(id: number, ticket: Ticket) {
         return this.http.put(this.url + 'updateTicket/' + id, ticket, this.options).map(res => res.json());
+    }
+    transferTicket(ticket: Ticket) {
+        return this.http.put(this.url + 'transferTicket/', ticket, this.options).map(res => res.json());
+    }    
+    checkTransQ(id: number) {
+        return this.http.get(this.url + 'CheckTransQ/' + id, this.options).map(res => res.json());
     }
 }

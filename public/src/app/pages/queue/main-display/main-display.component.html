@@ -1,0 +1,22 @@
+<div class="row">
+  <div class="col-lg-6 col-md-6">
+    <iframe class="my-1 mx-0" width="600" height="600" src="https://www.youtube.com/embed/RKe96PMgvnw?rel=0&autoplay=1&showinfo=0&controls=0&loop=1&enablejsapi=1&mute=1"
+      frameborder="0"></iframe>
+  </div>
+  <div class="col-lg-6 col-md-6">
+    <div class="row">
+      <div *ngFor="let dept of departments" class="col-lg-6 col-md-6">
+        <div class="card">
+          <div class="card-header">{{dept.DeptName}} </div>
+          <div class="card-body">
+            <ul>
+              <li *ngFor="let tck of dept.tickets">
+                {{tck.ServiceNo}}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

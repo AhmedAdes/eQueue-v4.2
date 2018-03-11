@@ -9,6 +9,7 @@ import { NavbarComponent } from "./navbar/navbar.component";
 import { SidebarComponent } from "./sidebar/sidebar.component";
 import { ToggleFullscreenDirective } from "./directives/toggle-fullscreen.directive";
 import { BootstrapPanelComponent } from 'app/pages/bootstrap-panel/bootstrap-panel.component';
+import { StopWatchComponent } from '../pages/stop-watch/stop-watch.component';
 
 
 
@@ -19,6 +20,7 @@ import { BootstrapPanelComponent } from 'app/pages/bootstrap-panel/bootstrap-pan
         NavbarComponent,
         SidebarComponent,
         BootstrapPanelComponent,
+        StopWatchComponent,        
         ToggleFullscreenDirective,
         NgbModule
     ],
@@ -32,7 +34,8 @@ import { BootstrapPanelComponent } from 'app/pages/bootstrap-panel/bootstrap-pan
         NavbarComponent,
         SidebarComponent,
         BootstrapPanelComponent,
-        ToggleFullscreenDirective
+        ToggleFullscreenDirective,
+        StopWatchComponent
         ]
 })
 export class SharedModule { }

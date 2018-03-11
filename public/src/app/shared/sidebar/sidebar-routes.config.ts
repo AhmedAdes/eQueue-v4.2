@@ -53,6 +53,11 @@ export const ROUTES: RouteInfo[] = [
     }
     ,
     {
+        path: '/out/mdisplay', title: 'Main Display', icon: 'ft-codepen', class: '', 
+        badge: '', badgeClass: '', isExternalLink: false,submenu: []
+    }
+    ,
+    {
         path: '/home/customer/issue', title: 'Issue new Ticket', icon: 'ft-square', class: '',
         badge: '', badgeClass: '', isExternalLink: false, submenu: [], disable: curUser && curUser.etyp === 1
     },

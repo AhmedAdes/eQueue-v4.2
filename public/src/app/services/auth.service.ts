@@ -34,8 +34,7 @@ export class AuthenticationService {
                 const token = arrRet.tkn;
                 if (token) {
                     // set token property
-                    this.token = token;
-                    console.log(arrRet);
+                    this.token = token;                    
                     this.salt = arrRet.salt
                     // var tt = new Buffer(arrRet.user[0].UserPhoto, 'base64')
                     let base64String
@@ -46,11 +45,11 @@ export class AuthenticationService {
                         photo = 'data:image/PNG;base64,' + base64String
                     } else {
                         photo = './assets/img/avatar5.png'
-                    }
+                    }                    
                     this.currentUser = {
                         uID: arrRet.user[0].UserID, uName: arrRet.user[0].UserName, uRl: this.getRole(arrRet.user[0].UserRole),
                         etyp: arrRet.user[0].EntityType, tkn: token, slt: arrRet.salt, photo: photo,
-                        cID: arrRet.user[0].CompID, bID: arrRet.user[0].BranchID
+                        cID: arrRet.user[0].CompID, bID: arrRet.user[0].BranchID, uWD: arrRet.user[0].Window
                     }
 
                     // store username and jwt token in local storage to keep user logged in between page refreshes
@@ -78,7 +77,7 @@ export class AuthenticationService {
     }
     getType(typ: number): string {
         const Types = CompanyTypes
-        const ret = Types.find(t=> t.class == typ).name
+        const ret = Types.find(t => t.class == typ).name
         return ret;
     }
 
@@ -86,5 +85,5 @@ export class AuthenticationService {
         this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
         return this.currentUser;
     }
-    
+
 }

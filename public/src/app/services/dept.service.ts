@@ -30,7 +30,7 @@ export class DepartmentService {
         return this.http.get(this.url+ 'UserDept/' + userId, this.options).map(res => res.json());
     }
     getBranchDepts(brncId: number) {
-        return this.http.get(this.url + 'BranchDept/' + brncId, this.options).map(res => res.json());
+    return this.http.get(this.url + 'BranchDept/' + brncId, this.options).map(res => res.json());
     }
     checkCompDepts(compId: number) {
         return this.http.get(this.url + 'CheckCompDept/' + compId, this.options).map(res => res.json());

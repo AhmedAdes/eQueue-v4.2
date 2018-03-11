@@ -31,7 +31,7 @@ export class CompanyComponent implements OnInit {
         this.createForm();
     }
 
-    ngOnInit() {        
+    ngOnInit() {
         this.srvComp.getCompanyId(this.srvAuth.getUser().uID)
             .subscribe(res => {
                 this.companyId = res.CompID;
@@ -61,7 +61,8 @@ export class CompanyComponent implements OnInit {
             Fax: [''],
             Description: [''],
             WorkField: ['', Validators.required],
-            DefaultLanguage: ['', Validators.required]
+            DefaultLanguage: ['', Validators.required],
+            MaxPend:['']
         });
         this.Country.valueChanges.subscribe(val => {
             this.onCountryChange(val);
@@ -101,7 +102,7 @@ export class CompanyComponent implements OnInit {
                 });
         }
         else {
-            this.srvComp.UpdateComp(this.form.value)
+            this.srvComp.UpdateComp(this.company)
                 .subscribe(() => {
                     this.router.navigateByUrl('/out/companySetup/departments', { relativeTo: this.route.parent, skipLocationChange: true });
                 },
@@ -125,6 +126,7 @@ export class CompanyComponent implements OnInit {
         this.company.WorkField = this.WorkField.value;
         this.company.DefaultLanguage = this.DefaultLanguage.value;
         this.company.Disabled = false;
+        this.company.MaxPend = this.MaxPend.value as number;        
     }
     get CompName() { return this.form.get('CompName'); }
     get Country() { return this.form.get('Country'); }
@@ -138,4 +140,5 @@ export class CompanyComponent implements OnInit {
     get Description() { return this.form.get('Description'); }
     get WorkField() { return this.form.get('WorkField'); }
     get DefaultLanguage() { return this.form.get('DefaultLanguage'); }
+    get MaxPend() { return this.form.get('MaxPend'); }
 }

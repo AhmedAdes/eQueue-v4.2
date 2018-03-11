@@ -52,8 +52,9 @@ router.get("/UserDept/:userId", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query(`Select d.DeptName ,d.DeptID  ,u.BranchID from dbo.CompDept d join dbo.UserDepts ud on d.DeptID = ud.DeptID And ud.UserID = ${req.params.userId} join dbo.Users u on u.UserID = ud.UserID `)
-    .then(function (ret) { res.json(ret.recordset) })
+    .query(`Select d.DeptName ,d.DeptID  ,u.BranchID from dbo.CompDept d join dbo.UserDepts ud on d.DeptID = ud.DeptID And ud.UserID = ${req.params.userId} join dbo.Users u on u.UserID = ud.UserID 
+            SELECT Distinct(MaxPend) FROM dbo.Company c JOIN dbo.Users u ON c.CompID = u.CompID AND u.UserID =${req.params.userId};`)
+    .then(function (ret) { res.json(ret.recordsets) })
     .catch(function (err) {
       if (err) { res.json({ error: err }); console.log(err); }
     });

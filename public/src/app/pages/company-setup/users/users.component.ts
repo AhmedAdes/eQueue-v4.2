@@ -18,6 +18,7 @@ export class UserComponent implements OnInit {
   user = new User();
   branch = new Branch();
   usersCount: boolean;
+  managers;
   branches: Branch[] = [];
 
   constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute,

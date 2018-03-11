@@ -1,31 +1,68 @@
-.badge{
-    margin: 2px;
-    padding: 5px;
-    border-radius: 20px;
-    cursor: pointer;
+.badge {
+  margin: 2px;
+  padding: 5px;
+  border-radius: 20px;
+  cursor: pointer;
 }
-.waiting{
-    color: red;
-    background-color: white;
-    border: solid 1px blue;
+
+.waiting {
+  color: #FF4758;
+  background-color: white;
+  
 }
-.served{
-    color: white;
-    background-color: green;
-} 
-.current{
-    color: white;
-    background-color: darkorange;
+
+.served {
+  color: #558B2F;
+  background-color: white;
+  border: solid 1px  #558B2F;
 }
-.pending{
-    color: white;
-    background-color: blue;
+
+.current {
+  color: #F57F17;
+  background-color: white;  
+  
 }
-.notAttend{
-    color: white;
-    background-color: black;
+
+.otherCurrent {
+  color: #BF360C;
+  background-color: white;
 }
-.hold{
-    color: white;
-    background-color: deeppink;
+
+.pending {
+  color: #01579B;
+  background-color: white;
+  
+}
+
+.notAttend {
+  color: black;
+  background-color: white;
+}
+
+.hold {
+  color: #006064;
+  background-color: white;
+  border: dashed 2px #006064;      
+}
+
+.Transferred{
+  color: #01579B;
+  background-color: white;
+  border: dashed 2px #006064;        
+}
+.selectedQ {
+  border: solid 2px;
+  box-shadow: 5px 5px 5px;
+}
+
+.queues {
+  min-height: 100px;
+  max-height: 200px;
+  overflow-y: scroll;
+}
+.btn-dark{
+  cursor: not-allowed;
+}
+.btn-outline-dark{
+  cursor: not-allowed;  
 }

@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import {QueueLayoutComponent , MainQueueComponent , QueueHistoryComponent , QueueScheduleComponent
+import {QueueLayoutComponent , MainQueueComponent , QueueHistoryComponent , QueueScheduleComponent 
 } from './'
 import { AuthGuard } from '../../services'
+import {  } from 'app/pages/queue/main-display/main-display.component';
 
 const routes: Routes = [
   {
@@ -11,7 +12,7 @@ const routes: Routes = [
     children: [
       { path: 'mqueue', component: MainQueueComponent, data: { title: 'Main Queue'}, canActivate: [AuthGuard] },
       { path: 'hstry', component: QueueHistoryComponent, data: { title: 'Queue History' }, canActivate: [AuthGuard] },
-      { path: 'schd', component: QueueScheduleComponent, data: { title: 'Queue Schedule' }, canActivate: [AuthGuard] },
+      { path: 'schd', component: QueueScheduleComponent, data: { title: 'Queue Schedule' }, canActivate: [AuthGuard] },            
     ]
   }
 ];

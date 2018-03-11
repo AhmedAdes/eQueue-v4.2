@@ -5,6 +5,7 @@ import { ContentLayoutPageComponent } from './content-layout-page.component';
 import { LoginPageComponent } from '../login/login-page.component';
 
 import { AuthGuard } from 'app/services';
+import { MainDisplayComponent } from 'app/pages/queue';
 
 
 const routes: Routes = [
@@ -18,6 +19,13 @@ const routes: Routes = [
   {
     path: 'login',
     component: LoginPageComponent,
+    data: {
+      title: 'Login Page'
+    }
+  },
+  {
+    path: 'mdisplay',
+    component: MainDisplayComponent,
     data: {
       title: 'Login Page'
     }

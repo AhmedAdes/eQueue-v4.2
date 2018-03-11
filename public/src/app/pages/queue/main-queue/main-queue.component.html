@@ -1,68 +1,156 @@
 <div>
-  <div *ngIf="sTk.QID>0" class="row">
-    <div class="col-md-12 col-sm-12 col-xs-12">
-      <active-queue [tId]="sTk.QID"></active-queue>
+  <div class="row mx-0 my-0">
+    <div class="col-md-12 col-sm-12 col-xs-12">      
+      <active-queue [startTimer]="startTimer" [tId]="sTk.QID"></active-queue>
     </div>
   </div>
-  <div class="row">
-
-    <div class="card col-md-12 col-sm-12 col-xs-12">
-      <div class="block-button px-3 py-3">
-        <a [class.active]="(sDept && (dept.DeptName == sDept.DeptName))" class="btn btn-outline-danger btn-lg btn-round " href="javascript:void(0)"
-          *ngFor="let dept of depts" (click)="onDeptSelect(dept)">{{dept.DeptName}} </a>
-      </div>
-      <div *ngIf="sDept" class="card-body">
-        <div class="card-block">
-
-          <div class="row">
-            <div class="col-md-3">
-              <button class="btn btn-primary btn-raised btn-block" (click)="changeList(0)">
-                All Queue
-                <span class="badge badge-pill badge-danger">{{all}} </span>
-              </button>
-            </div>
-            <div class="col-md-3">
-              <button class="btn btn-primary btn-raised btn-block" (click)="changeList(1)">Hold Queue
-                <span class="badge badge-pill badge-danger">{{hold}} </span>
-              </button>
-            </div>
-            <div class="col-md-3">
-              <button class="btn btn-primary btn-raised btn-block" (click)="changeList(2)">Transferred Queue
-                <span class="badge badge-pill badge-danger">{{trans}} </span>
-              </button>
-            </div>
-            <div class="col-md-3">
-              <button class="btn btn-primary btn-raised btn-block" (click)="changeList(3)">VIP Queue
-                <span class="badge badge-pill badge-danger">{{vip}} </span>
-              </button>
-            </div>
+  <div class="row" style="min-height:200px">
+    <div class="card border border-primary col-md-12 col-sm-12 col-xs-12">
+      <div *ngIf="sDept" class=" card-body row ">
+        <div class="col-md-2 col-sm-2 py-2 px-0">
+          <div class=" btn-group-vertical  w-100">
+            <button [class.active]="(sDept && (dept.DeptName == sDept.DeptName))" *ngFor="let dept of depts ; let i=index" 
+              class="btn btn-outline-info btn-raised"
+              (click)="onDeptSelect(dept)">{{dept.DeptName}}
+              <span class="px-1 badge badge-pink white">{{deptsWQ[i]}}</span>
+            </button>            
+          </div>          
+          <div class="btn-group-horizontal"> 
+            <button [disabled]="sTk.QID==0 || sTk.QStatus == 'NotAttended'"
+            class="btn btn-sm ml-1 mt-4 mb-0"
+            [class.btn-outline-dark]="sTk.QID==0"
+            [class.btn-outline-success]="sTk.QID!=0"
+            (click)="open(content)">TRANSFER</button>          
+            
+            <button [disabled]="!start"
+            class="btn btn-sm ml-1 mt-4 mb-0"
+            [class.btn-outline-dark]="!start"
+            [class.btn-outline-primary]="start"
+            (click)="updateQ('HOLD')">HOLD</button>
           </div>
-
-          <div class="row">
-            <span *ngFor="let t of sTkts" class="badge badge-danger" 
-              [class.waiting]="t.QStatus == 'Waiting'" [class.served]="t.QStatus == 'Served'"
-              [class.current]="t.QStatus == 'Current' && t.ProvUserID == currentUser.uID" 
-              [class.otherCurrent]="t.QStatus == 'Current' && t.ProvUserID != currentUser.uID"
-              [class.pending]="t.QStatus == 'Pending'" 
-              [class.notAttend]="t.QStatus == 'Not-Attended'" 
-              [class.hold]="t.QStatus == 'Hold'"
-              [class.hold]="(sTk) && t.QID == sTk.QID" 
-              (click)="onQSelect(t)">
-              {{t.ServiceNo}}
-            </span>
-          </div>
-
         </div>
-
+        <div class="col-md-10 col-sm-10 ">
+          <div class="card py-0 px-0">
+            <div class="my-0 py-0 btn-group btn-group-justified btn-group-raised">
+              <button [class.active]="sTab=='All'" class="w-25 btn py-0 btn-outline-danger" (click)="changeList(0)">Waiting
+                <span *ngIf="all && all >0 " class="badge badge-pink white">{{all}} </span>
+              </button>
+              <button [disabled]="hold <= 0" [class.active]="sTab=='Hold'" class="w-25 btn py-0 btn-outline-primary" (click)="changeList(1)">Hold
+                <span *ngIf="hold && hold>0 " class="badge badge-pill badge-danger">{{hold}} </span>
+              </button>
+              <button [disabled]="trans <= 0" [class.active]="sTab=='Transferred'" class="w-25 btn py-0 btn-outline-danger" (click)="changeList(2)">Trans
+                <span *ngIf="trans && trans >0" class="badge badge-pill badge-danger">{{trans}} </span>
+              </button>
+              <button [disabled]="vip <= 0" [class.active]="sTab=='Vip'" class="w-25  btn py-0 btn-outline-info" (click)="changeList(3)">VIP
+                <span *ngIf="vip && vip >0" class="badge badge-pill badge-danger">{{vip}} </span>
+              </button>
+            </div>
+            <div class="queues card-body border border-info rounded">
+              <span [hidden]="sTab !=='Hold' && t.QStatus=='Hold' && t.ProvUserID == currentUser.uID" *ngFor="let t of sTkts" class="badge badge-danger pr-0 py-0 "
+                [class.waiting]="t.QStatus == 'Waiting'" [class.served]="t.QStatus == 'Served'" [class.current]="t.QStatus == 'Current' "
+                [class.otherCurrent]="t.QStatus == 'Current' && t.ProvUserID != currentUser.uID" [class.pending]="t.QStatus == 'Pending'"
+                [class.Transferred]="t.QStatus == 'Transferred'" 
+                [class.notAttend]="t.QStatus == 'NotAttended'" [class.hold]="t.QStatus == 'Hold'" [class.selectedQ]="(sTk) && t.QID == sTk.QID"
+                (click)="onQSelect(t)"
+                placement="bottom"
+                [ngbTooltip]="t.QStatus">                
+                {{t.ServiceNo}}
+                <span *ngIf="t.QStatus == 'Waiting'" class="badge py-0 px-0" style="background-color:#FFACB5;">
+                  <i class="font-medium-2 mr-0 icon-emoticon-smile"></i>
+                </span>
+                <span *ngIf="t.QStatus == 'Served'" class="badge py-0 px-0" style="background-color:#C5E1A5;">
+                  <i class="font-medium-2  mr-0 icon-emoticon-smile"></i>
+                </span>
+                <span *ngIf="t.QStatus == 'Current' && t.ProvUserID == currentUser.uID" class="badge py-0 px-0" style="background-color:#FFEE58;">
+                  <i class="font-medium-2  mr-0 icon-emoticon-smile"></i>
+                </span>
+                <span *ngIf="t.QStatus == 'Pending'" class="badge py-0 px-0" style="background-color:#81D4FA;">
+                  <i class="font-medium-2  mr-0 icon-emoticon-smile"></i>
+                </span>
+                <span *ngIf="t.QStatus == 'Transferred'" class="badge py-0 px-0" style="background-color:#81D4FA;">
+                  <i class="font-medium-2  mr-0 icon-emoticon-smile"></i>
+                </span>
+                <span *ngIf="t.QStatus == 'Hold'" class="badge py-0 px-0" style="background-color:#4DB6AC;">
+                  <i class="font-medium-2  mr-0 icon-emoticon-smile"></i>
+                </span>
+                <span *ngIf="t.QStatus == 'Current' && t.ProvUserID != currentUser.uID" class="badge py-0 px-0" style="background-color:#FF7043;">
+                  <i class="font-medium-2  mr-0 icon-emoticon-smile"></i>
+                </span>
+                <span *ngIf="t.QStatus == 'NotAttended'" class="badge py-0 px-0" style="background-color:rgb(156, 189, 187)">
+                  <i class="font-medium-2  mr-0 ft-x-circle"></i>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="card-footer ">
-        <div class="block-button position-sticky px-3 py-3">
-          <a class="col-md-2 btn btn-outline-info btn-lg btn-round " href="javascript:void(0)" (click)="nextQ()">NEXT Q</a>
-          <a class="col-md-2  btn btn-outline-success btn-lg btn-round " href="javascript:void(0)">Start</a>
-          <a class="col-md-2 btn btn-outline-warning btn-lg btn-round " href="javascript:void(0)">Transfer</a>
-          <a class="col-md-2 btn btn-outline-primary btn-lg btn-round " href="javascript:void(0)">Hold</a>
+    </div>
+  </div>
+  <div class="row fixed-bottom">
+    <div class="col-md-12 col-sm-12 col-xs-12">        
+      <div *ngIf="sTab!=='Hold'" class="d-flex justify-content-end ">        
+        <div class="mx-5">
+          <div class="btn-group btn-group-justified btn-group-raised">            
+            
+          </div>
+        </div>
+        <div class="mr-5">
+          <div class="btn-group btn-group-justified  btn-group-raised btn-round">
+            <button [disabled]="!start" 
+              class="btn btn-lg btn-round " 
+              [class.btn-dark]="!start" 
+              [class.btn-danger]="start" 
+              (click)="updateQ('STOP')">STOP</button>
+            <button [disabled]="!(sTk && (sTk.QStatus=='Current' || sTk.QStatus=='Pending') && !start)" 
+              class="btn btn-lg btn-round "
+              [class.btn-dark]="!(sTk && (sTk.QStatus=='Current' || sTk.QStatus=='Pending') && !start)" 
+              [class.btn-success]="(sTk && (sTk.QStatus=='Current' || sTk.QStatus=='Pending') && !start)"               
+              (click)="updateQ('START')">START</button>
+            <button [disabled]="start" 
+              class="btn btn-lg btn-round " 
+              [class.btn-dark]="start"
+              [class.btn-info]="!start"
+              (click)="updateQ('NEXT')">NEXT Q</button>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="sTab == 'Hold' && hold>0" class="d-flex justify-content-end mx-5">
+        <div class="btn-group btn-group-justified btn-group-raised btn-round">
+          <button [disabled]="start || (sTk.QID==0)"
+            class="btn btn-lg btn-round " 
+            [class.btn-dark]="start || (sTk.QID==0)"
+            [class.btn-success]="!(start || (sTk.QID==0))"
+            (click)="updateQ('RESUMEQ')">Resume</button>
+          <button [disabled]="!start"  
+            class="btn  btn-lg btn-round "
+            [class.btn-dark]="!start" 
+            [class.btn-danger]="start" 
+            (click)="updateQ('PAUSEQ')">Pause</button>
+          <button [disabled]="!start"  
+            class="btn  btn-lg btn-round "
+            [class.btn-dark]="!start" 
+            [class.btn-info]="start" 
+            (click)="updateQ('STOPQ')">Stop</button>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<!--Modal-->
+<ng-template #content let-c="close" let-d="dismiss">
+  <div style="min-height:200px;max-height:400px;overflow-y: scroll;">
+    <div class="modal-header">
+      <h4 class="modal-title">Transfer <b>{{sTk.ServiceNo}}</b></h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">  
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <q-trans [ticket]="sTk" (transDone)="c('Close click')"></q-trans>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
+    </div>
+  </div>
+</ng-template>

@@ -1,8 +1,17 @@
-<div class="panel panel-default">
-  <div class="panel-heading" (click)="OnToggle()">    
-    <ng-content select=".heading"></ng-content>    
+<div class="my-0 card">
+  <div [style.color]="hColor" [style.background-color]="hBackColor" class="card-head py-1 px-1 " (click)="OnToggle()">
+    <span class="ft-chevrons pull-right" [class.ft-chevrons-down]="!toggle" [class.ft-chevrons-up]="toggle"></span>
+    <ng-content select=".heading"></ng-content>
+
   </div>
-  <div *ngIf="toggle" class="panel-body" >
-    <ng-content select=".body"></ng-content>
+
+  <div *ngIf="toggle" [style.color]="bColor" [style.background-color] ="bBackColor" class="card-body">
+    <div class="px-2 py-1">
+      <div class="media">
+        <div class="media-body text-left">
+          <ng-content select=".body"></ng-content>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
