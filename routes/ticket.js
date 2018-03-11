@@ -73,8 +73,19 @@ router.get("/TicketDetails/:id", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query(`SELECT * FROM vwAllQueue WHERE QID = ${req.params.id};
-            SELECT * FROM vwAllQueueDetails WHERE QID = ${req.params.id};`)
+    .query(`
+    SELECT q.QID ,q.UserID ,q.BranchID ,q.DeptID ,q.ServiceNo ,q.RequestDate ,q.VisitDate ,
+          q.VisitTime ,q.StartServeDT ,q.EndServeDT ,q.QStatus ,q.ServingTime ,q.QCurrent ,
+          q.QTransfer ,q.TransferedFrom ,q.UniqueNo ,q.ProvUserID ,b.BranchName, b.BranchAddress,
+          c.CompName, c.WorkField, d.DeptName 
+    FROM dbo.vwAllQueue q 
+    JOIN dbo.Branch b ON b.BranchID = q.BranchID 
+    JOIN dbo.Company c ON c.CompID = b.CompID 
+    JOIN dbo.CompDept d ON q.DeptID = d.DeptID
+    WHERE q.QID = ${req.params.id};
+    SELECT QID ,qd.ServID, s.ServName, s.ServTime ,ServCount ,Notes 
+    FROM vwAllQueueDetails qd JOIN dbo.DeptServices s ON s.ServID = qd.ServID 
+    WHERE QID = ${req.params.id};`)
     .then(function (ret) {
       let Que = ret.recordsets[0]
       let Srv = ret.recordsets[1]

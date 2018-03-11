@@ -8,10 +8,10 @@
               Filter By:
             </h3>
             <div class="form-group row">
-              <label for="selDate" class="col-3 text-right">
+              <label for="selDate" class="col-sm-3">
                 Select Date
               </label>
-              <div class="col-7">
+              <div class="col-sm-7">
                 <div class="input-group my-0">
                   <div class="input-group-prepend">
                     <div class="input-group-text">
@@ -23,10 +23,10 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="selComp" class="col-3 text-right">
+              <label for="selComp" class="col-sm-3">
                 Select Company
               </label>
-              <div class="col-7">
+              <div class="col-sm-7">
                 <div class="input-group my-0">
                   <div class="input-group-prepend">
                     <div class="input-group-text">
@@ -41,10 +41,10 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="selBrnc" class="col-3 text-right">
+              <label for="selBrnc" class="col-sm-3">
                 Select Branch
               </label>
-              <div class="col-7">
+              <div class="col-sm-7">
                 <div class="input-group my-0">
                   <div class="input-group-prepend">
                     <div class="input-group-text">
@@ -59,10 +59,10 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="selDept" class="col-3 text-right">
+              <label for="selDept" class="col-sm-3">
                 Select Department
               </label>
-              <div class="col-7">
+              <div class="col-sm-7">
                 <div class="input-group my-0">
                   <div class="input-group-prepend">
                     <div class="input-group-text">
@@ -77,10 +77,10 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="selServ" class="col-3 text-right">
+              <label for="selServ" class="col-sm-3">
                 Select Service
               </label>
-              <div class="col-7">
+              <div class="col-sm-7">
                 <div class="input-group my-0">
                   <div class="input-group-prepend">
                     <div class="input-group-text">
@@ -95,26 +95,26 @@
               </div>
             </div>
             <div class="form-group row justify-content-center">
-              <button class="col col-4 btn btn-raised btn-success btn-block" (click)="ViewReport()">
+              <button class="col col-sm-4 btn btn-raised btn-success btn-block" (click)="ViewReport()">
                 <i class="fa fa-search"></i> Start Search</button>
             </div>
           </div>
         </div>
       </div>
       <div class="card bg-grey bg-lighten-2">
-        <div class="card-body">
-          <div class="p-2">
+        <div class="card-body p-2">
+          <div id="results" class="table-responsive">
             <table class="table table-hover">
               <thead class="thead-dark text-center">
                 <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Company</th>
-                  <th scope="col">Branch</th>
-                  <th scope="col">Department</th>
-                  <th scope="col">Visit Date</th>
-                  <th scope="col">Ticket No</th>
-                  <th scope="col">Visit Status</th>
-                  <th scope="col"></th>
+                  <th scope="col" class="width-10">#</th>
+                  <th scope="col" class="width-15">Company</th>
+                  <th scope="col" class="width-15">Branch</th>
+                  <th scope="col" class="width-15">Department</th>
+                  <th scope="col" class="width-15">Visit Date</th>
+                  <th scope="col" class="width-10">Ticket No</th>
+                  <th scope="col" class="width-10">Visit Status</th>
+                  <th scope="col" class="width-10">details</th>
                 </tr>
               </thead>
               <tbody class="text-center">
@@ -127,7 +127,7 @@
                   <td>{{tkt.ServiceNo}}</td>
                   <td>{{tkt.QStatus}}</td>
                   <td>
-                    <button class="btn btn-raised btn-success btn-round" title="More Details">
+                    <button class="btn btn-raised btn-success btn-round" title="More Details" (click)="getTicketDetials(tkt)">
                       <i class="icon fa fa-arrow-circle-right"></i>
                     </button>
                   </td>
@@ -140,17 +140,86 @@
     </div>
     <div class="col-md-12" *ngIf="showDetails">
       <div class="card bg-grey bg-lighten-2">
-        <div class="card-header">
-          <h3> Ticket No.: {{Ticketmodel.ServiceNo}}</h3>
-        </div>
-        <div class="card-body">
-          <label class="control-label">Company: {{Ticketmodel.CompName}}</label>
-          <label class="control-label">Branch: {{Ticketmodel.BranchName}}</label>
-          <label class="control-label">Department: {{Ticketmodel.DeptName}}</label>
-          <label class="control-label">Booking Date: {{Ticketmodel.RequestDate}}</label>          
-          <label class="control-label">Visit Date: {{Ticketmodel.VisitDate}}</label>
-          <label class="control-label">Ticket Status: {{Ticketmodel.QStatus}}</label>
-          <label class="control-label">Company Name: {{Ticketmodel.CompName}}</label>
+        <div class="px-2">
+          <div class="card-header bg-dark text-white">
+            <h3 class="card-title text-center">
+              <i class="fa fa-ticket"></i>
+              <b> Ticket No: {{tModel.ServiceNo}}</b>
+            </h3>
+          </div>
+          <div class="card-body">
+            <!-- dl.row>dt.col-sm-3+dd.col-sm-9 -->
+            <dl class="row">
+              <dt class="col-sm-3 text-right">Company:</dt>
+              <dd class="col-sm-9">{{tModel.CompName}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col-sm-3 text-right">Branch:</dt>
+              <dd class="col-sm-9">{{tModel.BranchName}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col-sm-3 text-right">Department:</dt>
+              <dd class="col-sm-9">{{tModel.DeptName}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col-sm-3 text-right">Booking Date:</dt>
+              <dd class="col-sm-9">{{tModel.RequestDate | date: 'mediumDate'}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col-sm-3 text-right">Visit Date:</dt>
+              <dd class="col-sm-9">{{tModel.VisitDate | date: 'mediumDate'}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col-sm-3 text-right">Ticket Status:</dt>
+              <dd class="col-sm-9">{{tModel.QStatus}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col-sm-3 text-right">Serviced By:</dt>
+              <dd class="col-sm-9">{{tModel.ProvUserID}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col-sm-3 text-right">Call Time:</dt>
+              <dd class="col-sm-9">{{tModel.CallTime | date: 'shortTime'}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col-sm-3 text-right">Service Start:</dt>
+              <dd class="col-sm-9">{{tModel.StartServeDT | date: 'shortTime'}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col-sm-3 text-right">Service End:</dt>
+              <dd class="col-sm-9">{{tModel.EndServeDT | date: 'shortTime'}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col-sm-3 text-right">Services:</dt>
+              <dd class="col-sm-9">
+                <table class="table table-brdered table-hover">
+                  <colgroup>
+                    <col width="25%" />
+                    <col width="25%" />
+                    <col width="50%" />
+                  </colgroup>
+                  <thead class="thead-dark text-left">
+                    <tr>
+                      <th>Service</th>
+                      <th>Count</th>
+                      <th>Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let sr of tModel.Services">
+                      <td>{{sr.ServName}}</td>
+                      <td>{{sr.ServCount}}</td>
+                      <td>{{sr.Notes}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </dd>
+            </dl>
+            <div class="row px-2 justify-content-start">
+              <button (click)="Back()" class="col col-sm-3 btn btn-raised btn-danger btn-block">
+                <i class="icon fa fa-arrow-circle-left"></i> Back</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -36,6 +36,7 @@ export class IssueTicketComponent implements OnInit {
   srvfrm
   servNo: string
   uniqueNo: string
+  waiting: number
   visitTime: string
   submitted = false
   showForm = true
@@ -166,6 +167,7 @@ export class IssueTicketComponent implements OnInit {
       }
       this.servNo = cols.ServiceNo
       this.uniqueNo = cols.UniqueNo
+      this.waiting = cols.Waiting
       this.visitTime = hf.changeToServerTime(cols.VisitTime)
       this.showForm = false
     }, err => hf.handleError(err))

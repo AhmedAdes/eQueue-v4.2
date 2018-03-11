@@ -27,7 +27,7 @@ export class HistoryComponent implements OnInit {
   deptList: Department[] = []
   servList: Service[] = []
   ticketList: Ticket[] = []
-  Ticketmodel = new Ticket()
+  tModel = new Ticket()
   showDetails = false
 
   constructor(private srvTkt: TicketService, private auth: AuthenticationService) { }
@@ -57,6 +57,12 @@ export class HistoryComponent implements OnInit {
           return
         }
         this.ticketList = t
+        const element = document.querySelector('#results')
+        if (element) {
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' })
+          }, 300)
+        }
       }, err => hf.handleError(err))
   }
   onCompChange(val) {
@@ -93,9 +99,13 @@ export class HistoryComponent implements OnInit {
     }
   }
   getTicketDetials(t: Ticket) {
-    this.srvTkt.getTicketDetails(t.QID).subscribe(t => {
-      if (t.error) { hf.handleError(t.error); return }
-      this.Ticketmodel = t
+    this.srvTkt.getTicketDetails(t.QID).subscribe(td => {
+      if (td.error) { hf.handleError(td.error); return }
+      this.tModel = td[0]
+      this.showDetails = true
     }, err => hf.handleError(err))
+  }
+  Back() {
+    this.showDetails = false
   }
 }
