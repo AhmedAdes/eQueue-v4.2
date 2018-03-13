@@ -10,6 +10,7 @@ import { CompanyComponent } from 'app/pages/company-setup/company/company.compon
 import { DepartmentsComponent } from 'app/pages/company-setup/departments/departments.component';
 import { BranchesComponent } from 'app/pages/company-setup/branches/branches.component';
 import { UserComponent } from 'app/pages/company-setup/users/users.component';
+import { DashboardComponent } from 'app/pages/dashboard/dashboard.component';
 
 
 const routes: Routes = [
@@ -20,7 +21,7 @@ const routes: Routes = [
     path: 'users', component: UsersComponent, data: { title: 'Users' }, canActivate: [AuthGuard]
   },
   {
-    path: 'dashboard', component: UsersComponent, canActivate: [AuthGuard]
+    path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard]
   }
   ,
   { path: 'customer', loadChildren: '../customer/customer.module#CustomerModule' },

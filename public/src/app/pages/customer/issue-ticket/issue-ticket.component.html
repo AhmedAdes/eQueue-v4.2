@@ -19,7 +19,7 @@
                 <div class="form-group row" [ngClass]="{ 'has-danger': submitted && comp.invalid }">
                   <label for="selComp" class=" label-control col-md-3 col-sm-4">Provider Company</label>
                   <div class="col-md-9 col-sm-8">
-                    <select #focus class="form-control" name="selComp" [(ngModel)]="selComp" [formControl]="comp">
+                    <select #focus class="form-control" name="selComp" [formControl]="comp">
                       <option value="">Select a Company ...</option>
                       <option *ngFor="let cmp of compList" [value]="cmp.CompID">{{cmp.CompName}}</option>
                     </select>
@@ -30,7 +30,7 @@
                 <div class="form-group row" [ngClass]="{ 'has-danger': submitted && branch.invalid }">
                   <label for="selBrnch" class=" label-control col-md-3 col-sm-4">Select a Branch</label>
                   <div class="col-md-9 col-sm-8">
-                    <select class="form-control" name="selBrnch" [(ngModel)]="selBrnch" [formControl]="branch">
+                    <select class="form-control" name="selBrnch" [formControl]="branch">
                       <option value="">Select a Branch ...</option>
                       <option *ngFor="let brn of branchList" [value]="brn.BranchID">{{brn.BranchName}}</option>
                     </select>
@@ -41,7 +41,7 @@
                 <div class="form-group row" [ngClass]="{ 'has-danger': submitted && dept.invalid }">
                   <label for="selDept" class=" label-control col-md-3 col-sm-4">Select a Department</label>
                   <div class="col-md-9 col-sm-8">
-                    <select class="form-control" name="selDept" [(ngModel)]="selDept" [formControl]="dept">
+                    <select class="form-control" name="selDept" [formControl]="dept">
                       <option value="">Select a Department ...</option>
                       <option *ngFor="let dpt of deptList" [value]="dpt.DeptID">{{dpt.DeptName}}</option>
                     </select>
@@ -57,8 +57,7 @@
                         <div formArrayName="srvfrm">
                           <li *ngFor="let srvc of srvfrm.controls; let idx = index" class="">
                             <div [formGroupName]="idx">
-                              <input formControlName="checked" type="checkbox" (change)="subscribeChecked(idx, $event.target.checked)"> 
-                              {{srvfrm.controls[idx].controls.ServName.value}}
+                              <input formControlName="checked" type="checkbox" (change)="subscribeChecked(idx, $event.target.checked)"> {{srvfrm.controls[idx].controls.ServName.value}}
                               <div *ngIf="srvfrm.controls[idx].controls.checked.value">
                                 <div class="form-group row">
                                   <label class="label-control col-md-4 col-sm-6">Service Count</label>
@@ -84,7 +83,7 @@
 
                 <div class="form-group row" [ngClass]="{ 'has-danger': submitted && vDate.invalid }">
                   <label for="visitDate" class=" label-control col-md-3 col-sm-4">Pick a Date for your visit</label>
-                  <div class="col-md-9 col-sm-8">
+                  <div class="col-md-4 col-sm-8">
                     <div class="position-relative">
                       <!-- <input type="date" formControlName="vDate" id="visitDate" [min]="today" class="form-control"> -->
                       <ngb-datepicker formControlName="modDate" [minDate]="today"></ngb-datepicker>
@@ -93,6 +92,17 @@
                       </div> -->
                     </div>
                     <div class="form-text text-muted danger" *ngIf="(vDate.touched || submitted) && vDate.invalid">Visit Date is required.</div>
+                  </div>
+                  <div class="col-md-5 col-sm-12 col-xs-12">
+                    <div class="alert alert-info text-center">
+                      <p>
+                        <i>Total Number of waiting customers before you</i>
+                        <br>
+                        <span *ngIf="dept.value && modDate.value">
+                          <b>{{fireCustNo}}</b>
+                        </span>
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -113,10 +123,16 @@
                 <h2 class="display-1"> {{visitTime | date: 'shortTime'}} </h2>
                 <p>Please arrive before your estimated time by around 10 minutes</p>
                 <p>Please Remember the following number:
-                  <u class="text-danger"><b>{{uniqueNo}}</b></u>
+                  <u class="text-danger">
+                    <b>{{uniqueNo}}</b>
+                  </u>
                   you will be asked for it when you get served
                 </p>
-                <p>Total Waiting Customers Before You: <u class="text-danger"><b>{{waiting}}</b></u></p>
+                <p>Total Waiting Customers Before You:
+                  <u class="text-danger">
+                    <b>{{waiting}}</b>
+                  </u>
+                </p>
               </div>
               <div class="form-actions center clearfix">
                 <button type="button" class="btn btn-lg btn-raised btn-primary" (click)="resetAll()">

@@ -34,7 +34,8 @@ export class AuthenticationService {
                 const token = arrRet.tkn;
                 if (token) {
                     // set token property
-                    this.token = token;                    
+                    this.token = token;
+                    // console.log(arrRet);
                     this.salt = arrRet.salt
                     // var tt = new Buffer(arrRet.user[0].UserPhoto, 'base64')
                     let base64String
@@ -45,7 +46,7 @@ export class AuthenticationService {
                         photo = 'data:image/PNG;base64,' + base64String
                     } else {
                         photo = './assets/img/avatar5.png'
-                    }                    
+                    }
                     this.currentUser = {
                         uID: arrRet.user[0].UserID, uName: arrRet.user[0].UserName, uRl: this.getRole(arrRet.user[0].UserRole),
                         etyp: arrRet.user[0].EntityType, tkn: token, slt: arrRet.salt, photo: photo,
@@ -66,6 +67,7 @@ export class AuthenticationService {
     logout(): void {
         // clear token remove user from local storage to log user out
         this.token = null;
+        this.salt = null;
         this.currentUser = null;
         localStorage.removeItem('currentUser');
     }

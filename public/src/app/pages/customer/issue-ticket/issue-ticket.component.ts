@@ -1,14 +1,18 @@
 import { Component, OnInit, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl, AbstractControl } from '@angular/forms';
 import { NgbDateStruct, NgbDatepickerI18n } from '@ng-bootstrap/ng-bootstrap';
+import { FormArray } from '@angular/forms/src/model';
+
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
+import { ISubscription, Subscription } from 'rxjs/Subscription';
+
 import {
   CompanyService, BranchService, DepartmentService, DeptServsService, TicketService,
   AuthenticationService
 } from '../../../services'
 import { Company, Branch, Department, CurrentUser, QueueService } from '../../../Models'
 import * as hf from '../../helper.functions'
-import { validateConfig } from '@angular/router/src/config';
-import { FormArray } from '@angular/forms/src/model';
 
 @Component({
   selector: 'app-issue-ticket',
@@ -21,9 +25,9 @@ export class IssueTicketComponent implements OnInit {
   branchList: Branch[] = []
   deptList: Department[] = []
   servList: QueueService[] = []
-  selComp: number
-  selBrnch: number
-  selDept: number
+  tickets: Observable<any>
+  fireCustNo = 0
+
   selServ: any[]
   visitDate: string
   inFrm: FormGroup
@@ -46,7 +50,8 @@ export class IssueTicketComponent implements OnInit {
 
   constructor(private srvtkt: TicketService, private auth: AuthenticationService,
     private srvComp: CompanyService, private srvBrnc: BranchService,
-    private srvDept: DepartmentService, private srvSrv: DeptServsService, private fb: FormBuilder
+    private srvDept: DepartmentService, private srvSrv: DeptServsService,
+    private fb: FormBuilder, public db: AngularFireDatabase
   ) {
     this.inFrm = fb.group({
       'comp': ['', Validators.required],
@@ -60,6 +65,7 @@ export class IssueTicketComponent implements OnInit {
     this.inFrm.controls['comp'].valueChanges.subscribe(val => this.OnCompChange(val))
     this.inFrm.controls['branch'].valueChanges.subscribe(val => this.OnBranchChange(val))
     this.inFrm.controls['dept'].valueChanges.subscribe(val => this.onDeptChange(val))
+    this.inFrm.controls['modDate'].valueChanges.subscribe(val => this.observQueueList())
 
     this.comp = this.inFrm.get('comp')
     this.branch = this.inFrm.get('branch')
@@ -129,6 +135,7 @@ export class IssueTicketComponent implements OnInit {
       (<FormArray>this.srvfrm).controls = []
       return
     }
+    this.observQueueList()
     this.srvSrv.getDeptServss(val).subscribe(sv => {
       this.servList = sv.map(v => {
         return {
@@ -136,7 +143,7 @@ export class IssueTicketComponent implements OnInit {
           checked: false, ServCount: 0, Notes: ''
         }
       })
-      if(this.srvfrm.controls.length > 0) (<FormArray>this.srvfrm).controls = []
+      if (this.srvfrm.controls.length > 0) (<FormArray>this.srvfrm).controls = []
       this.servList.forEach(s => this.addService(s))
     })
   }
@@ -180,5 +187,23 @@ export class IssueTicketComponent implements OnInit {
     // this.foc.first.nativeElement.focus()
     this.submitted = false
   }
-
+  observQueueList() {
+    if (!this.dept.value) {
+      return
+    }
+    this.tickets = this.db.list('MainQueue/' + this.branch.value
+    ).valueChanges().map(tks => {
+      return tks.filter((tkt) => {
+        let dd = new Date(Date.UTC(this.modDate.value.year, this.modDate.value.month - 1, this.modDate.value.day))
+        if (tkt['VisitDate'] == hf.handleDate(dd)
+          && tkt['DeptID'] == this.dept.value
+          && (['Waiting', 'Current', 'Hold', 'Pending'].findIndex(c => c == tkt['QStatus']) > -1)) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+    })
+    this.tickets.subscribe(t => this.fireCustNo = t ? t.length : 0)
+  }
 }
