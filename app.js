@@ -63,6 +63,9 @@ app.use("/api/srvc", srvc);
 app.use("/api/tckt", tckt);
 // app.use("/api/aud", audio);
 
+let daycron = require('./scripts/dayCrons.js')
+daycron.scdul.start()
+
 Connection.connect(err => {
   if (err) {
     console.log("Failed to open a SQL Database connection.", err.stack);

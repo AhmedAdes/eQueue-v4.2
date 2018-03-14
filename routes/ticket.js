@@ -143,11 +143,15 @@ router.get("/SearchDetails/:id", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   var request = new sql.Request(sqlcon);
   request
-    .query(`SELECT DISTINCT c.CompID, c.CompName FROM dbo.vwAllQueue q JOIN dbo.Branch b ON b.BranchID = q.BranchID 
+    .query(`SELECT DISTINCT c.CompID, c.CompName 
+    FROM dbo.vwAllQueue q JOIN dbo.Branch b ON b.BranchID = q.BranchID 
     JOIN dbo.Company c ON c.CompID = b.CompID WHERE UserID = ${req.params.id};
-    SELECT DISTINCT b.CompID, q.BranchID, b.BranchName FROM dbo.vwAllQueue q JOIN dbo.Branch b ON b.BranchID = q.BranchID WHERE UserID = ${req.params.id} ;
-    SELECT DISTINCT q.BranchID, q.DeptID, d.DeptName FROM dbo.vwAllQueue q JOIN dbo.CompDept d ON d.DeptID = q.DeptID WHERE UserID = ${req.params.id};
-    SELECT DISTINCT s.DeptID, q.ServID, s.ServName FROM dbo.vwAllQueueDetails q JOIN dbo.DeptServices s ON s.ServID = q.ServID
+    SELECT DISTINCT b.CompID, q.BranchID, b.BranchName 
+    FROM dbo.vwAllQueue q JOIN dbo.Branch b ON b.BranchID = q.BranchID WHERE UserID = ${req.params.id} ;
+    SELECT DISTINCT q.BranchID, q.DeptID, d.DeptName 
+    FROM dbo.vwAllQueue q JOIN dbo.CompDept d ON d.DeptID = q.DeptID WHERE UserID = ${req.params.id};
+    SELECT DISTINCT s.DeptID, q.ServID, s.ServName 
+    FROM dbo.vwAllQueueDetails q JOIN dbo.DeptServices s ON s.ServID = q.ServID
     WHERE q.QID IN (SELECT QID FROM dbo.vwAllQueue WHERE UserID = ${req.params.id});`)
     .then(function (ret) {
       res.json(ret.recordsets);
@@ -227,7 +231,7 @@ router.post("/IssueNew", function (req, res, next) {
       let qid = ret.recordset[0].QID
       firebase
         .database()
-        .ref("MainQueue/" + qid)
+        .ref("MainQueue/" + det.branch + '/' + qid)
         .set({
           QID: qid,
           VisitDate: det.vDate.split('T')[0],
@@ -250,14 +254,15 @@ router.post("/IssueNew", function (req, res, next) {
 })
 router.put("/CancelTicket/:id", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
-  var request = new sql.Request(sqlcon);
+  let b = req.body;
+  let request = new sql.Request(sqlcon);
   request.input('QID', req.params.id)
   request
     .execute(`CancelTicket`)
     .then(function (ret) {
       firebase
         .database()
-        .ref("MainQueue/" + req.params.id)
+        .ref("MainQueue/" + b.branch + '/' + req.params.id)
         .update({
           QStatus: 'Cancelled'
         })
@@ -273,8 +278,7 @@ router.put("/CancelTicket/:id", function (req, res, next) {
       console.log(err);
     });
 });
-// CancelTicket
-
+//TODO: Change the path of firebase ref to the new structure of branchID/Qid
 router.put("/updateTicket/:id", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   let ticket = req.body;

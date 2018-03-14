@@ -22,10 +22,9 @@ CREATE TABLE Company
 	WorkField NVARCHAR(100), -- Shipping , FrightForwarding , etc..
 	DefaultLanguage NVARCHAR(20),
 	[Disabled] BIT DEFAULT 0,	-- for ADMIN Use Only
-	MaxPend INT, -- Max Pending # of Customers
+	MaxPend INT,
 	CONSTRAINT PK_Company PRIMARY KEY CLUSTERED (CompID)
-) 
-
+)
 CREATE TABLE Branch
 (
 	BranchID INT IDENTITY(1,1) NOT NULL,
@@ -88,6 +87,7 @@ CREATE TABLE Users
 	[Disabled] BIT DEFAULT 0, -- For CompanyAdmin Use	
 	CONSTRAINT PK_Users PRIMARY KEY CLUSTERED (UserID)
 )
+GO
 CREATE TABLE UserDepts
 (
 	UserID INT,
@@ -816,6 +816,8 @@ JOIN dbo.QueueDetails qd ON qd.QID = q.QID
 JOIN dbo.DeptServices s ON s.ServID = qd.ServID
 WHERE QStatus NOT IN ('Served', 'Cancelled', 'Not-Attended', 'Transferred') 
 GO
+
+
 -------------------------------------------------------------------------
 -----------View Updated-----------------------
 CREATE VIEW vwDailyTickets 
@@ -847,7 +849,6 @@ JOIN dbo.QueueDetails qd ON qd.QID = q.QID
 JOIN dbo.DeptServices s ON s.ServID = qd.ServID
 GO
 --------------------------------------20-1-2018--------------------------------------------
-
 -------------------------------------------------------------------------
 CREATE VIEW vwAllQueue
 AS

@@ -9,14 +9,16 @@ import { AuthenticationService } from '../../services'
 export class DashboardComponent implements OnInit {
 
   curUser = this.auth.getUser()
+  custData = [{ head: 'Current Active Tickets', count: 3 }, { head: 'Total Tickets in Last 30 Days', count: 26 },
+  { head: 'Monthly Visit Rate', count: 6 }]
 
   constructor(private auth: AuthenticationService) { }
 
   ngOnInit() {
     if (this.curUser) {
-      if (this.curUser.etyp = 0) {
+      if (this.curUser.etyp = 0) { //sysAdmin
 
-      } else if (this.curUser.etyp = 1) {
+      } else if (this.curUser.etyp = 1) { //Provider
         switch (this.curUser.uRl) {
           case 1: //CompADMIN
             break;
@@ -27,7 +29,7 @@ export class DashboardComponent implements OnInit {
           default:
             break;
         }
-      } else if (this.curUser.etyp = 2) {
+      } else if (this.curUser.etyp = 2) { //Customer
         switch (this.curUser.uRl) {
           case 1: //CompADMIN
             break;
