@@ -254,7 +254,7 @@ router.post("/IssueNew", function (req, res, next) {
 })
 router.put("/CancelTicket/:id", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
-  let b = req.body;
+  let b = req.body.tkt;
   let request = new sql.Request(sqlcon);
   request.input('QID', req.params.id)
   request
@@ -262,7 +262,7 @@ router.put("/CancelTicket/:id", function (req, res, next) {
     .then(function (ret) {
       firebase
         .database()
-        .ref("MainQueue/" + b.branch + '/' + req.params.id)
+        .ref("MainQueue/" + b.BranchID + '/' + req.params.id)
         .update({
           QStatus: 'Cancelled'
         })

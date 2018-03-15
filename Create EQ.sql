@@ -774,24 +774,31 @@ IF @TransBefore = 0
 		SELECT IDENT_CURRENT('MainQueue')AS QID;
 GO
 -----------------------------------------------------
-CREATE	 PROC EndDay
+ALTER PROC EndDay
 AS
 UPDATE dbo.MainQueue SET QStatus = 'Not-Attended' WHERE VisitDate < CAST(GETDATE() AS DATE) AND QStatus IN ('Waiting', 'Pending')
 UPDATE dbo.MainQueue SET QStatus = 'Served' WHERE VisitDate < CAST(GETDATE() AS DATE) AND QStatus IN ('Hold')
 
 INSERT dbo.ArchiveMainQueue
         ( QID, UserID, BranchID, DeptID, QLetter, QNumber, ServiceNo, RequestDate, VisitDate, VisitTime, StartServeDT, QStatus,
-			EndServeDT, ServingTime, QCurrent, QCall, QTransfer, NQTransferredFrom, NQTransferredBy, TransferedFrom, UniqueNo, 
+			EndServeDT, ServingTime, QCurrent, QTransfer, NQTransferredFrom, NQTransferredBy, TransferedFrom, UniqueNo, 
 			ProvUserID, CallTime, OQTransferred, OQTransferredBy, OQTransferredTo, OQTransferDT )
 SELECT QID, UserID, BranchID, DeptID, QLetter, QNumber, ServiceNo, RequestDate, VisitDate, VisitTime, StartServeDT, QStatus,
-		EndServeDT, ServingTime, QCurrent, QCall, QTransfer, NQTransferredFrom, NQTransferredBy, TransferedFrom, UniqueNo, 
+		EndServeDT, ServingTime, QCurrent, QTransfer, NQTransferredFrom, NQTransferredBy, TransferedFrom, UniqueNo, 
 		ProvUserID, CallTime, OQTransferred, OQTransferredBy, OQTransferredTo, OQTransferDT
 FROM dbo.MainQueue WHERE VisitDate < CAST(GETDATE() AS DATE) 
 --------------------
 INSERT dbo.ArchiveQueueDetails ( QID, DeptID, ServID, ServCount, Notes ) 
 SELECT QID, DeptID, ServID, ServCount, Notes  FROM dbo.QueueDetails 
 WHERE QID IN (SELECT QID FROM dbo.MainQueue WHERE VisitDate < CAST(GETDATE() AS DATE))
+
+INSERT dbo.ArchiveQueueHoldDetails
+        ( QID, StartTime, EndTime )
+SELECT QID, StartTime, EndTime  FROM dbo.QueueHoldDetails
+WHERE QID IN (SELECT QID FROM dbo.MainQueue WHERE VisitDate < CAST(GETDATE() AS DATE))
+
 --------------------
+DELETE dbo.QueueHoldDetails WHERE QID IN (SELECT QID FROM dbo.MainQueue WHERE VisitDate < CAST(GETDATE() AS DATE))
 DELETE dbo.QueueDetails WHERE QID IN (SELECT QID FROM dbo.MainQueue WHERE VisitDate < CAST(GETDATE() AS DATE))
 DELETE dbo.MainQueue WHERE VisitDate < CAST(GETDATE() AS DATE) 
 GO
