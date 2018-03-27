@@ -35,13 +35,13 @@
               <button [class.active]="sTab=='All'" class="w-25 btn py-0 btn-outline-danger" (click)="changeList(0)">Waiting
                 <span *ngIf="all && all >0 " class="badge badge-pink white">{{all}} </span>
               </button>
-              <button [disabled]="hold <= 0" [class.active]="sTab=='Hold'" class="w-25 btn py-0 btn-outline-primary" (click)="changeList(1)">Hold
+              <button [class.active]="sTab=='Hold'" class="w-25 btn py-0 btn-outline-primary" (click)="changeList(1)">Hold
                 <span *ngIf="hold && hold>0 " class="badge badge-pill badge-danger">{{hold}} </span>
               </button>
-              <button [disabled]="trans <= 0" [class.active]="sTab=='Transferred'" class="w-25 btn py-0 btn-outline-danger" (click)="changeList(2)">Trans
+              <button [class.active]="sTab=='Transferred'" class="w-25 btn py-0 btn-outline-danger" (click)="changeList(2)">Trans
                 <span *ngIf="trans && trans >0" class="badge badge-pill badge-danger">{{trans}} </span>
               </button>
-              <button [disabled]="vip <= 0" [class.active]="sTab=='Vip'" class="w-25  btn py-0 btn-outline-info" (click)="changeList(3)">VIP
+              <button [class.active]="sTab=='Vip'" class="w-25  btn py-0 btn-outline-info" (click)="changeList(3)">VIP
                 <span *ngIf="vip && vip >0" class="badge badge-pill badge-danger">{{vip}} </span>
               </button>
             </div>
@@ -96,6 +96,9 @@
         </div>
         <div class="mr-5">
           <div class="btn-group btn-group-justified  btn-group-raised btn-round">
+            <button [disabled]="!sTk" 
+            class="btn btn-success btn-round "              
+            (click)="callQ()">Call Q</button>
             <button [disabled]="!start" 
               class="btn btn-lg btn-round " 
               [class.btn-dark]="!start" 

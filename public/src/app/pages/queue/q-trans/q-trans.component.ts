@@ -3,7 +3,6 @@ import { FormGroup, FormControl, Validators, FormBuilder, FormArray } from '@ang
 import { DepartmentService, DeptServsService, AuthenticationService, TicketService } from 'app/services';
 import swal from 'sweetalert2';
 import { Ticket } from 'app/Models';
-import { AudioService } from 'app/services/audio.service';
 
 @Component({
   selector: 'q-trans',
@@ -21,16 +20,11 @@ export class QTransComponent implements OnInit {
   form;
   constructor(private srvDept: DepartmentService, private srvServcs: DeptServsService,
     private authSrv: AuthenticationService, private srvTkts: TicketService,
-     private fb: FormBuilder , private audSrv : AudioService) { }
+     private fb: FormBuilder) { }
 
   ngOnInit() {
     this.srvDept.getBranchDepts(this.BranchID)
-      .subscribe(res => {
-        this.audSrv.getAudId('1.wav')
-        .subscribe(res=>{         
-          console.log(res.url) 
-          this.playAudio(res.url);
-        })
+      .subscribe(res => {        
         this.Depts = res;
         this.ticket.DeptID = null;
         console.log(this.ticket)
@@ -38,15 +32,6 @@ export class QTransComponent implements OnInit {
 
     this.createForm();
   }
-
-  playAudio(path){
-    let audio = new Audio();
-    audio.crossOrigin  ='anonymous';    
-    audio.src = path;    
-    audio.load();
-    audio.play();    
-    }
-  
     createForm() {
     this.form = this.fb.group({
       DeptID: ['', Validators.required],

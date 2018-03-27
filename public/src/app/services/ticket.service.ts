@@ -49,8 +49,11 @@ export class TicketService {
     }
     transferTicket(ticket: Ticket) {
         return this.http.put(this.url + 'transferTicket/', ticket, this.options).map(res => res.json());
-    }    
+    }
     checkTransQ(id: number) {
         return this.http.get(this.url + 'CheckTransQ/' + id, this.options).map(res => res.json());
+    }
+    updateQCount(tkt: Ticket) {
+        return this.http.put(this.url + 'updateQCount/',tkt, this.options).map(res => res.json());
     }
 }

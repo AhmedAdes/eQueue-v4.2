@@ -68,7 +68,7 @@ export class MainQueueComponent implements OnInit {
       }
       this.all = data.filter(x => x['DeptID'] == deptID && (x.QStatus == 'Waiting' || x.QStatus == 'Pending' || x.QStatus == 'Current')).length;
       this.hold = data.filter(x => x['DeptID'] == deptID && x['QStatus'] == 'Hold' && x.ProvUserID == this.currentUser.uID).length;
-      this.trans = data.filter(x => x['DeptID'] == deptID && x['QStatus'] == 'Transferred').length;
+      this.trans = data.filter(x => x['DeptID'] == deptID && (x['QStatus'] == 'Transferred' || x['QStatus'] == 'Current')).length;
       this.vip = data.filter(x => x['DeptID'] == deptID && x['UserID'] == '1').length;
 
     })
@@ -120,6 +120,8 @@ export class MainQueueComponent implements OnInit {
           if (this.sTk) {
             this.sTk.ProvUserID = this.currentUser.uID;
             this.sTk.QStatus = 'Current';
+            this.sTk.ProvWindow = this.currentUser.uWD;
+            this.sTk.CallCount = 1;
             this.sTk.QCurrent = true;
             this.sTk.Qtask = action;
             if (this.getLastCurQ()) this.sTk.lastCurQ = this.getLastCurQ().QID;// Get Last Current Q tt Not Served if any
@@ -135,6 +137,7 @@ export class MainQueueComponent implements OnInit {
           if (this.sTk) {
             this.sTk.ProvUserID = this.currentUser.uID;
             this.sTk.QStatus = 'Current';
+            this.sTk.ProvWindow = this.currentUser.uWD;
             this.sTk.QCurrent = true;
             this.sTk.Qtask = action;
             if (this.getLastCurQ()) this.sTk.lastCurQ = this.getLastCurQ().QID;// Get Last Current Q tt Not Served if any            
@@ -151,6 +154,7 @@ export class MainQueueComponent implements OnInit {
             this.startTimer = true;
             this.sTk.ProvUserID = this.currentUser.uID;
             this.sTk.QStatus = 'Current';
+            this.sTk.ProvWindow = this.currentUser.uWD;
             this.sTk.QCurrent = true;
             this.sTk.Qtask = 'START';
             this.start = true;
@@ -241,6 +245,10 @@ export class MainQueueComponent implements OnInit {
         this.sTk.FirstPendQ = this.sTkts[pend].QID;
       }
     }
+  }
+  callQ() {
+    this.sTk.CallCount += 1;
+    this.srvTkts.updateQCount(this.sTk).subscribe();
   }
   onQSelect(ticket) {
     if (!this.start)

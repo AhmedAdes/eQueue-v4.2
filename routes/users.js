@@ -4,6 +4,22 @@ var sql = require("mssql");
 var jwt = require("jsonwebtoken");
 var sqlcon = sql.globalPool;
 
+router.get("/compAdm/:id", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+
+  var request = new sql.Request(sqlcon);
+  request
+    .query(`SELECT UserRole, ISNULL(CompID, 0) CompID FROM dbo.Users Where UserID=${req.params.id}`)
+    .then(function(ret) {
+      res.json(ret.recordset);
+    })
+    .catch(function (err) {
+      if (err) {
+        res.json({ error: err });
+        console.log(err);
+      }
+    });
+});
 router.use(function (req, res, next) {
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers["authorization"];
@@ -63,22 +79,6 @@ router.get("/compUsers/:id", function (req, res, next) {
   request
     .query("SELECT * FROM dbo.Users Where UserID=" + req.params.id)
     .then(function (ret) {
-      res.json(ret.recordset);
-    })
-    .catch(function (err) {
-      if (err) {
-        res.json({ error: err });
-        console.log(err);
-      }
-    });
-});
-router.get("/compAdm/:id", function (req, res, next) {
-  res.setHeader("Content-Type", "application/json");
-
-  var request = new sql.Request(sqlcon);
-  request
-    .query(`SELECT UserRole, ISNULL(CompID, 0) CompID FROM dbo.Users Where UserID=${req.params.id}`)
-    .then(function(ret) {
       res.json(ret.recordset);
     })
     .catch(function (err) {

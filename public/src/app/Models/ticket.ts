@@ -3,7 +3,7 @@ export class Ticket {
     QID: number = 0;
     lastCurQ: number = 0;
     FirstPendQ: number = 0;
-    notAttQ : number;
+    notAttQ: number;
     UserID: number;
     cCompName: string;
     cUserName: string;
@@ -21,8 +21,9 @@ export class Ticket {
     ServingTime: number;
     QStatus: string;
     QCurrent: boolean;
+    CallCount: number;
     QTransfer: boolean;
-    OQTransferred: boolean;    
+    OQTransferred: boolean;
     UniqueNo: string;
     BranchAddress: string;
     EstUserNo: number;
@@ -30,12 +31,13 @@ export class Ticket {
     CompID: number;
     CompName: string;
     ProvUserID: number;
+    ProvWindow: number;
     pUserName: string;
-    NQTransferredFrom:string;
-    NQTransferredBy:string;
-    OQTransferredBy:string;
-    OQTransferredTo:string;
-    OQTransferDT:string;
+    NQTransferredFrom: string;
+    NQTransferredBy: string;
+    OQTransferredBy: string;
+    OQTransferredTo: string;
+    OQTransferDT: string;
     Services: QueueService[] = [];
     Qtask: string; // Passing the required task ( NEXT , START , HOLD , TRANSFERE , ETC..) 
 }

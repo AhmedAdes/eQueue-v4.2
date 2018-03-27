@@ -88,8 +88,6 @@ CREATE TABLE Users
 	CONSTRAINT PK_Users PRIMARY KEY CLUSTERED (UserID)
 )
 GO
-ALTER TABLE dbo.Users Alter Column Title nvarchar(50) 
-GO
 CREATE TABLE UserDepts
 (
 	UserID INT,
@@ -115,8 +113,9 @@ CREATE TABLE MainQueue
 	QCurrent BIT,
 	QCall Bit, -- true for first time to call the ticket then to be false , in case call again to change to true then false
 	QTransfer BIT,  -- to be used for NQTransfer Not for OQTransfer
-	NQTransferedFrom NVARCHAR(50), --  DeptName that Makes the Transfer for this New Q 
-	NQTransferedBy NVARCHAR(100) , -- The User Who Makes The Transfer for this New Q 
+	NQTransferredFrom NVARCHAR(50), --  DeptName that Makes the Transfer for this New Q 
+	NQTransferredBy NVARCHAR(100) , -- The User Who Makes The Transfer for this New Q 
+	TransferedFrom INT, -- The Primary Key for the original Q
 	UniqueNo NVARCHAR(50),
 	ProvUserID INT, --The Employee Served the Customer 
 	EstUserNo INT,
@@ -244,7 +243,7 @@ GO
 
 CREATE PROC RegisterUser
 @CompID INT, @BranchID INT, @UserName NVARCHAR(200), @UserPass NVARCHAR(50), @UserRole NVARCHAR(50), @EntityType TINYINT,
-@ManagerID INT, @Phone NVARCHAR(50),@Mobile NVARCHAR(50),@Email NVARCHAR(200), @Title NVARCHAR(50),@Disabled bit
+@ManagerID INT, @Phone NVARCHAR(50),@Mobile NVARCHAR(50),@Email NVARCHAR(200), @Title NVARCHAR(200),@Disabled bit
 AS
 DECLARE @Salt UNIQUEIDENTIFIER = NEWID()
 INSERT dbo.Users
@@ -358,15 +357,14 @@ AS
 	UPDATE dbo.MainQueue SET VisitTime= @VisitTime, EstUserNo=@UserNO WHERE QID=@QID
 GO
 
-ALter Proc IssueTicket
+Create Proc IssueTicket
 	@CompID int, @DeptID INT, @BranchID INT, @UserID INT, @VisitDate DATE, @QueueDetails tpQueueDetails READONLY
 as
-	DECLARE @ServSerial INT,  @VisTime TIME, @cQID INT
+	DECLARE @ServSerial INT,  @VisTime TIME, @cQID INT 
 	Select @ServSerial= ISNULL(MAX(QNumber), 0) +1 FROM MainQueue Where BranchID=@BranchID and DeptID=@DeptID AND VisitDate = @VisitDate
 	DECLARE @ServLetter nvarchar(5) = (Select Letter From CompDept Where DeptID=@DeptID )
 	DECLARE @TotSrvTime INT = (SELECT SUM(ServCount * s.ServTime) FROM @QueueDetails q JOIN dbo.DeptServices s ON s.ServID = q.ServID)
 	DECLARE @VIP BIT = (SELECT CAST(ISNULL(CompID, 0) AS BIT) FROM dbo.Company WHERE CompID = @UserID)
-	DECLARE @WaitingList INT = (SELECT COUNT(DISTINCT ServiceNo) FROM dbo.vwActiveTickets Where BranchID=@BranchID and DeptID=@DeptID AND VisitDate = @VisitDate)
 
 	INSERT MainQueue 
 			(BranchID, DeptID, VisitDate, VisitTime, UserID, QLetter, QNumber, RequestDate, QStatus, UniqueNo, EstServingTime)
@@ -383,7 +381,7 @@ as
 			( QID, DeptID, ServID, ServCount, Notes )
 	SELECT @cQID, DeptID, ServID, ServCount, Notes FROM @QueueDetails
 
-	Select QID, ServiceNo, UniqueNo, VisitTime, EstUserNo, @WaitingList Waiting, @VIP VIP From MainQueue Where QID = @cQID
+	Select QID, ServiceNo, UniqueNo, VisitTime, EstUserNo, @VIP VIP From MainQueue Where QID = @cQID
 GO
 
 CREATE PROC UserCompanyUpdate
@@ -542,7 +540,7 @@ GO
 CREATE PROC CompUserInsert
 @CompID INT,@BranchID INT,@ManagerID INT NULL,@UserName nvarchar(100),@UserPass nvarchar(100),@UserRole nvarchar(100),
 @EntityType tinyint,@Phone nvarchar(50),@Mobile nvarchar(50),@Email nvarchar(200),
-@Title nvarchar(100),@Disabled bit ,@UserDepts UserDepts READONLY
+@Title nvarchar(200),@Disabled bit ,@UserDepts UserDepts READONLY
 As
 SET Transaction ISOLATION LEVEL READ UNCOMMITTED
 Declare @UserId Int;
@@ -563,7 +561,7 @@ GO
 CREATE PROC CompUserUpdate
 @UserId INT,@CompID INT,@BranchID INT,@ManagerID INT NULL,@UserName nvarchar(100),@UserRole nvarchar(100),
 @Phone nvarchar(50),@Mobile nvarchar(50),@Email nvarchar(200),
-@Title nvarchar(100),@Disabled bit ,@UserDepts UserDepts READONLY
+@Title nvarchar(200),@Disabled bit ,@UserDepts UserDepts READONLY
 As
 SET Transaction ISOLATION LEVEL READ UNCOMMITTED
 Begin

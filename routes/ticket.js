@@ -195,6 +195,20 @@ router.get("/getToday", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   res.json(new Date());
 });
+router.put("/updateQCount", function (req, res, next) {
+  res.setHeader("Content-Type", "application/json");
+  let tkt = req.body;
+  console.log(tkt)
+  firebase
+    .database()
+    .ref("MainQueue/" + tkt.QID)
+    .update({
+      CallCount: tkt.CallCount
+    });
+  res.json({
+    res: 'done'
+  })
+})
 router.post("/IssueNew", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   let det = req.body.tckt
@@ -305,7 +319,9 @@ router.put("/updateTicket/:id", function (req, res, next) {
               .ref("MainQueue/" + ticket.QID)
               .update({
                 QStatus: ticket.QStatus,
-                ProvUserID: ticket.ProvUserID
+                ProvUserID: ticket.ProvUserID,
+                ProvWindow: ticket.ProvWindow,
+                CallCount: ticket.CallCount
               });
             firebase
               .database()
@@ -343,7 +359,6 @@ router.put("/updateTicket/:id", function (req, res, next) {
       res.json(ret.recordset[0]);
     })
 })
-
 router.put("/transferTicket", function (req, res, next) {
   res.setHeader("Content-Type", "application/json");
   let ticket = req.body;
