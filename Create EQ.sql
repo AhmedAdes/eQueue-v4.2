@@ -22,9 +22,9 @@ CREATE TABLE Company
 	WorkField NVARCHAR(100), -- Shipping , FrightForwarding , etc..
 	DefaultLanguage NVARCHAR(20),
 	[Disabled] BIT DEFAULT 0,	-- for ADMIN Use Only
+	MaxPend INT,
 	CONSTRAINT PK_Company PRIMARY KEY CLUSTERED (CompID)
 )
-ALTER TABLE Company ADD MaxPend INT
 CREATE TABLE Branch
 (
 	BranchID INT IDENTITY(1,1) NOT NULL,
@@ -94,6 +94,7 @@ CREATE TABLE UserDepts
 	DeptID INT,
 	CONSTRAINT PK_UserDepts PRIMARY KEY CLUSTERED (UserID, DeptID)
 )
+GO
 CREATE TABLE MainQueue
 (
 	QID INT IDENTITY(1,1) NOT NULL,
@@ -167,10 +168,18 @@ CREATE TABLE ArchiveMainQueue
 	EndServeDT DATETIME2, --only with Served//Not-Served//Not-Attended
 	ServingTime INT, --in seconds Only increment with Hold
 	QCurrent BIT,
-	QTransfer BIT,
+	QCall Bit, -- true for first time to call the ticket then to be false , in case call again to change to true then false
+	QTransfer BIT,  -- to be used for NQTransfer Not for OQTransfer
+	NQTransferredFrom NVARCHAR(50), --  DeptName that Makes the Transfer for this New Q 
+	NQTransferredBy NVARCHAR(100) , -- The User Who Makes The Transfer for this New Q 
 	TransferedFrom INT, -- The Primary Key for the original Q
 	UniqueNo NVARCHAR(50),
 	ProvUserID INT, --The Employee Served the Customer 
+	CallTime DATETIME2,
+	OQTransferred BIT, -- To Know i'ts transferred to other Dept for OLD Q 
+	OQTransferredBy NVARCHAR(100), -- The Name of Employee who make the Trans for OLD Q 
+	OQTransferredTo NVARCHAR(50), -- The Name of Department ,these data for info only no need for ID for OLD Q 
+	OQTransferDT DATETIME2,
 	CONSTRAINT PK_ArchMainQueue PRIMARY KEY CLUSTERED (QID)
 )
 CREATE TABLE ArchiveQueueDetails
@@ -212,7 +221,7 @@ ALTER TABLE dbo.ArchiveQueueDetails ADD CONSTRAINT FK_ArchQueueDetails_DeptServi
 GO
 
 
-ALTER PROC AuthenticateUser
+CREATE PROC AuthenticateUser
 @LoginName NVARCHAR(50), @UserPass NVARCHAR(50) AS
 IF EXISTS (SELECT TOP 1 UserID FROM dbo.Users WHERE Email=@LoginName)
 BEGIN
@@ -302,7 +311,7 @@ CREATE PROC CompanyDelete
 DELETE dbo.Company
 WHERE CompID = @CompId
 GO
-Create Function LPAD(@Num INT, @Replace Char(1), @Length INT)
+CREATE Function LPAD(@Num INT, @Replace Char(1), @Length INT)
 Returns NvarChar(max)
 begin
 	Declare @Out NvarChar(max) = right(replicate(@Replace,@Length)+cast(@Num as varchar(15)),@Length)
@@ -357,7 +366,7 @@ AS
 	UPDATE dbo.MainQueue SET VisitTime= @VisitTime, EstUserNo=@UserNO WHERE QID=@QID
 GO
 
-Create Proc IssueTicket
+CREATE Proc IssueTicket
 	@CompID int, @DeptID INT, @BranchID INT, @UserID INT, @VisitDate DATE, @QueueDetails tpQueueDetails READONLY
 as
 	DECLARE @ServSerial INT,  @VisTime TIME, @cQID INT 
@@ -478,7 +487,7 @@ Select * from dbo.DeptServices Where ServID = @ServID;
 Go
 ---------------------------------------------------------------------
 -- Create Type for BranchDept 
-Create Type dbo.BranchDepts AS Table(
+CREATE Type dbo.BranchDepts AS Table(
 	BranchID INT,
 	DeptID INT
 )
@@ -531,7 +540,7 @@ GO
 
 ---------------------------------------------------------------------
 -- Create Type for UserDept 
-Create Type dbo.UserDepts AS Table(
+CREATE Type dbo.UserDepts AS Table(
 	UserID INT,
 	DeptID INT
 )
@@ -609,7 +618,7 @@ and bd.DeptID = ud.DeptID
 GO
 -----------------------------------------------------
 -------SP Updated----------
-ALTER PROC TicketUpdate
+CREATE PROC TicketUpdate
 @QID INT ,@QStatus NVARCHAR(20),@QCurrent BIT NULL
 ,@QTransfer BIT NULL ,@ProvUserID INT ,@Qtask NVARCHAR(40),@FirstPendQ INT
 AS
@@ -722,7 +731,7 @@ SELECT @QID ;
 GO
 -----------------------------------------------------
 ---------------Transfer -----------------------------
-ALTER PROC QTransfer 
+CREATE PROC QTransfer 
 @QID INT ,@DeptID INT ,@NQTransferredFrom NVARCHAR(50),@NQTransferredBy NVARCHAR(100),
 @OQTransferredBy NVARCHAR(100) ,@OQTransferredTo NVARCHAR(50),
 @QueueDetails tpQueueDetails READONLY
@@ -764,22 +773,31 @@ IF @TransBefore = 0
 		SELECT IDENT_CURRENT('MainQueue')AS QID;
 GO
 -----------------------------------------------------
-CREATE	 PROC EndDay
+ALTER PROC EndDay
 AS
 UPDATE dbo.MainQueue SET QStatus = 'Not-Attended' WHERE VisitDate < CAST(GETDATE() AS DATE) AND QStatus IN ('Waiting', 'Pending')
 UPDATE dbo.MainQueue SET QStatus = 'Served' WHERE VisitDate < CAST(GETDATE() AS DATE) AND QStatus IN ('Hold')
 
 INSERT dbo.ArchiveMainQueue
-        ( QID, UserID ,BranchID ,DeptID ,QLetter ,QNumber ,ServiceNo ,RequestDate ,VisitDate ,VisitTime ,StartServeDT ,
-			QStatus ,EndServeDT ,ServingTime ,QCurrent ,QTransfer ,TransferedFrom ,UniqueNo ,ProvUserID )
-SELECT QID, UserID ,BranchID ,DeptID ,QLetter ,QNumber ,ServiceNo ,RequestDate ,VisitDate ,VisitTime ,StartServeDT ,
-			QStatus ,EndServeDT ,ServingTime ,QCurrent ,QTransfer ,TransferedFrom ,UniqueNo ,ProvUserID
+        ( QID, UserID, BranchID, DeptID, QLetter, QNumber, ServiceNo, RequestDate, VisitDate, VisitTime, StartServeDT, QStatus,
+			EndServeDT, ServingTime, QCurrent, QTransfer, NQTransferredFrom, NQTransferredBy, TransferedFrom, UniqueNo, 
+			ProvUserID, CallTime, OQTransferred, OQTransferredBy, OQTransferredTo, OQTransferDT )
+SELECT QID, UserID, BranchID, DeptID, QLetter, QNumber, ServiceNo, RequestDate, VisitDate, VisitTime, StartServeDT, QStatus,
+		EndServeDT, ServingTime, QCurrent, QTransfer, NQTransferredFrom, NQTransferredBy, TransferedFrom, UniqueNo, 
+		ProvUserID, CallTime, OQTransferred, OQTransferredBy, OQTransferredTo, OQTransferDT
 FROM dbo.MainQueue WHERE VisitDate < CAST(GETDATE() AS DATE) 
 --------------------
 INSERT dbo.ArchiveQueueDetails ( QID, DeptID, ServID, ServCount, Notes ) 
 SELECT QID, DeptID, ServID, ServCount, Notes  FROM dbo.QueueDetails 
 WHERE QID IN (SELECT QID FROM dbo.MainQueue WHERE VisitDate < CAST(GETDATE() AS DATE))
+
+INSERT dbo.ArchiveQueueHoldDetails
+        ( QID, StartTime, EndTime )
+SELECT QID, StartTime, EndTime  FROM dbo.QueueHoldDetails
+WHERE QID IN (SELECT QID FROM dbo.MainQueue WHERE VisitDate < CAST(GETDATE() AS DATE))
+
 --------------------
+DELETE dbo.QueueHoldDetails WHERE QID IN (SELECT QID FROM dbo.MainQueue WHERE VisitDate < CAST(GETDATE() AS DATE))
 DELETE dbo.QueueDetails WHERE QID IN (SELECT QID FROM dbo.MainQueue WHERE VisitDate < CAST(GETDATE() AS DATE))
 DELETE dbo.MainQueue WHERE VisitDate < CAST(GETDATE() AS DATE) 
 GO
@@ -805,20 +823,10 @@ JOIN dbo.DeptServices s ON s.ServID = qd.ServID
 WHERE QStatus NOT IN ('Served', 'Cancelled', 'Not-Attended', 'Transferred') 
 GO
 
-CREATE VIEW vwAllQueue
-AS
-SELECT QID, UserID, BranchID, DeptID, ServiceNo, RequestDate, VisitDate, VisitTime, StartServeDT, EndServeDT, 
-	QStatus, ServingTime, QCurrent, QTransfer, TransferedFrom, UniqueNo, ProvUserID 
-FROM dbo.MainQueue
-UNION ALL
-SELECT QID, UserID, BranchID, DeptID, ServiceNo, RequestDate, VisitDate, VisitTime, StartServeDT, EndServeDT, 
-	QStatus, ServingTime, QCurrent, QTransfer, TransferedFrom, UniqueNo, ProvUserID 
-FROM dbo.ArchiveMainQueue
-GO
 
 -------------------------------------------------------------------------
 -----------View Updated-----------------------
-ALTER VIEW vwDailyTickets 
+CREATE VIEW vwDailyTickets 
 AS
 SELECT QID ,q.UserID , cu.CompName as cCompName, u.UserName as cUserName,q.BranchID, b.BranchName ,q.DeptID, d.DeptName ,QLetter ,QNumber ,ServiceNo ,RequestDate ,VisitDate ,VisitTime 
 ,StartServeDT,EndServeDT,ServingTime,QStatus ,QCurrent ,QTransfer ,UniqueNo , b.BranchAddress ,EstUserNo ,EstServingTime ,c.CompID, c.CompName ,q.ProvUserID,p.UserName as pUserName
@@ -847,27 +855,6 @@ JOIN dbo.QueueDetails qd ON qd.QID = q.QID
 JOIN dbo.DeptServices s ON s.ServID = qd.ServID
 GO
 --------------------------------------20-1-2018--------------------------------------------
-
--------------------------------------------------------------------------
-ALTER VIEW vwActiveTickets 
-AS
-SELECT QID ,q.UserID, u.UserName ,q.BranchID, b.BranchName ,q.DeptID, d.DeptName ,QLetter ,QNumber ,ServiceNo ,RequestDate ,VisitDate ,VisitTime ,
-       QStatus ,QCurrent ,QTransfer ,UniqueNo , b.BranchAddress ,EstUserNo ,EstServingTime ,c.CompID, c.CompName
-FROM MainQueue q 
-JOIN dbo.Users u ON u.UserID = q.UserID
-JOIN dbo.CompDept d ON d.DeptID = q.DeptID
-JOIN dbo.Branch b ON b.BranchID = q.BranchID
-JOIN dbo.Company c ON c.CompID = b.CompID
-WHERE QStatus NOT IN ('Served', 'Cancelled', 'Not-Attended', 'Transferred') 
-GO
-
-ALTER VIEW vwActiveTicketsServices
-AS
-SELECT q.QID, q.UserID, qd.ServID, s.ServName, qd.ServCount, qd.Notes 
-FROM MainQueue q 
-JOIN dbo.QueueDetails qd ON qd.QID = q.QID
-JOIN dbo.DeptServices s ON s.ServID = qd.ServID
-GO
 -------------------------------------------------------------------------
 CREATE VIEW vwAllQueue
 AS
@@ -897,7 +884,7 @@ CREATE PROC SearchUserTickets
 @UserID INT, @CompID INT, @BranchID INT, @DeptID INT, @ServID INT, @VisitDate DATE
 AS
 DECLARE @str NVARCHAR(max)= 
-	'SELECT QID ,q.UserID, u.UserName ,q.BranchID, b.BranchName ,q.DeptID, d.DeptName ,ServiceNo ,RequestDate ,VisitDate ,VisitTime ,
+	'SELECT q.QID ,q.UserID, u.UserName ,q.BranchID, b.BranchName ,q.DeptID, d.DeptName ,ServiceNo ,RequestDate ,VisitDate ,VisitTime ,
 		   QStatus ,QCurrent ,QTransfer ,UniqueNo , b.BranchAddress ,c.CompID, c.CompName
 	FROM dbo.vwAllQueue q 
 	LEFT JOIN dbo.vwAllQueueDetails qd ON qd.QID = q.QID

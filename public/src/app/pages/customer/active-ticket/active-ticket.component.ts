@@ -18,7 +18,10 @@ export class ActiveTicketComponent implements OnInit {
     this.srvTkt.getActiveTickets(this.currentUser.uID).subscribe(cols => {
       this.tickets = cols;
       if (this.tickets) {
-        this.tickets.forEach(t => t['visTimeChngd'] = hf.changeToServerTime(t.VisitTime))
+        this.tickets.forEach(t => {
+          t['reqDateChngd'] = hf.changeToServerTime(t.RequestDate)
+          t['visTimeChngd'] = hf.changeToServerTime(t.VisitTime)
+        })
       }
     }, err => hf.handleError(err))
   }

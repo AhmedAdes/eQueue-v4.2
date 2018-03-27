@@ -1,3 +1,46 @@
-<p>
-  dashboard works!
-</p>
+<!-- Customer Dashboard -->
+<div>
+  <div class="jumbotron">
+    <h2>Book New Ticket</h2>
+    <p>Start using the app for your benefits and book a new ticket now</p>
+    <a class="btn btn-raised btn-lg btn-primary" [routerLink]="['/home/customer/issue']">Issue Ticket...</a>
+  </div>
+  <div matchHeight="card" class="row">
+    <div class="col">
+      <div class="card bg-secondary text-center">
+        <div class="card-body">
+          <div class="card-title">
+            <h4>Current Active Tickets</h4>
+          </div>
+          <div class="font-large-2">3</div>
+          <a class="btn btn-raised btn-lg btn-primary" [routerLink]="['/home/customer/actv']">Active Tickets</a>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card bg-info text-center">
+        <div class="card-body">
+          <div class="card-title">
+            <h4>Total Tickets in Last 30 Days</h4>
+          </div>
+          <div class="font-large-2">26</div>
+          <a class="btn btn-raised btn-lg btn-primary" [routerLink]="['/home/customer/hstry']">View History</a>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card bg-success text-center">
+        <div class="card-body">
+          <div class="card-title">
+            <h4>Monthly Visit Rate</h4>
+          </div>
+          <div class="align-middle">
+            <span class="font-large-2">0.9</span>
+            <span class="font-weight-bold">per Day</span>
+          </div>
+          <a href="" class="btn btn-raised btn-lg btn-primary">Reports</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
