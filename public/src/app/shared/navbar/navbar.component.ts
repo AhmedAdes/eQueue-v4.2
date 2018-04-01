@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthenticationService } from '../../services'
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-navbar',
@@ -9,9 +8,19 @@ import { AuthenticationService } from '../../services'
 })
 
 export class NavbarComponent {
-  constructor(public auth: AuthenticationService, public router: Router) { }
-  DoLogout() {
-    this.auth.logout()
-    this.router.navigate(['/out/login'])
+
+  currentLang = 'en';
+  toggleClass = 'ft-maximize';
+  constructor(public translate: TranslateService) {
+    const browserLang: string = translate.getBrowserLang();
+    translate.setDefaultLang(this.currentLang)
+    translate.use(browserLang.match(/en|es|pt|de/) ? browserLang : 'en');
+    translate.getTranslation(browserLang).subscribe();
   }
+
+  ChangeLanguage(language: string) {
+    this.translate.use(language);
+    this.translate.getTranslation(language).subscribe();
+  }
+
 }

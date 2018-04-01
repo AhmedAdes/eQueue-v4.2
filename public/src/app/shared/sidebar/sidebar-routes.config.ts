@@ -9,10 +9,10 @@ export const ROUTES: RouteInfo[] = [
         path: '/home/dashboard', title: 'Dashboard', icon: 'ft-layout', class: '',
         badge: '', badgeClass: '', isExternalLink: false, submenu: []
     },
-    {
-        path: '/home/users', title: 'Users', icon: 'ft-square', class: '',
-        badge: '', badgeClass: '', isExternalLink: false, submenu: []
-    },
+    // {
+    //     path: '/home/users', title: 'Users', icon: 'ft-square', class: '',
+    //     badge: '', badgeClass: '', isExternalLink: false, submenu: []
+    // },
     {
         path: '', title: 'Company Structure', icon: 'ft-codepen', class: 'has-sub', badge: '', badgeClass: '', isExternalLink: false,
         submenu: [
@@ -53,7 +53,7 @@ export const ROUTES: RouteInfo[] = [
     }
     ,
     {
-        path: '/out/mdisplay', title: 'Main Display', icon: 'ft-codepen', class: '', 
+        path: '/out/mdisplay', title: 'Main Display', icon: 'ft-codepen', class: '',
         badge: '', badgeClass: '', isExternalLink: false,submenu: []
     }
     ,
