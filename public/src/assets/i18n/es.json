@@ -1,22 +1,22 @@
 {
   "Dashboard": "Tablero",
 
-  "Company Structure": "Company Structure",
-    "Company": "Company",
-    "Departments": "Departments",
-    "Branches": "Branches",
-    "Users": "Users",
+  "Company Structure": "Estructura de la empresa",
+    "Company": "Empresa",
+    "Departments": "Departamentos",
+    "Branches": "Sucursales",
+    "Users": "Usuarios",
 
-  "Queue": "Queue",
-    "Main Queue": "Main Queue",
-    "Queue History": "Queue History",
-    "Queue Schedule": "Queue Schedule",
+  "Queue": "Cola",
+    "Main Queue": "Cola principal",
+    "Queue History": "Historial de cola",
+    "Queue Schedule": "Horario de cola",
 
-  "Main Display": "Main Display",
+  "Main Display": "Pantalla Principal",
 
-  "Issue new Ticket": "Issue new Ticket",
-  "Active Tickets": "Active Tickets",
-  "Tickets History": "Tickets History",
+  "Issue new Ticket": "Emitir nuevo Boleto",
+  "Active Tickets": "Boletos Activos",
+  "Tickets History": "Historia de los Boletos",
 
   "ChangeLog": "ChangeLog",
   "Login": "Iniciar sesión",

@@ -12,15 +12,13 @@ export class NavbarComponent {
   currentLang = 'en';
   toggleClass = 'ft-maximize';
   constructor(public translate: TranslateService) {
-    const browserLang: string = translate.getBrowserLang();
     translate.setDefaultLang(this.currentLang)
+    const browserLang: string = translate.getBrowserLang();
     translate.use(browserLang.match(/en|es|pt|de/) ? browserLang : 'en');
-    translate.getTranslation(browserLang).subscribe();
   }
 
   ChangeLanguage(language: string) {
     this.translate.use(language);
-    this.translate.getTranslation(language).subscribe();
   }
 
 }
