@@ -16,6 +16,7 @@
 *.launch
 .settings/
 *.pem
+*.exe
 
 # IDE - VSCode
 .vscode/*
